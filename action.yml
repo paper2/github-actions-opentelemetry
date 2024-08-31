@@ -1,23 +1,16 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'github-actions-opentelemetry'
+description: 'A GitHub Action that sends telemetry data by OpenTelemetry'
+author: '35333687+paper2@users.noreply.github.com'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
   icon: 'heart'
   color: 'red'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
-    required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+  github-token:
+    description: 'GitHub token for client authentication'
+    default: ${{ github.token }}
+    required: false
 
 runs:
   using: node20
