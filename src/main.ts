@@ -5,7 +5,7 @@ import {
   fetchWorkflowRun,
   fetchWorkflowRunJobs
 } from './github.js'
-import { createGuage } from './instrumentation/metrics/index.js'
+import { createGuage, shutdown } from './metrics/index.js'
 
 type RunContext = {
   ghContext: typeof github.context
@@ -58,8 +58,7 @@ async function exportMetrics(context: RunContext): Promise<void> {
       createGuage('job_duration', calcDifferenceSecond(started_at, created_at), { job_id: job.id })
     }
 
-    // sleep
-    await new Promise(resolve => setTimeout(resolve, 10000))
+    await shutdown()
 
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
