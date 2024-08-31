@@ -68940,9 +68940,20 @@ async function exportMetrics(context) {
         const workflowRun = await fetchWorkflowRun(context.octokit, context.ghContext.repo.owner, context.ghContext.repo.repo, context.ghContext.runId);
         const workflowJobs = await fetchWorkflowRunJobs(context.octokit, context.ghContext.repo.owner, context.ghContext.repo.repo, context.ghContext.runId);
         for (const job of workflowJobs) {
+            if (!job.completed_at) {
+                continue;
+            }
             const created_at = new Date(job.created_at);
             const started_at = new Date(job.started_at);
-            createGuage('job_duration', calcDifferenceSecond(started_at, created_at), { job_id: job.id });
+            const completed_at = new Date(job.completed_at);
+            const jobMetricsAttributes = {
+                id: job.id,
+                name: job.name,
+                run_id: job.run_id,
+                workflow_name: job.workflow_name || ''
+            };
+            createGuage('job_queued_duration', calcDifferenceSecond(started_at, created_at), jobMetricsAttributes);
+            createGuage('job_duration', calcDifferenceSecond(completed_at, started_at), jobMetricsAttributes);
         }
         await shutdown();
     }

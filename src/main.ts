@@ -5,7 +5,7 @@ import {
   fetchWorkflowRun,
   fetchWorkflowRunJobs
 } from './github.js'
-import { createGuage, shutdown } from './metrics/index.js'
+import { createGuage, shutdown, JobMetricsAttributes } from './metrics/index.js'
 
 type RunContext = {
   ghContext: typeof github.context
@@ -51,13 +51,29 @@ async function exportMetrics(context: RunContext): Promise<void> {
     )
 
     for (const job of workflowJobs) {
+      if (!job.completed_at) {
+        continue
+      }
+
       const created_at = new Date(job.created_at)
       const started_at = new Date(job.started_at)
+      const completed_at = new Date(job.completed_at)
+      const jobMetricsAttributes: JobMetricsAttributes = {
+        id: job.id,
+        name: job.name,
+        run_id: job.run_id,
+        workflow_name: job.workflow_name || ''
+      }
 
       createGuage(
-        'job_duration',
+        'job_queued_duration',
         calcDifferenceSecond(started_at, created_at),
-        { job_id: job.id }
+        jobMetricsAttributes
+      )
+      createGuage(
+        'job_duration',
+        calcDifferenceSecond(completed_at, started_at),
+        jobMetricsAttributes
       )
     }
 
