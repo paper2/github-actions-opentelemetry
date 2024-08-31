@@ -3,15 +3,12 @@ import * as core from '@actions/core'
 import {
   createOctokit,
   fetchWorkflowRun,
-  fetchWorkflowRunJobs
+  fetchWorkflowRunJobs,
+  WorkflowJobs,
+  WorkFlowContext,
+  WorkflowRun
 } from './github.js'
 import { createGuage, shutdown, JobMetricsAttributes } from './metrics/index.js'
-
-type RunContext = {
-  ghContext: typeof github.context
-  token: string
-  octokit: ReturnType<typeof createOctokit>
-}
 
 /**
  * The main function for the action.
@@ -21,65 +18,75 @@ export async function run(): Promise<void> {
   const ghContext = github.context
   const token = core.getInput('github-token')
   const octokit = createOctokit(token)
-  const RunContext = { ghContext, token, octokit }
+  const workflowContext: WorkFlowContext = {
+    owner: ghContext.repo.owner,
+    repo: ghContext.repo.repo,
+    runId: ghContext.runId
+  }
 
   try {
-    await exportMetrics(RunContext)
-    core.debug('Metrics exported successfully.')
+    const workflowRun = await fetchWorkflowRun(octokit, workflowContext)
+    const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowContext)
+    createJobGuages(workflowJobs)
+    await shutdown()
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
-async function exportMetrics(context: RunContext): Promise<void> {
-  try {
-    // for test
-    // export GITHUB_REPOSITORY=paper2/github-actions-opentelemetry
-    // export GITHUB_RUN_ID=10640837411
+// const createWorkflowGuages = (workflow: WorkflowRun) => {
+//   if (!workflow) {
+//     core.warning('Workflow is not completed yet.')
+//     return
+//   }
+//   const created_at = new Date(workflow.created_at)
+//   const completed_at = new Date(workflow.completed_at)
+//   const workflowMetricsAttributes: JobMetricsAttributes = {
+//     id: workflow.id,
+//     name: workflow.name,
+//     run_id: workflow.run_number,
+//     workflow_name: workflow.name
+//   }
 
-    const workflowRun = await fetchWorkflowRun(
-      context.octokit,
-      context.ghContext.repo.owner,
-      context.ghContext.repo.repo,
-      context.ghContext.runId
-    )
-    const workflowJobs = await fetchWorkflowRunJobs(
-      context.octokit,
-      context.ghContext.repo.owner,
-      context.ghContext.repo.repo,
-      context.ghContext.runId
-    )
+//   createGuage(
+//     'workflow_queued_duration',
+//     calcDifferenceSecond(updated_at, created_at),
+//     workflowMetricsAttributes
+//   )
+//   createGuage(
+//     'workflow_duration',
+//     calcDifferenceSecond(completed_at, updated_at),
+//     workflowMetricsAttributes
+//   )
+// }
 
-    for (const job of workflowJobs) {
-      if (!job.completed_at) {
-        continue
-      }
-
-      const created_at = new Date(job.created_at)
-      const started_at = new Date(job.started_at)
-      const completed_at = new Date(job.completed_at)
-      const jobMetricsAttributes: JobMetricsAttributes = {
-        id: job.id,
-        name: job.name,
-        run_id: job.run_id,
-        workflow_name: job.workflow_name || ''
-      }
-
-      createGuage(
-        'job_queued_duration',
-        calcDifferenceSecond(started_at, created_at),
-        jobMetricsAttributes
-      )
-      createGuage(
-        'job_duration',
-        calcDifferenceSecond(completed_at, started_at),
-        jobMetricsAttributes
-      )
+const createJobGuages = (workflowJobs: WorkflowJobs) => {
+  for (const job of workflowJobs) {
+    if (!job.completed_at) {
+      core.warning(`Job ${job.id} is not completed yet.`)
+      continue
     }
 
-    await shutdown()
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    const created_at = new Date(job.created_at)
+    const started_at = new Date(job.started_at)
+    const completed_at = new Date(job.completed_at)
+    const jobMetricsAttributes: JobMetricsAttributes = {
+      id: job.id,
+      name: job.name,
+      run_id: job.run_id,
+      workflow_name: job.workflow_name || ''
+    }
+
+    createGuage(
+      'job_queued_duration',
+      calcDifferenceSecond(started_at, created_at),
+      jobMetricsAttributes
+    )
+    createGuage(
+      'job_duration',
+      calcDifferenceSecond(completed_at, started_at),
+      jobMetricsAttributes
+    )
   }
 }
 

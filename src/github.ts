@@ -6,6 +6,12 @@ export type WorkflowRun =
 export type WorkflowJobs =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
+export interface WorkFlowContext {
+  owner: string,
+  repo: string,
+  runId: number
+}
+
 export const createOctokit = (token: string): Octokit => {
   return new Octokit({
     auth: token
@@ -14,28 +20,24 @@ export const createOctokit = (token: string): Octokit => {
 
 export const fetchWorkflowRun = async (
   octokit: Octokit,
-  owner: string,
-  repo: string,
-  runId: number
+  workflowContext: WorkFlowContext
 ): Promise<WorkflowRun> => {
   const workflow = await octokit.rest.actions.getWorkflowRun({
-    owner,
-    repo,
-    run_id: runId
+    owner: workflowContext.owner,
+    repo: workflowContext.repo,
+    run_id: workflowContext.runId
   })
   return workflow.data
 }
 
 export const fetchWorkflowRunJobs = async (
   octokit: Octokit,
-  owner: string,
-  repo: string,
-  runId: number
+  workflowContext: WorkFlowContext
 ): Promise<WorkflowJobs> => {
   const workflowJob = await octokit.rest.actions.listJobsForWorkflowRun({
-    owner,
-    repo,
-    run_id: runId,
+    owner: workflowContext.owner,
+    repo: workflowContext.repo,
+    run_id: workflowContext.runId,
     per_page: 100
   })
   return workflowJob.data.jobs
