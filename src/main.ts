@@ -5,7 +5,7 @@ import {
   fetchWorkflowRun,
   fetchWorkflowRunJobs
 } from './github.js'
-import { setMeterProvider, createGuage, shutdown } from './metrics/index.js'
+import { createGuage } from './instrumentation/metrics/index.js'
 
 type RunContext = {
   ghContext: typeof github.context
@@ -33,7 +33,6 @@ export async function run(): Promise<void> {
 
 async function exportMetrics(context: RunContext): Promise<void> {
   try {
-    setMeterProvider()
 
     // for test
     // export GITHUB_REPOSITORY=paper2/github-actions-opentelemetry  
@@ -59,7 +58,9 @@ async function exportMetrics(context: RunContext): Promise<void> {
       createGuage('job_duration', calcDifferenceSecond(started_at, created_at), { job_id: job.id })
     }
 
-    await shutdown()
+    // sleep
+    await new Promise(resolve => setTimeout(resolve, 10000))
+
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
