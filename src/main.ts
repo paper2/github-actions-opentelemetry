@@ -33,9 +33,8 @@ export async function run(): Promise<void> {
 
 async function exportMetrics(context: RunContext): Promise<void> {
   try {
-
     // for test
-    // export GITHUB_REPOSITORY=paper2/github-actions-opentelemetry  
+    // export GITHUB_REPOSITORY=paper2/github-actions-opentelemetry
     // export GITHUB_RUN_ID=10640837411
 
     const workflowRun = await fetchWorkflowRun(
@@ -55,19 +54,25 @@ async function exportMetrics(context: RunContext): Promise<void> {
       const created_at = new Date(job.created_at)
       const started_at = new Date(job.started_at)
 
-      createGuage('job_duration', calcDifferenceSecond(started_at, created_at), { job_id: job.id })
+      createGuage(
+        'job_duration',
+        calcDifferenceSecond(started_at, created_at),
+        { job_id: job.id }
+      )
     }
 
     await shutdown()
-
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
 // TODO: utilとか作る？
-export const calcDifferenceSecond = (targetDateTime: Date, compareDateTime: Date): number => {
-  let diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
+export const calcDifferenceSecond = (
+  targetDateTime: Date,
+  compareDateTime: Date
+): number => {
+  let diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
 
-  return Math.floor(diffMilliSecond / 1000);
+  return Math.floor(diffMilliSecond / 1000)
 }

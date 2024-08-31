@@ -68862,34 +68862,6 @@ const fetchWorkflowRunJobs = async (octokit, owner, repo, runId) => {
 
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
 var src = __nccwpck_require__(5163);
-// EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-metrics-otlp-proto/build/src/index.js
-var build_src = __nccwpck_require__(6664);
-// EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-metrics/build/src/index.js
-var sdk_metrics_build_src = __nccwpck_require__(7349);
-;// CONCATENATED MODULE: ./src/metrics/opentelemetry.ts
-
-
-
-let provider;
-const setMeterProvider = () => {
-    provider = new sdk_metrics_build_src.MeterProvider({
-        readers: [
-            new sdk_metrics_build_src.PeriodicExportingMetricReader({
-                exporter: new build_src.OTLPMetricExporter({
-                    //   url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
-                    headers: {} // an optional object containing custom headers to be sent with each request
-                }),
-                // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
-                exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
-            })
-        ]
-    });
-    src.metrics.setGlobalMeterProvider(provider);
-};
-const shutdown = async () => {
-    provider.shutdown();
-};
-
 ;// CONCATENATED MODULE: ./src/metrics/metrics.ts
 
 const createGuage = (name, value, attributes) => {
@@ -68898,8 +68870,44 @@ const createGuage = (name, value, attributes) => {
     // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.
     guage.addCallback(result => {
         result.observe(value, attributes);
+        console.log(`Guage: ${name} ${value} ${JSON.stringify(attributes)}`);
     });
 };
+
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-metrics-otlp-proto/build/src/index.js
+var build_src = __nccwpck_require__(6664);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-metrics/build/src/index.js
+var sdk_metrics_build_src = __nccwpck_require__(7349);
+;// CONCATENATED MODULE: ./src/metrics/instrumentation.ts
+
+
+
+const exporter = new build_src.OTLPMetricExporter({
+    //   url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
+    headers: {} // an optional object containing custom headers to be sent with each request
+});
+const periodicExportingMetricReader = new sdk_metrics_build_src.PeriodicExportingMetricReader({
+    exporter: exporter,
+    // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
+    exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
+});
+const provider = new sdk_metrics_build_src.MeterProvider({
+    readers: [periodicExportingMetricReader]
+});
+src.metrics.setGlobalMeterProvider(provider);
+const shutdown = async () => {
+    // NOTE: Maybe shutdown() fulushes asynchrously, so we need to force flush before shutdown.
+    await provider.forceFlush();
+    return provider
+        .shutdown()
+        .then(() => console.log('MetricProvider terminated'))
+        .catch(error => console.log('Error terminating MetricProvider', error))
+        .finally(() => process.exit(0));
+};
+
+;// CONCATENATED MODULE: ./src/metrics/index.ts
+
+
 
 ;// CONCATENATED MODULE: ./src/main.ts
 
@@ -68916,7 +68924,8 @@ async function run() {
     const octokit = createOctokit(token);
     const RunContext = { ghContext, token, octokit };
     try {
-        exportMetrics(RunContext);
+        await exportMetrics(RunContext);
+        core.debug('Metrics exported successfully.');
     }
     catch (error) {
         if (error instanceof Error)
@@ -68925,10 +68934,16 @@ async function run() {
 }
 async function exportMetrics(context) {
     try {
-        setMeterProvider();
+        // for test
+        // export GITHUB_REPOSITORY=paper2/github-actions-opentelemetry
+        // export GITHUB_RUN_ID=10640837411
         const workflowRun = await fetchWorkflowRun(context.octokit, context.ghContext.repo.owner, context.ghContext.repo.repo, context.ghContext.runId);
         const workflowJobs = await fetchWorkflowRunJobs(context.octokit, context.ghContext.repo.owner, context.ghContext.repo.repo, context.ghContext.runId);
-        createGuage('workflow_run_id', context.ghContext.runId, {});
+        for (const job of workflowJobs) {
+            const created_at = new Date(job.created_at);
+            const started_at = new Date(job.started_at);
+            createGuage('job_duration', calcDifferenceSecond(started_at, created_at), { job_id: job.id });
+        }
         await shutdown();
     }
     catch (error) {
@@ -68936,27 +68951,11 @@ async function exportMetrics(context) {
             core.setFailed(error.message);
     }
 }
-// import { wait } from './wait'
-// /**
-//  * The main function for the action.
-//  * @returns {Promise<void>} Resolves when the action is complete.
-//  */
-// export async function run(): Promise<void> {
-//   try {
-//     const ms: string = core.getInput('milliseconds')
-//     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-//     core.debug(`Waiting ${ms} milliseconds ...`)
-//     // Log the current timestamp, wait, then log the new timestamp
-//     core.debug(new Date().toTimeString())
-//     await wait(parseInt(ms, 10))
-//     core.debug(new Date().toTimeString())
-//     // Set outputs for other workflow steps to use
-//     core.setOutput('time', new Date().toTimeString())
-//   } catch (error) {
-//     // Fail the workflow run if an error occurs
-//     if (error instanceof Error) core.setFailed(error.message)
-//   }
-// }
+// TODO: utilとか作る？
+const calcDifferenceSecond = (targetDateTime, compareDateTime) => {
+    let diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
+    return Math.floor(diffMilliSecond / 1000);
+};
 
 ;// CONCATENATED MODULE: ./src/index.ts
 /**
