@@ -7,8 +7,8 @@ export type WorkflowJobs =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
 export interface WorkFlowContext {
-  owner: string,
-  repo: string,
+  owner: string
+  repo: string
   runId: number
 }
 
