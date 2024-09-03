@@ -1,15 +1,28 @@
 import { Octokit } from '@octokit/rest'
-import { Endpoints } from '@octokit/types'
 
-export type WorkflowRun =
-  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data']
-export type WorkflowJobs =
-  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
+// @octokit/types hadles xxx_at as string (e.g. created_at). For using Date type, difine original type.
+export interface WorkflowRun {
+  readonly created_at: Date
+  readonly status: string | null
+  readonly id: number
+  readonly name: string | null | undefined
+  readonly run_number: number
+}
+export interface WorkflowRunJob {
+  readonly created_at: Date
+  readonly started_at: Date
+  readonly completed_at: Date | null
+  readonly id: number
+  readonly name: string
+  readonly run_id: number
+  readonly workflow_name: string | null
+}
+export type WorkflowRunJobs = readonly WorkflowRunJob[]
 
-export interface WorkFlowContext {
-  owner: string
-  repo: string
-  runId: number
+export interface WorkflowContext {
+  readonly owner: string
+  readonly repo: string
+  readonly runId: number
 }
 
 export const createOctokit = (token: string): Octokit => {
@@ -20,25 +33,40 @@ export const createOctokit = (token: string): Octokit => {
 
 export const fetchWorkflowRun = async (
   octokit: Octokit,
-  workflowContext: WorkFlowContext
+  workflowContext: WorkflowContext
 ): Promise<WorkflowRun> => {
-  const workflow = await octokit.rest.actions.getWorkflowRun({
+  const res = await octokit.rest.actions.getWorkflowRun({
     owner: workflowContext.owner,
     repo: workflowContext.repo,
     run_id: workflowContext.runId
   })
-  return workflow.data
+  return {
+    created_at: new Date(res.data.created_at),
+    status: res.data.status,
+    id: res.data.id,
+    name: res.data.name,
+    run_number: res.data.run_number
+  }
 }
 
 export const fetchWorkflowRunJobs = async (
   octokit: Octokit,
-  workflowContext: WorkFlowContext
-): Promise<WorkflowJobs> => {
-  const workflowJob = await octokit.rest.actions.listJobsForWorkflowRun({
+  workflowContext: WorkflowContext
+): Promise<WorkflowRunJobs> => {
+  const res = await octokit.rest.actions.listJobsForWorkflowRun({
     owner: workflowContext.owner,
     repo: workflowContext.repo,
     run_id: workflowContext.runId,
     per_page: 100
   })
-  return workflowJob.data.jobs
+  const WorkflowRunJobs: WorkflowRunJobs = res.data.jobs.map(job => ({
+    created_at: new Date(job.created_at),
+    started_at: new Date(job.started_at),
+    completed_at: job.completed_at ? new Date(job.completed_at) : null,
+    id: job.id,
+    name: job.name,
+    run_id: job.run_id,
+    workflow_name: job.workflow_name
+  }))
+  return WorkflowRunJobs
 }

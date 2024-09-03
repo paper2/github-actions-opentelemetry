@@ -2,8 +2,7 @@ import * as opentelemetry from '@opentelemetry/api'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import {
   MeterProvider,
-  PeriodicExportingMetricReader,
-  ConsoleMetricExporter
+  PeriodicExportingMetricReader
 } from '@opentelemetry/sdk-metrics'
 
 const exporter = new OTLPMetricExporter({
@@ -11,7 +10,7 @@ const exporter = new OTLPMetricExporter({
   headers: {} // an optional object containing custom headers to be sent with each request
 })
 const periodicExportingMetricReader = new PeriodicExportingMetricReader({
-  exporter: exporter,
+  exporter,
   // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
   exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
 })
