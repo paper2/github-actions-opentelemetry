@@ -34,16 +34,17 @@ export async function run(): Promise<void> {
     const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowContext)
     createJobGuages(workflowJobs)
     createWorkflowGuages(workflowRun, workflowJobs)
-    await shutdown()
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
+
+  await shutdown()
 }
 
 const createWorkflowGuages = (
   workflow: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
-) => {
+): void => {
   if (workflow.status !== 'completed') {
     throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
   }
@@ -74,7 +75,7 @@ const createWorkflowGuages = (
   )
 }
 
-const createJobGuages = (workflowJobs: WorkflowRunJobs) => {
+const createJobGuages = (workflowJobs: WorkflowRunJobs): void => {
   for (const job of workflowJobs) {
     if (!job.completed_at) {
       core.warning(`Job ${job.id} is not completed yet.`)
@@ -106,7 +107,7 @@ export const calcDiffSec = (
   targetDateTime: Date,
   compareDateTime: Date
 ): number => {
-  let diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
+  const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
 
   return Math.floor(diffMilliSecond / 1000)
 }

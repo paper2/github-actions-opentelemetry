@@ -4,7 +4,7 @@ export const createGuage = (
   name: string,
   value: number,
   attributes: opentelemetry.Attributes
-) => {
+): void => {
   const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
   const guage = meter.createObservableGauge(name)
   // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.

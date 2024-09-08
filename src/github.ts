@@ -59,7 +59,7 @@ export const fetchWorkflowRunJobs = async (
     run_id: workflowContext.runId,
     per_page: 100
   })
-  const WorkflowRunJobs: WorkflowRunJobs = res.data.jobs.map(job => ({
+  const workflowRunJobs: WorkflowRunJobs = res.data.jobs.map(job => ({
     created_at: new Date(job.created_at),
     started_at: new Date(job.started_at),
     completed_at: job.completed_at ? new Date(job.completed_at) : null,
@@ -68,5 +68,5 @@ export const fetchWorkflowRunJobs = async (
     run_id: job.run_id,
     workflow_name: job.workflow_name
   }))
-  return WorkflowRunJobs
+  return workflowRunJobs
 }

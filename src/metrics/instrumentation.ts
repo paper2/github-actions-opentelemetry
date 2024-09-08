@@ -19,12 +19,13 @@ const provider = new MeterProvider({
 })
 opentelemetry.metrics.setGlobalMeterProvider(provider)
 
-export const shutdown = async () => {
-  // NOTE: Maybe shutdown() fulushes asynchrously, so we need to force flush before shutdown.
-  await provider.forceFlush()
-  return provider
-    .shutdown()
-    .then(() => console.log('MetricProvider terminated'))
-    .catch(error => console.log('Error terminating MetricProvider', error))
-    .finally(() => process.exit(0))
+export const shutdown = async (): Promise<void> => {
+  try {
+    await provider.forceFlush()
+    await provider.shutdown()
+  } catch (error) {
+    console.log('Error terminating MetricProvider', error)
+    process.exit(1)
+  }
+  process.exit(0)
 }
