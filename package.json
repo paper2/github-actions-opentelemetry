@@ -33,7 +33,7 @@
     "lint": "npx eslint . -c ./.eslintrc.yml",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
-    "test": "npx jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
   },
   "license": "MIT",

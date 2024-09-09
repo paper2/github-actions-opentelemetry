@@ -4,6 +4,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["../../__tests__/**/*", "../../src/**/*"],
+  "include": ["../../src/**/*", "../../jest.config.ts"],
   "exclude": ["../../dist", "../../node_modules", "../../coverage", "*.json"]
 }
