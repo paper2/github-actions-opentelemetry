@@ -32,6 +32,21 @@ jobs:
           # list of files that changed across commits
           fetch-depth: 0
 
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        id: install
+        run: npm ci
+
+      - name: Uninstall Typescript Eslint Plugin
+        id: unistall-typescript-eslint-plugin
+        run: npm uninstall @typescript-eslint/eslint-plugin
+
       - name: Super-linter
         uses: super-linter/super-linter@v7.1.0
         env:
