@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/rest'
+import * as github from '@actions/github'
 
 // @octokit/types hadles xxx_at as string (e.g. created_at). For using Date type, difine original type.
 export interface WorkflowRun {
@@ -19,13 +20,14 @@ export interface WorkflowRunJob {
 }
 export type WorkflowRunJobs = readonly WorkflowRunJob[]
 
-export interface WorkflowContext {
+interface WorkflowRunContext {
   readonly owner: string
   readonly repo: string
   readonly runId: number
 }
 
 export const createOctokit = (token: string): Octokit => {
+  // TODO: try to use github.getOctokit
   return new Octokit({
     auth: token
   })
@@ -33,7 +35,7 @@ export const createOctokit = (token: string): Octokit => {
 
 export const fetchWorkflowRun = async (
   octokit: Octokit,
-  workflowContext: WorkflowContext
+  workflowContext: WorkflowRunContext
 ): Promise<WorkflowRun> => {
   const res = await octokit.rest.actions.getWorkflowRun({
     owner: workflowContext.owner,
@@ -51,7 +53,7 @@ export const fetchWorkflowRun = async (
 
 export const fetchWorkflowRunJobs = async (
   octokit: Octokit,
-  workflowContext: WorkflowContext
+  workflowContext: WorkflowRunContext
 ): Promise<WorkflowRunJobs> => {
   const res = await octokit.rest.actions.listJobsForWorkflowRun({
     owner: workflowContext.owner,
@@ -69,4 +71,13 @@ export const fetchWorkflowRunJobs = async (
     workflow_name: job.workflow_name
   }))
   return workflowRunJobs
+}
+
+export const getWorkflowRunContext = (): WorkflowRunContext => {
+  const ghContext = github.context
+  return {
+    owner: ghContext.repo.owner,
+    repo: ghContext.repo.repo,
+    runId: ghContext.runId
+  }
 }

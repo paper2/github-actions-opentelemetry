@@ -1,4 +1,3 @@
-import * as github from '@actions/github'
 import * as core from '@actions/core'
 import {
   createOctokit,
@@ -6,7 +5,7 @@ import {
   fetchWorkflowRunJobs,
   WorkflowRun,
   WorkflowRunJobs,
-  WorkflowContext
+  getWorkflowRunContext
 } from './github/index.js'
 import {
   createGuage,
@@ -20,18 +19,13 @@ import {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
-  const ghContext = github.context
-  const token = core.getInput('github-token')
+  const token = core.getInput('GITHUB_TOKEN')
   const octokit = createOctokit(token)
-  const workflowContext: WorkflowContext = {
-    owner: ghContext.repo.owner,
-    repo: ghContext.repo.repo,
-    runId: ghContext.runId
-  }
+  const workflowRunContext = getWorkflowRunContext()
 
   try {
-    const workflowRun = await fetchWorkflowRun(octokit, workflowContext)
-    const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowContext)
+    const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
+    const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext)
     createJobGuages(workflowJobs)
     createWorkflowGuages(workflowRun, workflowJobs)
   } catch (error) {
