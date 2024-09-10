@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "newLine": "lf"
   },
-  "exclude": ["./dist", "./node_modules", "./coverage"]
+  "exclude": ["./dist", "./node_modules", "./coverage", "vitest.config.ts"]
 }
