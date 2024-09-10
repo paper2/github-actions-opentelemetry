@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "newLine": "lf"
   },
-  "exclude": ["./dist", "./node_modules", "./coverage", "jest.config.ts"]
+  "exclude": ["./dist", "./node_modules", "./coverage"]
 }
