@@ -7,7 +7,7 @@ import {
   WorkflowRun,
   WorkflowRunJobs,
   WorkflowContext
-} from './github.js'
+} from './github/index.js'
 import {
   createGuage,
   shutdown,
