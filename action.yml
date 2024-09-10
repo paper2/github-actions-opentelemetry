@@ -7,10 +7,10 @@ branding:
   color: 'red'
 
 inputs:
-  github-token:
+  GITHUB_TOKEN:
     description: 'GitHub token for client authentication'
-    default: ${{ github.token }}
-    required: false
+    default: ${{ secrets.GITHUB_TOKEN }}
+    required: true
 
 runs:
   using: node20
