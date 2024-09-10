@@ -1,2 +1,2 @@
-export * from './metrics.js'
-export * from './instrumentation.js'
+export * from './create-guage.js'
+export * from './setup-provider.js'

@@ -8,7 +8,8 @@ import {
 import {
   shutdown,
   createJobGuages,
-  createWorkflowGuages
+  createWorkflowGuages,
+  setupMeterProvider
 } from './metrics/index.js'
 
 /**
@@ -16,6 +17,8 @@ import {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
+  const provider = setupMeterProvider()
+
   const token = core.getInput('GITHUB_TOKEN')
   const octokit = createOctokit(token)
   const workflowRunContext = getWorkflowRunContext()
@@ -29,5 +32,5 @@ export async function run(): Promise<void> {
     if (error instanceof Error) core.setFailed(error.message)
   }
 
-  await shutdown()
+  await shutdown(provider)
 }

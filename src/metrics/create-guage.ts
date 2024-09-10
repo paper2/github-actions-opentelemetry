@@ -15,14 +15,14 @@ export const createGuage = (
   })
 }
 
-export interface JobMetricsAttributes extends opentelemetry.Attributes {
+interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly id: number
   readonly name: string
   readonly run_id: number
   readonly workflow_name: string
 }
 
-export interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
+interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   readonly id: number
   readonly run_id: number
   readonly workflow_name: string
