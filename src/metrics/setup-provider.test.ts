@@ -2,7 +2,8 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import * as opentelemetry from '@opentelemetry/api'
 import {
   InMemoryMetricExporter,
-  AggregationTemporality
+  AggregationTemporality,
+  MeterProvider
 } from '@opentelemetry/sdk-metrics'
 import * as createProvider from './create-provider.js'
 import { setupMeterProvider, shutdown } from './setup-provider.js'
@@ -78,13 +79,12 @@ describe('Metrics Exporter Tests', () => {
     expect(mockExit).toHaveBeenCalledWith(0)
   })
   test('should exit 1', async () => {
-    const provider = {
+    const provider: Partial<MeterProvider> = {
       forceFlush: vi
         .fn()
         .mockRejectedValueOnce(new Error('mocked forceFlush throw error'))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
-    await expect(shutdown(provider)).rejects.toThrow(
+    }
+    await expect(shutdown(provider as MeterProvider)).rejects.toThrow(
       'process.exit called with code: 1'
     )
     expect(mockExit).toHaveBeenCalledWith(1)
