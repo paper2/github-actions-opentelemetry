@@ -41,8 +41,8 @@ jobs:
         run: npm run lint
 
       - name: Test
-        id: npm-ci-test
-        run: npm run ci-test
+        id: npm-test
+        run: npm run test
 
   test-action:
     name: GitHub Actions Test
