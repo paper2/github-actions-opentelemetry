@@ -9,7 +9,6 @@ branding:
 inputs:
   GITHUB_TOKEN:
     description: 'GitHub token for client authentication'
-    default: ${{ secrets.GITHUB_TOKEN }}
     required: true
 
 runs:
