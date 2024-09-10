@@ -30,7 +30,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: npm
+          # disable cache
+          # cache: npm
 
       - name: Install Dependencies
         id: install
