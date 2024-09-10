@@ -3,15 +3,12 @@ import {
   createOctokit,
   fetchWorkflowRun,
   fetchWorkflowRunJobs,
-  WorkflowRun,
-  WorkflowRunJobs,
   getWorkflowRunContext
 } from './github/index.js'
 import {
-  createGuage,
   shutdown,
-  JobMetricsAttributes,
-  WorkflowMetricsAttributes
+  createJobGuages,
+  createWorkflowGuages
 } from './metrics/index.js'
 
 /**
@@ -33,75 +30,4 @@ export async function run(): Promise<void> {
   }
 
   await shutdown()
-}
-
-const createWorkflowGuages = (
-  workflow: WorkflowRun,
-  workflowRunJobs: WorkflowRunJobs
-): void => {
-  if (workflow.status !== 'completed') {
-    throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
-  }
-  const jobCompletedAtDates = workflowRunJobs.map(
-    job => job.completed_at || job.created_at
-  )
-  const jobCompletedAtMax = new Date(
-    Math.max(...jobCompletedAtDates.map(Number))
-  )
-
-  const jobStartedAtDates = workflowRunJobs.map(job => job.started_at)
-  const jobStartedtAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
-  const workflowMetricsAttributes: WorkflowMetricsAttributes = {
-    id: workflow.id,
-    run_id: workflow.run_number,
-    workflow_name: workflow.name || ''
-  }
-
-  createGuage(
-    'workflow_queued_duration',
-    calcDiffSec(jobStartedtAtMin, workflow.created_at),
-    workflowMetricsAttributes
-  )
-  createGuage(
-    'workflow_duration',
-    calcDiffSec(jobCompletedAtMax, workflow.created_at),
-    workflowMetricsAttributes
-  )
-}
-
-const createJobGuages = (workflowJobs: WorkflowRunJobs): void => {
-  for (const job of workflowJobs) {
-    if (!job.completed_at) {
-      core.warning(`Job ${job.id} is not completed yet.`)
-      continue
-    }
-
-    const jobMetricsAttributes: JobMetricsAttributes = {
-      id: job.id,
-      name: job.name,
-      run_id: job.run_id,
-      workflow_name: job.workflow_name || ''
-    }
-
-    createGuage(
-      'job_queued_duration',
-      calcDiffSec(job.started_at, job.created_at),
-      jobMetricsAttributes
-    )
-    createGuage(
-      'job_duration',
-      calcDiffSec(job.completed_at, job.started_at),
-      jobMetricsAttributes
-    )
-  }
-}
-
-// TODO: utilとか作る？
-export const calcDiffSec = (
-  targetDateTime: Date,
-  compareDateTime: Date
-): number => {
-  const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
-
-  return Math.floor(diffMilliSecond / 1000)
 }

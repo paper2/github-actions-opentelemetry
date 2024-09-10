@@ -20,7 +20,7 @@ export interface WorkflowRunJob {
 }
 export type WorkflowRunJobs = readonly WorkflowRunJob[]
 
-interface WorkflowRunContext {
+export interface WorkflowRunContext {
   readonly owner: string
   readonly repo: string
   readonly runId: number
