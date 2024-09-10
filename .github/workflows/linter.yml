@@ -43,10 +43,6 @@ jobs:
         id: install
         run: npm ci
 
-      - name: Uninstall Typescript Eslint Plugin
-        id: unistall-typescript-eslint-plugin
-        run: npm uninstall @typescript-eslint/eslint-plugin
-
       - name: Super-linter
         uses: super-linter/super-linter@v7.1.0
         env:
