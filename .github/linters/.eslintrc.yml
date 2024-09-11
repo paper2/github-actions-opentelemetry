@@ -1,7 +1,6 @@
 env:
   node: true
   es6: true
-  jest: true
 
 globals:
   Atomics: readonly
@@ -16,15 +15,18 @@ ignorePatterns:
 
 parser: '@typescript-eslint/parser'
 
+settings:
+  import/resolver: { 'typescript': {} }
+
 parserOptions:
   ecmaVersion: 2023
   sourceType: module
   project:
-    - './.github/linters/tsconfig.json'
     - './tsconfig.json'
+    - './.github/linters/tsconfig.json'
 
 plugins:
-  - jest
+  - 'vitest'
   - '@typescript-eslint'
 
 extends:
@@ -32,10 +34,11 @@ extends:
   - plugin:@typescript-eslint/eslint-recommended
   - plugin:@typescript-eslint/recommended
   - plugin:github/recommended
-  - plugin:jest/recommended
+  - plugin:vitest/legacy-recommended
 
 rules:
   {
+    'vitest/max-nested-describe': ['error', { 'max': 3 }],
     'camelcase': 'off',
     'eslint-comments/no-use': 'off',
     'eslint-comments/no-unused-disable': 'off',
