@@ -1,5 +1,6 @@
 on:
   workflow_run:
+    workflows: ['Check Transpiled JavaScript']
     types:
       - completed
 
