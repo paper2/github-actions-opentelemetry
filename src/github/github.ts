@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/rest'
 import * as github from '@actions/github'
+import { EventPayloadMap } from '@octokit/webhooks-types'
 
 // @octokit/types hadles xxx_at as string (e.g. created_at). For using Date type, difine original type.
 export interface WorkflowRun {
@@ -75,9 +76,16 @@ export const fetchWorkflowRunJobs = async (
 
 export const getWorkflowRunContext = (): WorkflowRunContext => {
   const ghContext = github.context
+
+  // If this workflow is triggerd on `workflow_run`, set runId it's id.
+  // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+  const workflowRunEvent: EventPayloadMap['workflow_run'] =
+    github.context.payload.workflow_run
+  const runId = workflowRunEvent.workflow_run.id || ghContext.runId
+
   return {
     owner: ghContext.repo.owner,
     repo: ghContext.repo.repo,
-    runId: ghContext.runId
+    runId
   }
 }

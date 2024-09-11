@@ -1,0 +1,26 @@
+on:
+  workflow_run:
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  test-action:
+    name: Run Github Actions OpenTelemetry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Run
+        id: run
+        uses: paper2/github-actions-opentelemetry@v1.0.0
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
