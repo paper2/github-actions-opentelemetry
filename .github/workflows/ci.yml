@@ -59,5 +59,7 @@ jobs:
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          GITHUB_RUN_ID: 10640837411
+          GITHUB_REPOSITORY: paper2/github-actions-opentelemetry
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
