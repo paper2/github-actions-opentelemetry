@@ -65285,8 +65285,6 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
 ;// CONCATENATED MODULE: ./node_modules/@octokit/rest/node_modules/universal-user-agent/index.js
@@ -68844,9 +68842,13 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 );
 
 
-;// CONCATENATED MODULE: ./src/github.ts
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
+;// CONCATENATED MODULE: ./src/github/github.ts
+
 
 const createOctokit = (token) => {
+    // TODO: try to use github.getOctokit
     return new dist_src_Octokit({
         auth: token
     });
@@ -68883,43 +68885,51 @@ const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
     }));
     return workflowRunJobs;
 };
+const getWorkflowRunContext = () => {
+    const ghContext = github.context;
+    return {
+        owner: ghContext.repo.owner,
+        repo: ghContext.repo.repo,
+        runId: ghContext.runId
+    };
+};
+
+;// CONCATENATED MODULE: ./src/github/index.ts
+
 
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
 var src = __nccwpck_require__(5163);
-;// CONCATENATED MODULE: ./src/metrics/metrics.ts
-
-const createGuage = (name, value, attributes) => {
-    const meter = src.metrics.getMeter('github-actions-metrics');
-    const guage = meter.createObservableGauge(name);
-    // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.
-    guage.addCallback(result => {
-        result.observe(value, attributes);
-        console.log(`Guage: ${name} ${value} ${JSON.stringify(attributes)}`);
-    });
-};
-
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-metrics-otlp-proto/build/src/index.js
 var build_src = __nccwpck_require__(6664);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-metrics/build/src/index.js
 var sdk_metrics_build_src = __nccwpck_require__(7349);
-;// CONCATENATED MODULE: ./src/metrics/instrumentation.ts
+;// CONCATENATED MODULE: ./src/metrics/create-provider.ts
 
 
-
-const exporter = new build_src.OTLPMetricExporter({
+const createExporter = () => new build_src.OTLPMetricExporter({
     //   url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
     headers: {} // an optional object containing custom headers to be sent with each request
 });
-const periodicExportingMetricReader = new sdk_metrics_build_src.PeriodicExportingMetricReader({
-    exporter,
-    // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
-    exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
+const createProvider = (exporter) => new sdk_metrics_build_src.MeterProvider({
+    readers: [
+        new sdk_metrics_build_src.PeriodicExportingMetricReader({
+            exporter,
+            // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
+            exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
+        })
+    ]
 });
-const provider = new sdk_metrics_build_src.MeterProvider({
-    readers: [periodicExportingMetricReader]
-});
-src.metrics.setGlobalMeterProvider(provider);
-const shutdown = async () => {
+
+;// CONCATENATED MODULE: ./src/metrics/setup-provider.ts
+
+
+const setupMeterProvider = () => {
+    const exporter = createExporter();
+    const provider = createProvider(exporter);
+    src.metrics.setGlobalMeterProvider(provider);
+    return provider;
+};
+const shutdown = async (provider) => {
     try {
         await provider.forceFlush();
         await provider.shutdown();
@@ -68931,40 +68941,17 @@ const shutdown = async () => {
     process.exit(0);
 };
 
-;// CONCATENATED MODULE: ./src/metrics/index.ts
+;// CONCATENATED MODULE: ./src/metrics/create-guage.ts
 
-
-
-;// CONCATENATED MODULE: ./src/main.ts
-
-
-
-
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-async function run() {
-    const ghContext = github.context;
-    const token = core.getInput('github-token');
-    const octokit = createOctokit(token);
-    const workflowContext = {
-        owner: ghContext.repo.owner,
-        repo: ghContext.repo.repo,
-        runId: ghContext.runId
-    };
-    try {
-        const workflowRun = await fetchWorkflowRun(octokit, workflowContext);
-        const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowContext);
-        createJobGuages(workflowJobs);
-        createWorkflowGuages(workflowRun, workflowJobs);
-    }
-    catch (error) {
-        if (error instanceof Error)
-            core.setFailed(error.message);
-    }
-    await shutdown();
-}
+const createGuage = (name, value, attributes) => {
+    const meter = src.metrics.getMeter('github-actions-metrics');
+    const guage = meter.createObservableGauge(name);
+    // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.
+    guage.addCallback(result => {
+        result.observe(value, attributes);
+        console.log(`Guage: ${name} ${value} ${JSON.stringify(attributes)}`);
+    });
+};
 const createWorkflowGuages = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
         throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
@@ -68984,7 +68971,6 @@ const createWorkflowGuages = (workflow, workflowRunJobs) => {
 const createJobGuages = (workflowJobs) => {
     for (const job of workflowJobs) {
         if (!job.completed_at) {
-            core.warning(`Job ${job.id} is not completed yet.`);
             continue;
         }
         const jobMetricsAttributes = {
@@ -68997,18 +68983,42 @@ const createJobGuages = (workflowJobs) => {
         createGuage('job_duration', calcDiffSec(job.completed_at, job.started_at), jobMetricsAttributes);
     }
 };
-// TODO: utilとか作る？
 const calcDiffSec = (targetDateTime, compareDateTime) => {
     const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
     return Math.floor(diffMilliSecond / 1000);
 };
+
+;// CONCATENATED MODULE: ./src/main.ts
+
+
+
+/**
+ * The main function for the action.
+ * @returns {Promise<void>} Resolves when the action is complete.
+ */
+async function run() {
+    const provider = setupMeterProvider();
+    const token = core.getInput('GITHUB_TOKEN');
+    const octokit = createOctokit(token);
+    const workflowRunContext = getWorkflowRunContext();
+    try {
+        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
+        const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
+        createJobGuages(workflowJobs);
+        createWorkflowGuages(workflowRun, workflowJobs);
+    }
+    catch (error) {
+        if (error instanceof Error)
+            core.setFailed(error.message);
+    }
+    await shutdown(provider);
+}
 
 ;// CONCATENATED MODULE: ./src/index.ts
 /**
  * The entrypoint for the action.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 run();
 
 })();
