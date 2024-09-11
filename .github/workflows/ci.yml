@@ -56,5 +56,8 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
