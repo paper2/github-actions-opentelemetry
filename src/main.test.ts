@@ -33,6 +33,11 @@ describe('run', () => {
       workflow_name: 'test-workflow'
     }
   ]
+  const mockExit = vi
+    .spyOn(process, 'exit')
+    .mockImplementation((code?: number | string | null | undefined): never => {
+      throw new Error(`process.exit called with code: ${code}`)
+    })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -52,7 +57,7 @@ describe('run', () => {
       mockWorkflowRunJobs
     )
 
-    await run()
+    await expect(run()).rejects.toThrow('process.exit called with code: 0')
 
     expect(githubModule.createOctokit).toHaveBeenCalledOnce()
     expect(githubModule.fetchWorkflowRun).toHaveBeenCalledWith(
@@ -79,8 +84,8 @@ describe('run', () => {
       new Error(errorMessage)
     )
 
-    await run()
-
+    await expect(run()).rejects.toThrow('process.exit called with code: 1')
+    expect(mockExit).toHaveBeenCalledWith(1)
     expect(core.setFailed).toHaveBeenCalledWith(errorMessage)
     expect(metricsModule.shutdown).toHaveBeenCalled()
   })

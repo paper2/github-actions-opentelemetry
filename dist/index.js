@@ -69010,8 +69010,12 @@ async function run() {
     catch (error) {
         if (error instanceof Error)
             core.setFailed(error.message);
+        process.exit(1);
     }
-    await shutdown(provider);
+    finally {
+        await shutdown(provider);
+    }
+    process.exit(0);
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

@@ -30,7 +30,9 @@ export async function run(): Promise<void> {
     createWorkflowGuages(workflowRun, workflowJobs)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+    process.exit(1)
+  } finally {
+    await shutdown(provider)
   }
-
-  await shutdown(provider)
+  process.exit(0)
 }
