@@ -1,3 +1,5 @@
+name: Send Telemetry after Other Workflow
+
 on:
   workflow_run:
     workflows: ['Check Transpiled JavaScript']
@@ -19,7 +21,7 @@ jobs:
 
       - name: Run
         id: run
-        uses: paper2/github-actions-opentelemetry@v0.0.1
+        uses: ./
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
