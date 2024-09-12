@@ -68889,8 +68889,11 @@ const getWorkflowRunContext = () => {
     const ghContext = github.context;
     // If this workflow is triggerd on `workflow_run`, set runId it's id.
     // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
-    const workflowRunEvent = github.context.payload.workflow_run;
-    const runId = workflowRunEvent?.workflow_run?.workflow_id ?? ghContext.runId;
+    const workflowRunEvent = github.context.payload;
+    if (!workflowRunEvent?.workflow_run) {
+        throw new Error('workflow_run payload is not found.');
+    }
+    const runId = workflowRunEvent.workflow_run.id;
     return {
         owner: ghContext.repo.owner,
         repo: ghContext.repo.repo,
