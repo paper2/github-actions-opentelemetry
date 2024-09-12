@@ -81,7 +81,7 @@ export const getWorkflowRunContext = (): WorkflowRunContext => {
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
   const workflowRunEvent: EventPayloadMap['workflow_run'] | undefined =
     github.context.payload.workflow_run
-  console.log(workflowRunEvent)
+  console.dir(workflowRunEvent, { depth: null })
   const runId = workflowRunEvent?.workflow_run?.id ?? ghContext.runId
 
   return {
