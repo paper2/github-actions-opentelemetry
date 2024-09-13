@@ -2,7 +2,11 @@ name: Send Telemetry after Other Workflow
 
 on:
   workflow_run:
-    workflows: ['Check Transpiled JavaScript']
+    workflows:
+      - Check Transpiled JavaScript
+      - Continuous Integration
+      - CodeQL
+      - Lint Codebase
     types:
       - completed
 
