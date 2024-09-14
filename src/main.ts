@@ -7,8 +7,8 @@ import {
 } from './github/index.js'
 import {
   shutdown,
-  createJobGuages,
-  createWorkflowGuages,
+  createJobGauges,
+  createWorkflowGauges,
   setupMeterProvider
 } from './metrics/index.js'
 
@@ -26,8 +26,8 @@ export async function run(): Promise<void> {
   try {
     const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
     const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext)
-    createJobGuages(workflowJobs)
-    createWorkflowGuages(workflowRun, workflowJobs)
+    createJobGauges(workflowRun, workflowJobs)
+    createWorkflowGauges(workflowRun, workflowJobs)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
     process.exit(1)

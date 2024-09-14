@@ -41,7 +41,7 @@ export const createWorkflowGauges = (
     Math.max(...jobCompletedAtDates.map(Number))
   )
 
-  const jobStartedAtDates = workflowRunJobs.map(job => job.started_at)
+  const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
     workflow_name: workflow.name || '',
@@ -50,12 +50,12 @@ export const createWorkflowGauges = (
 
   createGauge(
     'workflow_queued_duration',
-    calcDiffSec(jobStartedAtMin, workflow.created_at),
+    calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)),
     workflowMetricsAttributes
   )
   createGauge(
     'workflow_duration',
-    calcDiffSec(jobCompletedAtMax, workflow.created_at),
+    calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)),
     workflowMetricsAttributes
   )
 }
@@ -72,11 +72,14 @@ export const createJobGauges = (
     const jobMetricsAttributes: JobMetricsAttributes = {
       name: job.name,
       workflow_name: job.workflow_name || '',
-      owner_and_repository: `${workflow.owner}/${workflow.repository}`,
-      status: job.
+      owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
+      status: job.status
     }
 
-    const jobQueuedDuration = calcDiffSec(job.started_at, job.created_at)
+    const jobQueuedDuration = calcDiffSec(
+      new Date(job.started_at),
+      new Date(job.created_at)
+    )
     createGauge(
       'job_queued_duration',
       // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
@@ -85,7 +88,7 @@ export const createJobGauges = (
     )
     createGauge(
       'job_duration',
-      calcDiffSec(job.completed_at, job.started_at),
+      calcDiffSec(new Date(job.completed_at), new Date(job.started_at)),
       jobMetricsAttributes
     )
   }

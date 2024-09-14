@@ -5,21 +5,10 @@ import { Endpoints } from '@octokit/types'
 
 // TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
 
-export type WorkflowRun = Omit<
-  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data'],
-  'created_at'
-> & {
-  readonly created_at: Date
-}
-
-// NOTE:
-export type WorkflowRunJobs = (Omit<
-  Endpoints['GET /repos/{owner}/{repo}/actions/jobs/{job_id}']['response']['data'],
-  'created_at' | 'started_at'
-> & {
-  readonly created_at: Date
-  readonly started_at: Date
-})[]
+export type WorkflowRun =
+  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data']
+export type WorkflowRunJobs =
+  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
 export interface WorkflowRunContext {
   readonly owner: string
@@ -44,8 +33,7 @@ export const fetchWorkflowRun = async (
     run_id: workflowContext.runId
   })
   return {
-    ...res.data,
-    created_at: new Date(res.data.created_at)
+    ...res.data
   }
 }
 
@@ -59,11 +47,7 @@ export const fetchWorkflowRunJobs = async (
     run_id: workflowContext.runId,
     per_page: 100
   })
-  return res.data.jobs.map(job => ({
-    ...job,
-    created_at: new Date(job.created_at),
-    started_at: new Date(job.started_at)
-  }))
+  return res.data.jobs
 }
 
 export const getWorkflowRunContext = (): WorkflowRunContext => {
