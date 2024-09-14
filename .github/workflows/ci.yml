@@ -53,13 +53,18 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      # TODO: run test local action
-      # Problem: It referes workflow_run id is this in_progress workflow.
-      # - name: Test Local Action
-      #   id: test-action
-      #   uses: ./
-      #   env:
-      #     OTEL_EXPORTER_OTLP_ENDPOINT:
-      #       ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+
+          # If this job is removed, update it.
+          # https://github.com/paper2/github-actions-opentelemetry/actions/runs/10856659171
+          OWNER: paper2
+          REPOSITORY: github-actions-opentelemetry
+          WORKFLOW_RUN_ID: 10856659171
+
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -68844,7 +68844,18 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+;// CONCATENATED MODULE: ./src/settings.ts
+const settings = {
+    workflowRunId: process.env.WORKFLOW_RUN_ID
+        ? parseInt(process.env.WORKFLOW_RUN_ID)
+        : undefined,
+    owner: process.env.OWNER,
+    repository: process.env.REPOSITORY
+};
+/* harmony default export */ const src_settings = (settings);
+
 ;// CONCATENATED MODULE: ./src/github/github.ts
+
 
 
 const createOctokit = (token) => {
@@ -68874,16 +68885,16 @@ const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
 };
 const getWorkflowRunContext = () => {
     const ghContext = github.context;
-    // If this workflow is triggerd on `workflow_run`, set runId it's id.
+    // If this workflow is trigged on `workflow_run`, set runId it's id.
     // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
     const workflowRunEvent = github.context.payload;
-    if (!workflowRunEvent?.workflow_run) {
-        throw new Error('workflow_run payload is not found.');
+    const runId = src_settings.workflowRunId ?? workflowRunEvent?.workflow_run?.id;
+    if (runId === undefined) {
+        throw new Error('Workflow run id is undefined.');
     }
-    const runId = workflowRunEvent.workflow_run.id;
     return {
-        owner: ghContext.repo.owner,
-        repo: ghContext.repo.repo,
+        owner: src_settings.owner ?? ghContext.repo.owner,
+        repo: src_settings.repository ?? ghContext.repo.repo,
         runId
     };
 };

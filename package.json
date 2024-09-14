@@ -33,7 +33,7 @@
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest run --coverage",
-    "test-local": "WORKFLOW_RUN_ID=10640837411 GITHUB_REPOSITORY=paper2/github-actions-opentelemetry npx tsx ./src/index.ts",
+    "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry npx tsx ./src/index.ts",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
   },
   "license": "MIT",
