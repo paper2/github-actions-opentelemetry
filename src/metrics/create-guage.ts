@@ -18,13 +18,13 @@ export const createGauge = (
 interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly name: string
   readonly workflow_name: string
-  readonly owner_and_repository: string
+  readonly repository: string
   readonly status: string
 }
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   readonly workflow_name: string
-  readonly owner_and_repository: string
+  readonly repository: string
 }
 
 export const createWorkflowGauges = (
@@ -35,7 +35,7 @@ export const createWorkflowGauges = (
     throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
   }
   const jobCompletedAtDates = workflowRunJobs.map(
-    job => job.completed_at || job.created_at
+    job => new Date(job.completed_at || job.created_at)
   )
   const jobCompletedAtMax = new Date(
     Math.max(...jobCompletedAtDates.map(Number))
@@ -45,7 +45,7 @@ export const createWorkflowGauges = (
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
     workflow_name: workflow.name || '',
-    owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`
+    repository: `${workflow.repository.full_name}`
   }
 
   createGauge(
@@ -72,7 +72,7 @@ export const createJobGauges = (
     const jobMetricsAttributes: JobMetricsAttributes = {
       name: job.name,
       workflow_name: job.workflow_name || '',
-      owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
+      repository: `${workflow.repository.full_name}`,
       status: job.status
     }
 

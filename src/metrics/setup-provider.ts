@@ -2,10 +2,19 @@ import * as opentelemetry from '@opentelemetry/api'
 import { createExporter, createProvider } from './create-provider.js'
 import { MeterProvider } from '@opentelemetry/sdk-metrics'
 
+// set logger for debug
+opentelemetry.diag.setLogger(
+  new opentelemetry.DiagConsoleLogger(),
+  opentelemetry.DiagLogLevel.DEBUG
+)
+
 export const setupMeterProvider = (): MeterProvider => {
   const exporter = createExporter()
   const provider = createProvider(exporter)
-  opentelemetry.metrics.setGlobalMeterProvider(provider)
+  const result = opentelemetry.metrics.setGlobalMeterProvider(provider)
+  if (!result) {
+    console.warn('Global meter provider can not be set.')
+  }
   return provider
 }
 
