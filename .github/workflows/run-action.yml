@@ -29,5 +29,6 @@ jobs:
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          OTEL_EXPORTER_OTLP_HEADERS: ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
