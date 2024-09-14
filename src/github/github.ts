@@ -2,6 +2,8 @@ import { Octokit } from '@octokit/rest'
 import * as github from '@actions/github'
 import { EventPayloadMap } from '@octokit/webhooks-types'
 import { Endpoints } from '@octokit/types'
+import * as core from '@actions/core'
+import settings from '../settings.js'
 
 // TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
 
@@ -53,14 +55,20 @@ export const fetchWorkflowRunJobs = async (
 export const getWorkflowRunContext = (): WorkflowRunContext => {
   const ghContext = github.context
 
-  // If this workflow is triggerd on `workflow_run`, set runId it's id.
+  // If this workflow is trigged on `workflow_run`, set runId it's id.
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
   const workflowRunEvent = github.context
     .payload as EventPayloadMap['workflow_run']
   if (!workflowRunEvent?.workflow_run) {
-    throw new Error('workflow_run payload is not found.')
+    core.warning(
+      'Workflow run event is not found. This case is for local testing only.'
+    )
   }
-  const runId = workflowRunEvent.workflow_run.id
+  const runId = workflowRunEvent?.workflow_run?.id ?? settings.workflowRunId
+
+  if (runId === undefined) {
+    throw new Error('runId is undefined.')
+  }
 
   return {
     owner: ghContext.repo.owner,
