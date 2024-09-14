@@ -25,7 +25,7 @@ jobs:
 
       - name: Run
         id: run
-        uses: ./
+        uses: paper2/github-actions-opentelemetry@v0.0.2
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
