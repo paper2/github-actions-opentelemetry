@@ -66,12 +66,10 @@ To configure the action, you need to set the following environment variables:
 
 ## Setup Instructions
 
-1. **Create OTLP Endpoint**
-   > Set up an OpenTelemetry-compatible backend to receive telemetry data (e.g.,
-   > Jaeger, Prometheus, or other monitoring tools).
-1. **Add Workflow**
-   > Integrate the GitHub Actions OpenTelemetry tool into your workflows as
-   > shown in the examples above.
+1. **Create OTLP Endpoint**: Set up an OpenTelemetry-compatible backend to
+   receive telemetry data (e.g., Jaeger, Prometheus, or other monitoring tools).
+1. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
+   workflows as shown in the examples above.
 
 ## License
 
