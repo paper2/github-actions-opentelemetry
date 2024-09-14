@@ -13,26 +13,26 @@ describe('run', () => {
   const mockWorkflowRunContext: githubModule.WorkflowRunContext = {
     owner: 'test-owner',
     repo: 'test-repo',
-    runId: 10786665607
+    runId: 10856659171
   }
-  const mockWorkflowRun: githubModule.WorkflowRun = {
-    created_at: new Date(),
+  const mockWorkflowRun = {
+    created_at: '2024-09-01T00:00:00Z',
     status: 'completed',
-    id: 10786665607,
-    name: 'test-workflow',
-    run_number: 1
-  }
-  const mockWorkflowRunJobs: githubModule.WorkflowRunJobs = [
+    id: 10856659171,
+    name: 'Send Telemetry after Other Workflow',
+    run_number: 14
+  } as githubModule.WorkflowRun
+  const mockWorkflowRunJobs = [
     {
-      created_at: new Date(),
-      started_at: new Date(),
-      completed_at: new Date(),
-      id: 1,
-      name: 'test-job',
-      run_id: 10786665607,
-      workflow_name: 'test-workflow'
+      created_at: '2024-09-01T00:02:00Z',
+      started_at: '2024-09-01T00:05:00Z',
+      completed_at: '2024-09-01T00:10:00Z',
+      id: 30131735230,
+      name: 'Run Github Actions OpenTelemetry',
+      run_id: 10856659171,
+      workflow_name: 'Send Telemetry after Other Workflow'
     }
-  ]
+  ] as githubModule.WorkflowRunJobs
   const mockExit = vi
     .spyOn(process, 'exit')
     .mockImplementation((code?: number | string | null | undefined): never => {
@@ -68,10 +68,11 @@ describe('run', () => {
       mockOctokit,
       mockWorkflowRunContext
     )
-    expect(metricsModule.createJobGuages).toHaveBeenCalledWith(
+    expect(metricsModule.createJobGauges).toHaveBeenCalledWith(
+      mockWorkflowRun,
       mockWorkflowRunJobs
     )
-    expect(metricsModule.createWorkflowGuages).toHaveBeenCalledWith(
+    expect(metricsModule.createWorkflowGauges).toHaveBeenCalledWith(
       mockWorkflowRun,
       mockWorkflowRunJobs
     )

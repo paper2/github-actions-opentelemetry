@@ -1,34 +1,33 @@
 import * as opentelemetry from '@opentelemetry/api'
 import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 
-export const createGuage = (
+export const createGauge = (
   name: string,
   value: number,
   attributes: opentelemetry.Attributes
 ): void => {
   const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
-  const guage = meter.createObservableGauge(name)
-  // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.
-  guage.addCallback(result => {
+  const gauge = meter.createObservableGauge(name)
+  // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
+  gauge.addCallback(result => {
     result.observe(value, attributes)
-    console.log(`Guage: ${name} ${value} ${JSON.stringify(attributes)}`)
+    console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`)
   })
 }
 
 interface JobMetricsAttributes extends opentelemetry.Attributes {
-  readonly id: number
   readonly name: string
-  readonly run_id: number
   readonly workflow_name: string
+  readonly owner_and_repository: string
+  readonly status: string
 }
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
-  readonly id: number
-  readonly run_id: number
   readonly workflow_name: string
+  readonly owner_and_repository: string
 }
 
-export const createWorkflowGuages = (
+export const createWorkflowGauges = (
   workflow: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): void => {
@@ -42,47 +41,54 @@ export const createWorkflowGuages = (
     Math.max(...jobCompletedAtDates.map(Number))
   )
 
-  const jobStartedAtDates = workflowRunJobs.map(job => job.started_at)
-  const jobStartedtAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
+  const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
+  const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
-    id: workflow.id,
-    run_id: workflow.run_number,
-    workflow_name: workflow.name || ''
+    workflow_name: workflow.name || '',
+    owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`
   }
 
-  createGuage(
+  createGauge(
     'workflow_queued_duration',
-    calcDiffSec(jobStartedtAtMin, workflow.created_at),
+    calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)),
     workflowMetricsAttributes
   )
-  createGuage(
+  createGauge(
     'workflow_duration',
-    calcDiffSec(jobCompletedAtMax, workflow.created_at),
+    calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)),
     workflowMetricsAttributes
   )
 }
 
-export const createJobGuages = (workflowJobs: WorkflowRunJobs): void => {
-  for (const job of workflowJobs) {
+export const createJobGauges = (
+  workflow: WorkflowRun,
+  workflowRunJobs: WorkflowRunJobs
+): void => {
+  for (const job of workflowRunJobs) {
     if (!job.completed_at) {
       continue
     }
 
     const jobMetricsAttributes: JobMetricsAttributes = {
-      id: job.id,
       name: job.name,
-      run_id: job.run_id,
-      workflow_name: job.workflow_name || ''
+      workflow_name: job.workflow_name || '',
+      owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
+      status: job.status
     }
 
-    createGuage(
+    const jobQueuedDuration = calcDiffSec(
+      new Date(job.started_at),
+      new Date(job.created_at)
+    )
+    createGauge(
       'job_queued_duration',
-      calcDiffSec(job.started_at, job.created_at),
+      // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
+      jobQueuedDuration < 0 ? 0 : jobQueuedDuration,
       jobMetricsAttributes
     )
-    createGuage(
+    createGauge(
       'job_duration',
-      calcDiffSec(job.completed_at, job.started_at),
+      calcDiffSec(new Date(job.completed_at), new Date(job.started_at)),
       jobMetricsAttributes
     )
   }

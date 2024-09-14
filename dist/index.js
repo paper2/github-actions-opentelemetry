@@ -68860,11 +68860,7 @@ const fetchWorkflowRun = async (octokit, workflowContext) => {
         run_id: workflowContext.runId
     });
     return {
-        created_at: new Date(res.data.created_at),
-        status: res.data.status,
-        id: res.data.id,
-        name: res.data.name,
-        run_number: res.data.run_number
+        ...res.data
     };
 };
 const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
@@ -68874,16 +68870,7 @@ const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
         run_id: workflowContext.runId,
         per_page: 100
     });
-    const workflowRunJobs = res.data.jobs.map(job => ({
-        created_at: new Date(job.created_at),
-        started_at: new Date(job.started_at),
-        completed_at: job.completed_at ? new Date(job.completed_at) : null,
-        id: job.id,
-        name: job.name,
-        run_id: job.run_id,
-        workflow_name: job.workflow_name
-    }));
-    return workflowRunJobs;
+    return res.data.jobs;
 };
 const getWorkflowRunContext = () => {
     const ghContext = github.context;
@@ -68950,44 +68937,46 @@ const shutdown = async (provider) => {
 
 ;// CONCATENATED MODULE: ./src/metrics/create-guage.ts
 
-const createGuage = (name, value, attributes) => {
+const createGauge = (name, value, attributes) => {
     const meter = src.metrics.getMeter('github-actions-metrics');
-    const guage = meter.createObservableGauge(name);
-    // NOTE: Usyally, this callback is called by interval. But in this library, we call it manually last once.
-    guage.addCallback(result => {
+    const gauge = meter.createObservableGauge(name);
+    // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
+    gauge.addCallback(result => {
         result.observe(value, attributes);
-        console.log(`Guage: ${name} ${value} ${JSON.stringify(attributes)}`);
+        console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`);
     });
 };
-const createWorkflowGuages = (workflow, workflowRunJobs) => {
+const createWorkflowGauges = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
         throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
     }
     const jobCompletedAtDates = workflowRunJobs.map(job => job.completed_at || job.created_at);
     const jobCompletedAtMax = new Date(Math.max(...jobCompletedAtDates.map(Number)));
-    const jobStartedAtDates = workflowRunJobs.map(job => job.started_at);
-    const jobStartedtAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
+    const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
+    const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
     const workflowMetricsAttributes = {
-        id: workflow.id,
-        run_id: workflow.run_number,
-        workflow_name: workflow.name || ''
+        workflow_name: workflow.name || '',
+        owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`
     };
-    createGuage('workflow_queued_duration', calcDiffSec(jobStartedtAtMin, workflow.created_at), workflowMetricsAttributes);
-    createGuage('workflow_duration', calcDiffSec(jobCompletedAtMax, workflow.created_at), workflowMetricsAttributes);
+    createGauge('workflow_queued_duration', calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)), workflowMetricsAttributes);
+    createGauge('workflow_duration', calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)), workflowMetricsAttributes);
 };
-const createJobGuages = (workflowJobs) => {
-    for (const job of workflowJobs) {
+const createJobGauges = (workflow, workflowRunJobs) => {
+    for (const job of workflowRunJobs) {
         if (!job.completed_at) {
             continue;
         }
         const jobMetricsAttributes = {
-            id: job.id,
             name: job.name,
-            run_id: job.run_id,
-            workflow_name: job.workflow_name || ''
+            workflow_name: job.workflow_name || '',
+            owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
+            status: job.status
         };
-        createGuage('job_queued_duration', calcDiffSec(job.started_at, job.created_at), jobMetricsAttributes);
-        createGuage('job_duration', calcDiffSec(job.completed_at, job.started_at), jobMetricsAttributes);
+        const jobQueuedDuration = calcDiffSec(new Date(job.started_at), new Date(job.created_at));
+        createGauge('job_queued_duration', 
+        // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
+        jobQueuedDuration < 0 ? 0 : jobQueuedDuration, jobMetricsAttributes);
+        createGauge('job_duration', calcDiffSec(new Date(job.completed_at), new Date(job.started_at)), jobMetricsAttributes);
     }
 };
 const calcDiffSec = (targetDateTime, compareDateTime) => {
@@ -69011,8 +69000,8 @@ async function run() {
     try {
         const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
         const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
-        createJobGuages(workflowJobs);
-        createWorkflowGuages(workflowRun, workflowJobs);
+        createJobGauges(workflowRun, workflowJobs);
+        createWorkflowGauges(workflowRun, workflowJobs);
     }
     catch (error) {
         if (error instanceof Error)
