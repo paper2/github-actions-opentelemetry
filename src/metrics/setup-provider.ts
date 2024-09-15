@@ -3,10 +3,10 @@ import { createExporter, createProvider } from './create-provider.js'
 import { MeterProvider } from '@opentelemetry/sdk-metrics'
 
 // set logger for debug
-opentelemetry.diag.setLogger(
-  new opentelemetry.DiagConsoleLogger(),
-  opentelemetry.DiagLogLevel.DEBUG
-)
+// opentelemetry.diag.setLogger(
+//   new opentelemetry.DiagConsoleLogger(),
+//   opentelemetry.DiagLogLevel.DEBUG
+// )
 
 export const setupMeterProvider = (): MeterProvider => {
   const exporter = createExporter()
