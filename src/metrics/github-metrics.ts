@@ -1,19 +1,6 @@
-import * as opentelemetry from '@opentelemetry/api'
 import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
-
-export const createGauge = (
-  name: string,
-  value: number,
-  attributes: opentelemetry.Attributes
-): void => {
-  const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
-  const gauge = meter.createObservableGauge(name)
-  // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
-  gauge.addCallback(result => {
-    result.observe(value, attributes)
-    console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`)
-  })
-}
+import * as opentelemetry from '@opentelemetry/api'
+import { createGauge, calcDiffSec } from './create-gauge.js'
 
 interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly name: string
@@ -92,10 +79,4 @@ export const createJobGauges = (
       jobMetricsAttributes
     )
   }
-}
-
-const calcDiffSec = (targetDateTime: Date, compareDateTime: Date): number => {
-  const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
-
-  return Math.floor(diffMilliSecond / 1000)
 }
