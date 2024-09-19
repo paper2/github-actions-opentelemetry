@@ -35,12 +35,14 @@ describe('Metrics Exporter Tests', () => {
       .spyOn(createProvider, 'createExporter')
       .mockReturnValueOnce(inMemoryMetricExporter)
 
+    // NOTE: setupMeterProvider invokes setGlobalMeterProvider affecting in global scope.
+    //       Basically mocking meter provider for testing and not using it in global scope.
     const provider = setupMeterProvider()
     expect(mockCreateExporter).toHaveBeenCalledOnce()
 
     const meter = opentelemetry.metrics.getMeter('test')
-    const guage = meter.createObservableGauge('test_guage')
-    guage.addCallback(result => {
+    const gauge = meter.createObservableGauge('test_gauge')
+    gauge.addCallback(result => {
       result.observe(1234, { testKey: 'testValue' })
     })
 
@@ -55,7 +57,7 @@ describe('Metrics Exporter Tests', () => {
             metrics: [
               {
                 descriptor: {
-                  name: 'test_guage',
+                  name: 'test_gauge',
                   type: 'OBSERVABLE_GAUGE',
                   description: '',
                   unit: '',
