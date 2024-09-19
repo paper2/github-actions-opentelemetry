@@ -11,18 +11,14 @@ on:
       - completed
 
 permissions:
-  contents: read
+  # Need for private repository
+  actions: read
 
 jobs:
-  test-action:
-    name: Run Github Actions OpenTelemetry
+  send-telemetry:
+    name: Send CI Telemetry
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-
       - name: Run
         id: run
         uses: paper2/github-actions-opentelemetry@v0.0.2
