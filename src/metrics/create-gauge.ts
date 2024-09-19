@@ -21,5 +21,5 @@ export const calcDiffSec = (
 ): number => {
   const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
 
-  return Math.floor(diffMilliSecond / 1000)
+  return Math.floor(Math.abs(diffMilliSecond / 1000))
 }
