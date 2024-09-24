@@ -1,5 +1,11 @@
 # GitHub Actions OpenTelemetry (Dogfooding Release)
 
+[![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
+[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+
 This open-source tool allows you to send GitHub Actions workflow and job
 execution times to an OpenTelemetry (OTLP) endpoint. It helps you monitor and
 analyze GitHub Actions telemetry data using the OpenTelemetry protocol.
