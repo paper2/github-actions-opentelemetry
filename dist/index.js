@@ -68850,7 +68850,8 @@ const settings = {
         ? parseInt(process.env.WORKFLOW_RUN_ID)
         : undefined,
     owner: process.env.OWNER,
-    repository: process.env.REPOSITORY
+    repository: process.env.REPOSITORY,
+    logLevel: process.env.LOG_LEVEL || 'info'
 };
 /* harmony default export */ const src_settings = (settings);
 
@@ -68904,6 +68905,59 @@ const getWorkflowRunContext = () => {
 
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
 var src = __nccwpck_require__(5163);
+;// CONCATENATED MODULE: ./src/metrics/create-gauge.ts
+
+const createGauge = (name, value, attributes) => {
+    const meter = src.metrics.getMeter('github-actions-metrics');
+    const gauge = meter.createObservableGauge(name);
+    // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
+    gauge.addCallback(result => {
+        result.observe(value, attributes);
+        console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`);
+    });
+};
+// TODO: move to utils.
+const calcDiffSec = (targetDateTime, compareDateTime) => {
+    const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
+    return Math.floor(Math.abs(diffMilliSecond / 1000));
+};
+
+;// CONCATENATED MODULE: ./src/metrics/github-metrics.ts
+
+const createWorkflowGauges = (workflow, workflowRunJobs) => {
+    if (workflow.status !== 'completed') {
+        throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
+    }
+    const jobCompletedAtDates = workflowRunJobs.map(job => new Date(job.completed_at || job.created_at));
+    const jobCompletedAtMax = new Date(Math.max(...jobCompletedAtDates.map(Number)));
+    const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
+    const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
+    const workflowMetricsAttributes = {
+        workflow_name: workflow.name || '',
+        repository: `${workflow.repository.full_name}`
+    };
+    createGauge('workflow_queued_duration', calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)), workflowMetricsAttributes);
+    createGauge('workflow_duration', calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)), workflowMetricsAttributes);
+};
+const createJobGauges = (workflow, workflowRunJobs) => {
+    for (const job of workflowRunJobs) {
+        if (!job.completed_at) {
+            continue;
+        }
+        const jobMetricsAttributes = {
+            name: job.name,
+            workflow_name: job.workflow_name || '',
+            repository: `${workflow.repository.full_name}`,
+            status: job.status
+        };
+        const jobQueuedDuration = calcDiffSec(new Date(job.started_at), new Date(job.created_at));
+        createGauge('job_queued_duration', 
+        // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
+        jobQueuedDuration < 0 ? 0 : jobQueuedDuration, jobMetricsAttributes);
+        createGauge('job_duration', calcDiffSec(new Date(job.completed_at), new Date(job.started_at)), jobMetricsAttributes);
+    }
+};
+
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-metrics-otlp-proto/build/src/index.js
 var build_src = __nccwpck_require__(6664);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-metrics/build/src/index.js
@@ -68928,10 +68982,17 @@ const createProvider = (exporter) => new sdk_metrics_build_src.MeterProvider({
 ;// CONCATENATED MODULE: ./src/metrics/setup-provider.ts
 
 
+
+if (src_settings.logLevel === 'debug') {
+    src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
+}
 const setupMeterProvider = () => {
     const exporter = createExporter();
     const provider = createProvider(exporter);
-    src.metrics.setGlobalMeterProvider(provider);
+    const result = src.metrics.setGlobalMeterProvider(provider);
+    if (!result) {
+        console.warn('Global meter provider can not be set.');
+    }
     return provider;
 };
 const shutdown = async (provider) => {
@@ -68946,54 +69007,9 @@ const shutdown = async (provider) => {
     process.exit(0);
 };
 
-;// CONCATENATED MODULE: ./src/metrics/create-guage.ts
+;// CONCATENATED MODULE: ./src/metrics/index.ts
 
-const createGauge = (name, value, attributes) => {
-    const meter = src.metrics.getMeter('github-actions-metrics');
-    const gauge = meter.createObservableGauge(name);
-    // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
-    gauge.addCallback(result => {
-        result.observe(value, attributes);
-        console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`);
-    });
-};
-const createWorkflowGauges = (workflow, workflowRunJobs) => {
-    if (workflow.status !== 'completed') {
-        throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
-    }
-    const jobCompletedAtDates = workflowRunJobs.map(job => job.completed_at || job.created_at);
-    const jobCompletedAtMax = new Date(Math.max(...jobCompletedAtDates.map(Number)));
-    const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
-    const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
-    const workflowMetricsAttributes = {
-        workflow_name: workflow.name || '',
-        owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`
-    };
-    createGauge('workflow_queued_duration', calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)), workflowMetricsAttributes);
-    createGauge('workflow_duration', calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)), workflowMetricsAttributes);
-};
-const createJobGauges = (workflow, workflowRunJobs) => {
-    for (const job of workflowRunJobs) {
-        if (!job.completed_at) {
-            continue;
-        }
-        const jobMetricsAttributes = {
-            name: job.name,
-            workflow_name: job.workflow_name || '',
-            owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
-            status: job.status
-        };
-        const jobQueuedDuration = calcDiffSec(new Date(job.started_at), new Date(job.created_at));
-        createGauge('job_queued_duration', 
-        // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
-        jobQueuedDuration < 0 ? 0 : jobQueuedDuration, jobMetricsAttributes);
-        createGauge('job_duration', calcDiffSec(new Date(job.completed_at), new Date(job.started_at)), jobMetricsAttributes);
-    }
-};
-const calcDiffSec = (targetDateTime, compareDateTime) => {
-    const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
-    return Math.floor(diffMilliSecond / 1000);
-};
+
 
 ;// CONCATENATED MODULE: ./src/main.ts
 

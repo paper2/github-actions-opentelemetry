@@ -1,5 +1,11 @@
 # GitHub Actions OpenTelemetry (Dogfooding Release)
 
+[![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
+[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+
 This open-source tool allows you to send GitHub Actions workflow and job
 execution times to an OpenTelemetry (OTLP) endpoint. It helps you monitor and
 analyze GitHub Actions telemetry data using the OpenTelemetry protocol.
@@ -36,18 +42,14 @@ on:
       - completed
 
 permissions:
-  contents: read
+  # Need for private repository
+  actions: read
 
 jobs:
-  test-action:
-    name: Run GitHub Actions OpenTelemetry
+  send-telemetry:
+    name: Send CI Telemetry
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-
       - name: Run
         id: run
         uses: paper2/github-actions-opentelemetry@v0.0.2
@@ -68,7 +70,7 @@ To configure the action, you need to set the following environment variables:
 
 1. **Create OTLP Endpoint**: Set up an OpenTelemetry-compatible backend to
    receive telemetry data (e.g., Jaeger, Prometheus, or other monitoring tools).
-2. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
+1. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
    workflows as shown in the examples above.
 
 ## License

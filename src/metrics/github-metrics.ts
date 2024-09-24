@@ -1,30 +1,17 @@
-import * as opentelemetry from '@opentelemetry/api'
 import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
-
-export const createGauge = (
-  name: string,
-  value: number,
-  attributes: opentelemetry.Attributes
-): void => {
-  const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
-  const gauge = meter.createObservableGauge(name)
-  // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
-  gauge.addCallback(result => {
-    result.observe(value, attributes)
-    console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`)
-  })
-}
+import * as opentelemetry from '@opentelemetry/api'
+import { createGauge, calcDiffSec } from './create-gauge.js'
 
 interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly name: string
   readonly workflow_name: string
-  readonly owner_and_repository: string
+  readonly repository: string
   readonly status: string
 }
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   readonly workflow_name: string
-  readonly owner_and_repository: string
+  readonly repository: string
 }
 
 export const createWorkflowGauges = (
@@ -35,7 +22,7 @@ export const createWorkflowGauges = (
     throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
   }
   const jobCompletedAtDates = workflowRunJobs.map(
-    job => job.completed_at || job.created_at
+    job => new Date(job.completed_at || job.created_at)
   )
   const jobCompletedAtMax = new Date(
     Math.max(...jobCompletedAtDates.map(Number))
@@ -45,7 +32,7 @@ export const createWorkflowGauges = (
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
     workflow_name: workflow.name || '',
-    owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`
+    repository: `${workflow.repository.full_name}`
   }
 
   createGauge(
@@ -72,7 +59,7 @@ export const createJobGauges = (
     const jobMetricsAttributes: JobMetricsAttributes = {
       name: job.name,
       workflow_name: job.workflow_name || '',
-      owner_and_repository: `${workflow.repository.owner.name}/${workflow.repository}`,
+      repository: `${workflow.repository.full_name}`,
       status: job.status
     }
 
@@ -92,10 +79,4 @@ export const createJobGauges = (
       jobMetricsAttributes
     )
   }
-}
-
-const calcDiffSec = (targetDateTime: Date, compareDateTime: Date): number => {
-  const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
-
-  return Math.floor(diffMilliSecond / 1000)
 }
