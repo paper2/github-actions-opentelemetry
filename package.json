@@ -34,7 +34,7 @@
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
     "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry npx tsx ./src/index.ts",
-    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
+    "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
   "eslintConfig": {

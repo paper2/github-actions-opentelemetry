@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 import {
   createOctokit,
   fetchWorkflowRun,
@@ -21,7 +22,7 @@ export async function run(): Promise<void> {
 
   const token = core.getInput('GITHUB_TOKEN')
   const octokit = createOctokit(token)
-  const workflowRunContext = getWorkflowRunContext()
+  const workflowRunContext = getWorkflowRunContext(github.context)
 
   try {
     const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)

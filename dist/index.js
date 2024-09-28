@@ -45946,7 +45946,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(4408)
-const { stringify, getHeadersList } = __nccwpck_require__(3121)
+const { stringify, getHeadersList } = __nccwpck_require__(6576)
 const { webidl } = __nccwpck_require__(1744)
 const { Headers } = __nccwpck_require__(554)
 
@@ -46137,7 +46137,7 @@ module.exports = {
 
 
 const { maxNameValuePairSize, maxAttributeValueSize } = __nccwpck_require__(663)
-const { isCTLExcludingHtab } = __nccwpck_require__(3121)
+const { isCTLExcludingHtab } = __nccwpck_require__(6576)
 const { collectASequenceOfCodePointsFast } = __nccwpck_require__(685)
 const assert = __nccwpck_require__(9491)
 
@@ -46455,7 +46455,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 3121:
+/***/ 6576:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -65287,6 +65287,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./node_modules/@octokit/rest/node_modules/universal-user-agent/index.js
 function getUserAgent() {
   if (typeof navigator === "object" && "userAgent" in navigator) {
@@ -68842,8 +68844,6 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 );
 
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./src/settings.ts
 const settings = {
     workflowRunId: process.env.WORKFLOW_RUN_ID
@@ -68858,9 +68858,7 @@ const settings = {
 ;// CONCATENATED MODULE: ./src/github/github.ts
 
 
-
 const createOctokit = (token) => {
-    // TODO: try to use github.getOctokit
     return new dist_src_Octokit({
         auth: token
     });
@@ -68884,18 +68882,17 @@ const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
     });
     return res.data.jobs;
 };
-const getWorkflowRunContext = () => {
-    const ghContext = github.context;
+const getWorkflowRunContext = (context) => {
     // If this workflow is trigged on `workflow_run`, set runId it's id.
     // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
-    const workflowRunEvent = github.context.payload;
+    const workflowRunEvent = context.payload;
     const runId = src_settings.workflowRunId ?? workflowRunEvent?.workflow_run?.id;
     if (runId === undefined) {
         throw new Error('Workflow run id is undefined.');
     }
     return {
-        owner: src_settings.owner ?? ghContext.repo.owner,
-        repo: src_settings.repository ?? ghContext.repo.repo,
+        owner: src_settings.owner ?? context.repo.owner,
+        repo: src_settings.repository ?? context.repo.repo,
         runId
     };
 };
@@ -68916,13 +68913,15 @@ const createGauge = (name, value, attributes) => {
         console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`);
     });
 };
-// TODO: move to utils.
-const calcDiffSec = (targetDateTime, compareDateTime) => {
-    const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime();
-    return Math.floor(Math.abs(diffMilliSecond / 1000));
+
+;// CONCATENATED MODULE: ./src/utils/calc-diff-sec.ts
+const calcDiffSec = (startDate, endDate) => {
+    const diffMs = endDate.getTime() - startDate.getTime();
+    return Math.floor(diffMs / 1000);
 };
 
 ;// CONCATENATED MODULE: ./src/metrics/github-metrics.ts
+
 
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
@@ -68936,8 +68935,8 @@ const createWorkflowGauges = (workflow, workflowRunJobs) => {
         workflow_name: workflow.name || '',
         repository: `${workflow.repository.full_name}`
     };
-    createGauge('workflow_queued_duration', calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)), workflowMetricsAttributes);
-    createGauge('workflow_duration', calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)), workflowMetricsAttributes);
+    createGauge('workflow_queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes);
+    createGauge('workflow_duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes);
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
@@ -68950,11 +68949,14 @@ const createJobGauges = (workflow, workflowRunJobs) => {
             repository: `${workflow.repository.full_name}`,
             status: job.status
         };
-        const jobQueuedDuration = calcDiffSec(new Date(job.started_at), new Date(job.created_at));
-        createGauge('job_queued_duration', 
-        // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
-        jobQueuedDuration < 0 ? 0 : jobQueuedDuration, jobMetricsAttributes);
-        createGauge('job_duration', calcDiffSec(new Date(job.completed_at), new Date(job.started_at)), jobMetricsAttributes);
+        createGauge('job_duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes);
+        const jobQueuedDuration = calcDiffSec(new Date(job.created_at), new Date(job.started_at));
+        if (jobQueuedDuration < 0) {
+            // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
+            // Not creating metric because it is noise of Statistics.
+            continue;
+        }
+        createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes);
     }
 };
 
@@ -69015,6 +69017,7 @@ const shutdown = async (provider) => {
 
 
 
+
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -69023,7 +69026,7 @@ async function run() {
     const provider = setupMeterProvider();
     const token = core.getInput('GITHUB_TOKEN');
     const octokit = createOctokit(token);
-    const workflowRunContext = getWorkflowRunContext();
+    const workflowRunContext = getWorkflowRunContext(github.context);
     try {
         const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
         const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
