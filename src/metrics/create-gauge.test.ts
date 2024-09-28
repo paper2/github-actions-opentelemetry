@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge, calcDiffSec } from './create-gauge.js'
+import { createGauge } from './create-gauge.js'
 import {
   InMemoryMetricExporter,
   AggregationTemporality,
@@ -73,25 +73,5 @@ describe('createGauge', () => {
         ]
       }
     ])
-  })
-})
-
-describe('calcDiffSec', () => {
-  test('should calculate the difference in seconds between two dates', () => {
-    const date1 = new Date('2023-01-01T00:00:00Z')
-    const date2 = new Date('2023-01-01T00:00:10Z')
-
-    const diff = calcDiffSec(date2, date1)
-
-    expect(diff).toBe(10)
-  })
-
-  test('should return a positive value if the first date is earlier', () => {
-    const date1 = new Date('2023-01-01T00:00:00Z')
-    const date2 = new Date('2023-01-01T00:00:10Z')
-
-    const diff = calcDiffSec(date1, date2)
-
-    expect(diff).toBe(10)
   })
 })

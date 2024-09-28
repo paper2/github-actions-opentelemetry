@@ -18,7 +18,6 @@ export interface WorkflowRunContext {
 }
 
 export const createOctokit = (token: string): Octokit => {
-  // TODO: try to use github.getOctokit
   return new Octokit({
     auth: token
   })
@@ -51,12 +50,14 @@ export const fetchWorkflowRunJobs = async (
   return res.data.jobs
 }
 
-export const getWorkflowRunContext = (): WorkflowRunContext => {
-  const ghContext = github.context
+export type GitHubContext = typeof github.context
 
+export const getWorkflowRunContext = (
+  context: GitHubContext
+): WorkflowRunContext => {
   // If this workflow is trigged on `workflow_run`, set runId it's id.
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
-  const workflowRunEvent = github.context.payload as
+  const workflowRunEvent = context.payload as
     | EventPayloadMap['workflow_run']
     | undefined
 
@@ -67,8 +68,8 @@ export const getWorkflowRunContext = (): WorkflowRunContext => {
   }
 
   return {
-    owner: settings.owner ?? ghContext.repo.owner,
-    repo: settings.repository ?? ghContext.repo.repo,
+    owner: settings.owner ?? context.repo.owner,
+    repo: settings.repository ?? context.repo.repo,
     runId
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.0.3",
+  "version": "v0.0.4",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -32,9 +32,9 @@
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
-    "test": "vitest run --coverage",
+    "test": "vitest --coverage",
     "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry npx tsx ./src/index.ts",
-    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
+    "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
   "eslintConfig": {
