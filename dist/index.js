@@ -68904,9 +68904,9 @@ const getWorkflowRunContext = (context) => {
 var src = __nccwpck_require__(5163);
 ;// CONCATENATED MODULE: ./src/metrics/create-gauge.ts
 
-const createGauge = (name, value, attributes) => {
+const createGauge = (name, value, attributes, option) => {
     const meter = src.metrics.getMeter('github-actions-metrics');
-    const gauge = meter.createObservableGauge(name);
+    const gauge = meter.createObservableGauge(name, option);
     // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
     gauge.addCallback(result => {
         result.observe(value, attributes);
@@ -68935,8 +68935,8 @@ const createWorkflowGauges = (workflow, workflowRunJobs) => {
         workflow_name: workflow.name || '',
         repository: `${workflow.repository.full_name}`
     };
-    createGauge('workflow_queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes);
-    createGauge('workflow_duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes);
+    createGauge('workflow_queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
+    createGauge('workflow_duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
@@ -68949,14 +68949,14 @@ const createJobGauges = (workflow, workflowRunJobs) => {
             repository: `${workflow.repository.full_name}`,
             status: job.status
         };
-        createGauge('job_duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes);
+        createGauge('job_duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
         const jobQueuedDuration = calcDiffSec(new Date(job.created_at), new Date(job.started_at));
         if (jobQueuedDuration < 0) {
             // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
             // Not creating metric because it is noise of Statistics.
             continue;
         }
-        createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes);
+        createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
     }
 };
 

@@ -39,13 +39,15 @@ describe('createWorkflowGauges', () => {
       1,
       'workflow_queued_duration',
       12,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
       'workflow_duration',
       23,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toBeCalledTimes(2)
   })
@@ -62,13 +64,15 @@ describe('createJobGauges', () => {
       1,
       'job_duration',
       10,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
       'job_queued_duration',
       10,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toBeCalledTimes(4)
   })
@@ -91,13 +95,15 @@ describe('createJobGauges', () => {
       1,
       'job_duration',
       10,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
       'job_duration',
       10,
-      expect.anything()
+      expect.anything(),
+      { unit: 's' }
     )
     expect(mockCreateGauge).toBeCalledTimes(2)
   })

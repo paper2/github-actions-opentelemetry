@@ -32,12 +32,14 @@ export const createWorkflowGauges = (
   createGauge(
     'workflow_queued_duration',
     calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
-    workflowMetricsAttributes
+    workflowMetricsAttributes,
+    { unit: 's' }
   )
   createGauge(
     'workflow_duration',
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
-    workflowMetricsAttributes
+    workflowMetricsAttributes,
+    { unit: 's' }
   )
 }
 
@@ -67,7 +69,8 @@ export const createJobGauges = (
     createGauge(
       'job_duration',
       calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
-      jobMetricsAttributes
+      jobMetricsAttributes,
+      { unit: 's' }
     )
 
     const jobQueuedDuration = calcDiffSec(
@@ -79,6 +82,11 @@ export const createJobGauges = (
       // Not creating metric because it is noise of Statistics.
       continue
     }
-    createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes)
+    createGauge(
+      'job_queued_duration',
+      jobQueuedDuration,
+      jobMetricsAttributes,
+      { unit: 's' }
+    )
   }
 }
