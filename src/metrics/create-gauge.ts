@@ -13,13 +13,3 @@ export const createGauge = (
     console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`)
   })
 }
-
-// TODO: move to utils.
-export const calcDiffSec = (
-  targetDateTime: Date,
-  compareDateTime: Date
-): number => {
-  const diffMilliSecond = targetDateTime.getTime() - compareDateTime.getTime()
-
-  return Math.floor(Math.abs(diffMilliSecond / 1000))
-}

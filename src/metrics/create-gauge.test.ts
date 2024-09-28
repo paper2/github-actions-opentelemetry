@@ -1,12 +1,13 @@
 import { describe, test, expect, vi } from 'vitest'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge, calcDiffSec } from './create-gauge.js'
+import { createGauge } from './create-gauge.js'
 import {
   InMemoryMetricExporter,
   AggregationTemporality,
   MeterProvider,
   PeriodicExportingMetricReader
 } from '@opentelemetry/sdk-metrics'
+import { calcDiffSec } from '../utils/calc-diff-sec.js'
 
 interface InMemoryProvider {
   provider: MeterProvider

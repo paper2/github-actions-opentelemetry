@@ -1,13 +1,7 @@
 import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge, calcDiffSec } from './create-gauge.js'
-
-interface JobMetricsAttributes extends opentelemetry.Attributes {
-  readonly name: string
-  readonly workflow_name: string
-  readonly repository: string
-  readonly status: string
-}
+import { createGauge } from './create-gauge.js'
+import { calcDiffSec } from '../utils/calc-diff-sec.js'
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   readonly workflow_name: string
@@ -45,6 +39,13 @@ export const createWorkflowGauges = (
     calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)),
     workflowMetricsAttributes
   )
+}
+
+interface JobMetricsAttributes extends opentelemetry.Attributes {
+  readonly name: string
+  readonly workflow_name: string
+  readonly repository: string
+  readonly status: string
 }
 
 export const createJobGauges = (
