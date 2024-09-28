@@ -1,5 +1,4 @@
-export const calcDiffSec = (d1: Date, d2: Date): number => {
-  const diffMilliSecond = d1.getTime() - d2.getTime()
-
-  return Math.floor(Math.abs(diffMilliSecond / 1000))
+export const calcDiffSec = (startDate: Date, endDate: Date): number => {
+  const diffMs = endDate.getTime() - startDate.getTime()
+  return Math.floor(diffMs / 1000)
 }

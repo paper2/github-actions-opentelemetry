@@ -31,12 +31,12 @@ export const createWorkflowGauges = (
 
   createGauge(
     'workflow_queued_duration',
-    calcDiffSec(jobStartedAtMin, new Date(workflow.created_at)),
+    calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
     workflowMetricsAttributes
   )
   createGauge(
     'workflow_duration',
-    calcDiffSec(jobCompletedAtMax, new Date(workflow.created_at)),
+    calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
     workflowMetricsAttributes
   )
 }
@@ -64,20 +64,21 @@ export const createJobGauges = (
       status: job.status
     }
 
-    const jobQueuedDuration = calcDiffSec(
-      new Date(job.started_at),
-      new Date(job.created_at)
-    )
-    createGauge(
-      'job_queued_duration',
-      // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
-      jobQueuedDuration < 0 ? 0 : jobQueuedDuration,
-      jobMetricsAttributes
-    )
     createGauge(
       'job_duration',
-      calcDiffSec(new Date(job.completed_at), new Date(job.started_at)),
+      calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
       jobMetricsAttributes
     )
+
+    const jobQueuedDuration = calcDiffSec(
+      new Date(job.created_at),
+      new Date(job.started_at)
+    )
+    if (jobQueuedDuration < 0) {
+      // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
+      // Not creating metric because it is noise of Statistics.
+      continue
+    }
+    createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes)
   }
 }

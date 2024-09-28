@@ -60,7 +60,36 @@ describe('createJobGauges', () => {
     createJobGauges(workflowRun, workflowFlowRunJobs)
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       1,
+      'job_duration',
+      10,
+      expect.anything()
+    )
+    expect(mockCreateGauge).toHaveBeenNthCalledWith(
+      2,
       'job_queued_duration',
+      10,
+      expect.anything()
+    )
+    expect(mockCreateGauge).toBeCalledTimes(4)
+  })
+
+  test('should not create job_queued_duration', () => {
+    const workflowFlowRunJobsBiggerCreatedAt = [
+      {
+        created_at: '2024-08-31T00:00:32Z',
+        started_at: '2024-08-31T00:00:12Z',
+        completed_at: '2024-08-31T00:00:22Z'
+      },
+      {
+        created_at: '2024-08-31T00:00:33Z',
+        started_at: '2024-08-31T00:00:13Z',
+        completed_at: '2024-08-31T00:00:23Z'
+      }
+    ] as WorkflowRunJobs
+    createJobGauges(workflowRun, workflowFlowRunJobsBiggerCreatedAt)
+    expect(mockCreateGauge).toHaveBeenNthCalledWith(
+      1,
+      'job_duration',
       10,
       expect.anything()
     )
@@ -70,18 +99,6 @@ describe('createJobGauges', () => {
       10,
       expect.anything()
     )
-    expect(mockCreateGauge).toHaveBeenNthCalledWith(
-      3,
-      'job_queued_duration',
-      10,
-      expect.anything()
-    )
-    expect(mockCreateGauge).toHaveBeenNthCalledWith(
-      4,
-      'job_duration',
-      10,
-      expect.anything()
-    )
-    expect(mockCreateGauge).toBeCalledTimes(4)
+    expect(mockCreateGauge).toBeCalledTimes(2)
   })
 })
