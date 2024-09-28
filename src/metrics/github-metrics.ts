@@ -4,8 +4,9 @@ import { createGauge } from './create-gauge.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
-  readonly workflow_name: string
-  readonly repository: string
+  // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+  readonly 'cicd.pipeline.name': string
+  readonly 'cicd.pipeline.repository': string
 }
 
 export const createWorkflowGauges = (
@@ -25,18 +26,18 @@ export const createWorkflowGauges = (
   const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
-    workflow_name: workflow.name || '',
-    repository: `${workflow.repository.full_name}`
+    'cicd.pipeline.name': workflow.name || '',
+    'cicd.pipeline.repository': `${workflow.repository.full_name}`
   }
 
   createGauge(
-    'workflow_queued_duration',
+    'cicd.pipeline.queued_duration',
     calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
     workflowMetricsAttributes,
     { unit: 's' }
   )
   createGauge(
-    'workflow_duration',
+    'cicd.pipeline.duration',
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
     workflowMetricsAttributes,
     { unit: 's' }
@@ -44,10 +45,11 @@ export const createWorkflowGauges = (
 }
 
 interface JobMetricsAttributes extends opentelemetry.Attributes {
-  readonly name: string
-  readonly workflow_name: string
-  readonly repository: string
-  readonly status: string
+  // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+  readonly 'cicd.pipeline.name': string
+  readonly 'cicd.pipeline.repository': string
+  readonly 'cicd.pipeline.task.name': string
+  readonly 'cicd.pipeline.task.status': string
 }
 
 export const createJobGauges = (
@@ -60,14 +62,14 @@ export const createJobGauges = (
     }
 
     const jobMetricsAttributes: JobMetricsAttributes = {
-      name: job.name,
-      workflow_name: job.workflow_name || '',
-      repository: `${workflow.repository.full_name}`,
-      status: job.status
+      'cicd.pipeline.name': job.workflow_name || '',
+      'cicd.pipeline.repository': `${workflow.repository.full_name}`,
+      'cicd.pipeline.task.name': job.name,
+      'cicd.pipeline.task.status': job.status
     }
 
     createGauge(
-      'job_duration',
+      'cicd.pipeline.task.duration',
       calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
       jobMetricsAttributes,
       { unit: 's' }
@@ -83,7 +85,7 @@ export const createJobGauges = (
       continue
     }
     createGauge(
-      'job_queued_duration',
+      'cicd.pipeline.task.queued_duration',
       jobQueuedDuration,
       jobMetricsAttributes,
       { unit: 's' }

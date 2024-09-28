@@ -37,14 +37,14 @@ describe('createWorkflowGauges', () => {
     createWorkflowGauges(workflowRun, workflowFlowRunJobs)
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       1,
-      'workflow_queued_duration',
+      'cicd.pipeline.queued_duration',
       12,
       expect.anything(),
       { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
-      'workflow_duration',
+      'cicd.pipeline.duration',
       23,
       expect.anything(),
       { unit: 's' }
@@ -62,14 +62,14 @@ describe('createJobGauges', () => {
     createJobGauges(workflowRun, workflowFlowRunJobs)
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       1,
-      'job_duration',
+      'cicd.pipeline.task.duration',
       10,
       expect.anything(),
       { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
-      'job_queued_duration',
+      'cicd.pipeline.task.queued_duration',
       10,
       expect.anything(),
       { unit: 's' }
@@ -93,14 +93,14 @@ describe('createJobGauges', () => {
     createJobGauges(workflowRun, workflowFlowRunJobsBiggerCreatedAt)
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       1,
-      'job_duration',
+      'cicd.pipeline.task.duration',
       10,
       expect.anything(),
       { unit: 's' }
     )
     expect(mockCreateGauge).toHaveBeenNthCalledWith(
       2,
-      'job_duration',
+      'cicd.pipeline.task.duration',
       10,
       expect.anything(),
       { unit: 's' }

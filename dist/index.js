@@ -68932,11 +68932,11 @@ const createWorkflowGauges = (workflow, workflowRunJobs) => {
     const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
     const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
     const workflowMetricsAttributes = {
-        workflow_name: workflow.name || '',
-        repository: `${workflow.repository.full_name}`
+        'cicd.pipeline.name': workflow.name || '',
+        'cicd.pipeline.repository': `${workflow.repository.full_name}`
     };
-    createGauge('workflow_queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
-    createGauge('workflow_duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
+    createGauge('cicd.pipeline.queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
+    createGauge('cicd.pipeline.duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
@@ -68944,19 +68944,19 @@ const createJobGauges = (workflow, workflowRunJobs) => {
             continue;
         }
         const jobMetricsAttributes = {
-            name: job.name,
-            workflow_name: job.workflow_name || '',
-            repository: `${workflow.repository.full_name}`,
-            status: job.status
+            'cicd.pipeline.name': job.workflow_name || '',
+            'cicd.pipeline.repository': `${workflow.repository.full_name}`,
+            'cicd.pipeline.task.name': job.name,
+            'cicd.pipeline.task.status': job.status
         };
-        createGauge('job_duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
+        createGauge('cicd.pipeline.task.duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
         const jobQueuedDuration = calcDiffSec(new Date(job.created_at), new Date(job.started_at));
         if (jobQueuedDuration < 0) {
             // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
             // Not creating metric because it is noise of Statistics.
             continue;
         }
-        createGauge('job_queued_duration', jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
+        createGauge('cicd.pipeline.task.queued_duration', jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
     }
 };
 
