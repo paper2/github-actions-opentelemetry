@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as opentelemetry from '@opentelemetry/api'
 import {
   createOctokit,
   fetchWorkflowRun,
@@ -21,6 +22,14 @@ import {
   createWorkflowRunJobSpan,
   createWorkflowRunStepSpan
 } from './traces/index.js'
+import settings from './settings.js'
+
+if (settings.logLevel === 'debug') {
+  opentelemetry.diag.setLogger(
+    new opentelemetry.DiagConsoleLogger(),
+    opentelemetry.DiagLogLevel.DEBUG
+  )
+}
 
 /**
  * The main function for the action.
