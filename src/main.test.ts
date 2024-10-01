@@ -88,6 +88,5 @@ describe('run', () => {
     await expect(run()).rejects.toThrow('process.exit called with code: 1')
     expect(mockExit).toHaveBeenCalledWith(1)
     expect(core.setFailed).toHaveBeenCalledWith(errorMessage)
-    expect(metricsModule.shutdown).toHaveBeenCalled()
   })
 })

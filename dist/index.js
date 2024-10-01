@@ -11722,6 +11722,171 @@ exports.VERSION = '0.53.0';
 
 /***/ }),
 
+/***/ 7859:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+var __webpack_unused_export__;
+
+__webpack_unused_export__ = ({ value: true });
+exports.M = void 0;
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+var platform_1 = __nccwpck_require__(2055);
+Object.defineProperty(exports, "M", ({ enumerable: true, get: function () { return platform_1.OTLPTraceExporter; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 2055:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OTLPTraceExporter = void 0;
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+var node_1 = __nccwpck_require__(3851);
+Object.defineProperty(exports, "OTLPTraceExporter", ({ enumerable: true, get: function () { return node_1.OTLPTraceExporter; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 4394:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OTLPTraceExporter = void 0;
+const core_1 = __nccwpck_require__(9736);
+const otlp_exporter_base_1 = __nccwpck_require__(1363);
+const otlp_transformer_1 = __nccwpck_require__(4357);
+const version_1 = __nccwpck_require__(6811);
+const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
+const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const USER_AGENT = {
+    'User-Agent': `OTel-OTLP-Exporter-JavaScript/${version_1.VERSION}`,
+};
+/**
+ * Collector Trace Exporter for Node with protobuf
+ */
+class OTLPTraceExporter extends otlp_exporter_base_1.OTLPExporterNodeBase {
+    constructor(config = {}) {
+        super(config, otlp_transformer_1.ProtobufTraceSerializer, Object.assign(Object.assign(Object.assign(Object.assign({}, core_1.baggageUtils.parseKeyPairsIntoRecord((0, core_1.getEnv)().OTEL_EXPORTER_OTLP_TRACES_HEADERS)), (0, otlp_exporter_base_1.parseHeaders)(config === null || config === void 0 ? void 0 : config.headers)), USER_AGENT), { 'Content-Type': 'application/x-protobuf' }));
+    }
+    getDefaultUrl(config) {
+        if (typeof config.url === 'string') {
+            return config.url;
+        }
+        const env = (0, core_1.getEnv)();
+        if (env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0) {
+            return (0, otlp_exporter_base_1.appendRootPathToUrlIfNeeded)(env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT);
+        }
+        if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
+            return (0, otlp_exporter_base_1.appendResourcePathToUrl)(env.OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH);
+        }
+        return DEFAULT_COLLECTOR_URL;
+    }
+}
+exports.OTLPTraceExporter = OTLPTraceExporter;
+//# sourceMappingURL=OTLPTraceExporter.js.map
+
+/***/ }),
+
+/***/ 3851:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OTLPTraceExporter = void 0;
+var OTLPTraceExporter_1 = __nccwpck_require__(4394);
+Object.defineProperty(exports, "OTLPTraceExporter", ({ enumerable: true, get: function () { return OTLPTraceExporter_1.OTLPTraceExporter; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 6811:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VERSION = void 0;
+// this is autogenerated file, see scripts/version-update.js
+exports.VERSION = '0.53.0';
+//# sourceMappingURL=version.js.map
+
+/***/ }),
+
 /***/ 7684:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -32524,6 +32689,1896 @@ exports.ViewRegistry = ViewRegistry;
 
 /***/ }),
 
+/***/ 8920:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BasicTracerProvider = exports.ForceFlushState = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+const resources_1 = __nccwpck_require__(3871);
+const _1 = __nccwpck_require__(9253);
+const config_1 = __nccwpck_require__(91);
+const MultiSpanProcessor_1 = __nccwpck_require__(2352);
+const NoopSpanProcessor_1 = __nccwpck_require__(9252);
+const platform_1 = __nccwpck_require__(262);
+const utility_1 = __nccwpck_require__(4324);
+var ForceFlushState;
+(function (ForceFlushState) {
+    ForceFlushState[ForceFlushState["resolved"] = 0] = "resolved";
+    ForceFlushState[ForceFlushState["timeout"] = 1] = "timeout";
+    ForceFlushState[ForceFlushState["error"] = 2] = "error";
+    ForceFlushState[ForceFlushState["unresolved"] = 3] = "unresolved";
+})(ForceFlushState = exports.ForceFlushState || (exports.ForceFlushState = {}));
+/**
+ * This class represents a basic tracer provider which platform libraries can extend
+ */
+class BasicTracerProvider {
+    constructor(config = {}) {
+        var _a;
+        this._registeredSpanProcessors = [];
+        this._tracers = new Map();
+        const mergedConfig = (0, core_1.merge)({}, (0, config_1.loadDefaultConfig)(), (0, utility_1.reconfigureLimits)(config));
+        this.resource = (_a = mergedConfig.resource) !== null && _a !== void 0 ? _a : resources_1.Resource.empty();
+        this.resource = resources_1.Resource.default().merge(this.resource);
+        this._config = Object.assign({}, mergedConfig, {
+            resource: this.resource,
+        });
+        const defaultExporter = this._buildExporterFromEnv();
+        if (defaultExporter !== undefined) {
+            const batchProcessor = new platform_1.BatchSpanProcessor(defaultExporter);
+            this.activeSpanProcessor = batchProcessor;
+        }
+        else {
+            this.activeSpanProcessor = new NoopSpanProcessor_1.NoopSpanProcessor();
+        }
+    }
+    getTracer(name, version, options) {
+        const key = `${name}@${version || ''}:${(options === null || options === void 0 ? void 0 : options.schemaUrl) || ''}`;
+        if (!this._tracers.has(key)) {
+            this._tracers.set(key, new _1.Tracer({ name, version, schemaUrl: options === null || options === void 0 ? void 0 : options.schemaUrl }, this._config, this));
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this._tracers.get(key);
+    }
+    /**
+     * Adds a new {@link SpanProcessor} to this tracer.
+     * @param spanProcessor the new SpanProcessor to be added.
+     */
+    addSpanProcessor(spanProcessor) {
+        if (this._registeredSpanProcessors.length === 0) {
+            // since we might have enabled by default a batchProcessor, we disable it
+            // before adding the new one
+            this.activeSpanProcessor
+                .shutdown()
+                .catch(err => api_1.diag.error('Error while trying to shutdown current span processor', err));
+        }
+        this._registeredSpanProcessors.push(spanProcessor);
+        this.activeSpanProcessor = new MultiSpanProcessor_1.MultiSpanProcessor(this._registeredSpanProcessors);
+    }
+    getActiveSpanProcessor() {
+        return this.activeSpanProcessor;
+    }
+    /**
+     * Register this TracerProvider for use with the OpenTelemetry API.
+     * Undefined values may be replaced with defaults, and
+     * null values will be skipped.
+     *
+     * @param config Configuration object for SDK registration
+     */
+    register(config = {}) {
+        api_1.trace.setGlobalTracerProvider(this);
+        if (config.propagator === undefined) {
+            config.propagator = this._buildPropagatorFromEnv();
+        }
+        if (config.contextManager) {
+            api_1.context.setGlobalContextManager(config.contextManager);
+        }
+        if (config.propagator) {
+            api_1.propagation.setGlobalPropagator(config.propagator);
+        }
+    }
+    forceFlush() {
+        const timeout = this._config.forceFlushTimeoutMillis;
+        const promises = this._registeredSpanProcessors.map((spanProcessor) => {
+            return new Promise(resolve => {
+                let state;
+                const timeoutInterval = setTimeout(() => {
+                    resolve(new Error(`Span processor did not completed within timeout period of ${timeout} ms`));
+                    state = ForceFlushState.timeout;
+                }, timeout);
+                spanProcessor
+                    .forceFlush()
+                    .then(() => {
+                    clearTimeout(timeoutInterval);
+                    if (state !== ForceFlushState.timeout) {
+                        state = ForceFlushState.resolved;
+                        resolve(state);
+                    }
+                })
+                    .catch(error => {
+                    clearTimeout(timeoutInterval);
+                    state = ForceFlushState.error;
+                    resolve(error);
+                });
+            });
+        });
+        return new Promise((resolve, reject) => {
+            Promise.all(promises)
+                .then(results => {
+                const errors = results.filter(result => result !== ForceFlushState.resolved);
+                if (errors.length > 0) {
+                    reject(errors);
+                }
+                else {
+                    resolve();
+                }
+            })
+                .catch(error => reject([error]));
+        });
+    }
+    shutdown() {
+        return this.activeSpanProcessor.shutdown();
+    }
+    /**
+     * TS cannot yet infer the type of this.constructor:
+     * https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
+     * There is no need to override either of the getters in your child class.
+     * The type of the registered component maps should be the same across all
+     * classes in the inheritance tree.
+     */
+    _getPropagator(name) {
+        var _a;
+        return (_a = this.constructor._registeredPropagators.get(name)) === null || _a === void 0 ? void 0 : _a();
+    }
+    _getSpanExporter(name) {
+        var _a;
+        return (_a = this.constructor._registeredExporters.get(name)) === null || _a === void 0 ? void 0 : _a();
+    }
+    _buildPropagatorFromEnv() {
+        // per spec, propagators from env must be deduplicated
+        const uniquePropagatorNames = Array.from(new Set((0, core_1.getEnv)().OTEL_PROPAGATORS));
+        const propagators = uniquePropagatorNames.map(name => {
+            const propagator = this._getPropagator(name);
+            if (!propagator) {
+                api_1.diag.warn(`Propagator "${name}" requested through environment variable is unavailable.`);
+            }
+            return propagator;
+        });
+        const validPropagators = propagators.reduce((list, item) => {
+            if (item) {
+                list.push(item);
+            }
+            return list;
+        }, []);
+        if (validPropagators.length === 0) {
+            return;
+        }
+        else if (uniquePropagatorNames.length === 1) {
+            return validPropagators[0];
+        }
+        else {
+            return new core_1.CompositePropagator({
+                propagators: validPropagators,
+            });
+        }
+    }
+    _buildExporterFromEnv() {
+        const exporterName = (0, core_1.getEnv)().OTEL_TRACES_EXPORTER;
+        if (exporterName === 'none' || exporterName === '')
+            return;
+        const exporter = this._getSpanExporter(exporterName);
+        if (!exporter) {
+            api_1.diag.error(`Exporter "${exporterName}" requested through environment variable is unavailable.`);
+        }
+        return exporter;
+    }
+}
+exports.BasicTracerProvider = BasicTracerProvider;
+BasicTracerProvider._registeredPropagators = new Map([
+    ['tracecontext', () => new core_1.W3CTraceContextPropagator()],
+    ['baggage', () => new core_1.W3CBaggagePropagator()],
+]);
+BasicTracerProvider._registeredExporters = new Map();
+//# sourceMappingURL=BasicTracerProvider.js.map
+
+/***/ }),
+
+/***/ 2352:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MultiSpanProcessor = void 0;
+const core_1 = __nccwpck_require__(9736);
+/**
+ * Implementation of the {@link SpanProcessor} that simply forwards all
+ * received events to a list of {@link SpanProcessor}s.
+ */
+class MultiSpanProcessor {
+    constructor(_spanProcessors) {
+        this._spanProcessors = _spanProcessors;
+    }
+    forceFlush() {
+        const promises = [];
+        for (const spanProcessor of this._spanProcessors) {
+            promises.push(spanProcessor.forceFlush());
+        }
+        return new Promise(resolve => {
+            Promise.all(promises)
+                .then(() => {
+                resolve();
+            })
+                .catch(error => {
+                (0, core_1.globalErrorHandler)(error || new Error('MultiSpanProcessor: forceFlush failed'));
+                resolve();
+            });
+        });
+    }
+    onStart(span, context) {
+        for (const spanProcessor of this._spanProcessors) {
+            spanProcessor.onStart(span, context);
+        }
+    }
+    onEnd(span) {
+        for (const spanProcessor of this._spanProcessors) {
+            spanProcessor.onEnd(span);
+        }
+    }
+    shutdown() {
+        const promises = [];
+        for (const spanProcessor of this._spanProcessors) {
+            promises.push(spanProcessor.shutdown());
+        }
+        return new Promise((resolve, reject) => {
+            Promise.all(promises).then(() => {
+                resolve();
+            }, reject);
+        });
+    }
+}
+exports.MultiSpanProcessor = MultiSpanProcessor;
+//# sourceMappingURL=MultiSpanProcessor.js.map
+
+/***/ }),
+
+/***/ 7446:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SamplingDecision = void 0;
+/**
+ * A sampling decision that determines how a {@link Span} will be recorded
+ * and collected.
+ */
+var SamplingDecision;
+(function (SamplingDecision) {
+    /**
+     * `Span.isRecording() === false`, span will not be recorded and all events
+     * and attributes will be dropped.
+     */
+    SamplingDecision[SamplingDecision["NOT_RECORD"] = 0] = "NOT_RECORD";
+    /**
+     * `Span.isRecording() === true`, but `Sampled` flag in {@link TraceFlags}
+     * MUST NOT be set.
+     */
+    SamplingDecision[SamplingDecision["RECORD"] = 1] = "RECORD";
+    /**
+     * `Span.isRecording() === true` AND `Sampled` flag in {@link TraceFlags}
+     * MUST be set.
+     */
+    SamplingDecision[SamplingDecision["RECORD_AND_SAMPLED"] = 2] = "RECORD_AND_SAMPLED";
+})(SamplingDecision = exports.SamplingDecision || (exports.SamplingDecision = {}));
+//# sourceMappingURL=Sampler.js.map
+
+/***/ }),
+
+/***/ 1301:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Span = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+const semantic_conventions_1 = __nccwpck_require__(7275);
+const enums_1 = __nccwpck_require__(5092);
+/**
+ * This class represents a span.
+ */
+class Span {
+    /**
+     * Constructs a new Span instance.
+     *
+     * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
+     * */
+    constructor(parentTracer, context, spanName, spanContext, kind, parentSpanId, links = [], startTime, _deprecatedClock, // keeping this argument even though it is unused to ensure backwards compatibility
+    attributes) {
+        this.attributes = {};
+        this.links = [];
+        this.events = [];
+        this._droppedAttributesCount = 0;
+        this._droppedEventsCount = 0;
+        this._droppedLinksCount = 0;
+        this.status = {
+            code: api_1.SpanStatusCode.UNSET,
+        };
+        this.endTime = [0, 0];
+        this._ended = false;
+        this._duration = [-1, -1];
+        this.name = spanName;
+        this._spanContext = spanContext;
+        this.parentSpanId = parentSpanId;
+        this.kind = kind;
+        this.links = links;
+        const now = Date.now();
+        this._performanceStartTime = core_1.otperformance.now();
+        this._performanceOffset =
+            now - (this._performanceStartTime + (0, core_1.getTimeOrigin)());
+        this._startTimeProvided = startTime != null;
+        this.startTime = this._getTime(startTime !== null && startTime !== void 0 ? startTime : now);
+        this.resource = parentTracer.resource;
+        this.instrumentationLibrary = parentTracer.instrumentationLibrary;
+        this._spanLimits = parentTracer.getSpanLimits();
+        this._attributeValueLengthLimit =
+            this._spanLimits.attributeValueLengthLimit || 0;
+        if (attributes != null) {
+            this.setAttributes(attributes);
+        }
+        this._spanProcessor = parentTracer.getActiveSpanProcessor();
+        this._spanProcessor.onStart(this, context);
+    }
+    spanContext() {
+        return this._spanContext;
+    }
+    setAttribute(key, value) {
+        if (value == null || this._isSpanEnded())
+            return this;
+        if (key.length === 0) {
+            api_1.diag.warn(`Invalid attribute key: ${key}`);
+            return this;
+        }
+        if (!(0, core_1.isAttributeValue)(value)) {
+            api_1.diag.warn(`Invalid attribute value set for key: ${key}`);
+            return this;
+        }
+        if (Object.keys(this.attributes).length >=
+            this._spanLimits.attributeCountLimit &&
+            !Object.prototype.hasOwnProperty.call(this.attributes, key)) {
+            this._droppedAttributesCount++;
+            return this;
+        }
+        this.attributes[key] = this._truncateToSize(value);
+        return this;
+    }
+    setAttributes(attributes) {
+        for (const [k, v] of Object.entries(attributes)) {
+            this.setAttribute(k, v);
+        }
+        return this;
+    }
+    /**
+     *
+     * @param name Span Name
+     * @param [attributesOrStartTime] Span attributes or start time
+     *     if type is {@type TimeInput} and 3rd param is undefined
+     * @param [timeStamp] Specified time stamp for the event
+     */
+    addEvent(name, attributesOrStartTime, timeStamp) {
+        if (this._isSpanEnded())
+            return this;
+        if (this._spanLimits.eventCountLimit === 0) {
+            api_1.diag.warn('No events allowed.');
+            this._droppedEventsCount++;
+            return this;
+        }
+        if (this.events.length >= this._spanLimits.eventCountLimit) {
+            if (this._droppedEventsCount === 0) {
+                api_1.diag.debug('Dropping extra events.');
+            }
+            this.events.shift();
+            this._droppedEventsCount++;
+        }
+        if ((0, core_1.isTimeInput)(attributesOrStartTime)) {
+            if (!(0, core_1.isTimeInput)(timeStamp)) {
+                timeStamp = attributesOrStartTime;
+            }
+            attributesOrStartTime = undefined;
+        }
+        const attributes = (0, core_1.sanitizeAttributes)(attributesOrStartTime);
+        this.events.push({
+            name,
+            attributes,
+            time: this._getTime(timeStamp),
+            droppedAttributesCount: 0,
+        });
+        return this;
+    }
+    addLink(link) {
+        this.links.push(link);
+        return this;
+    }
+    addLinks(links) {
+        this.links.push(...links);
+        return this;
+    }
+    setStatus(status) {
+        if (this._isSpanEnded())
+            return this;
+        this.status = status;
+        return this;
+    }
+    updateName(name) {
+        if (this._isSpanEnded())
+            return this;
+        this.name = name;
+        return this;
+    }
+    end(endTime) {
+        if (this._isSpanEnded()) {
+            api_1.diag.error(`${this.name} ${this._spanContext.traceId}-${this._spanContext.spanId} - You can only call end() on a span once.`);
+            return;
+        }
+        this._ended = true;
+        this.endTime = this._getTime(endTime);
+        this._duration = (0, core_1.hrTimeDuration)(this.startTime, this.endTime);
+        if (this._duration[0] < 0) {
+            api_1.diag.warn('Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.', this.startTime, this.endTime);
+            this.endTime = this.startTime.slice();
+            this._duration = [0, 0];
+        }
+        if (this._droppedEventsCount > 0) {
+            api_1.diag.warn(`Dropped ${this._droppedEventsCount} events because eventCountLimit reached`);
+        }
+        this._spanProcessor.onEnd(this);
+    }
+    _getTime(inp) {
+        if (typeof inp === 'number' && inp < core_1.otperformance.now()) {
+            // must be a performance timestamp
+            // apply correction and convert to hrtime
+            return (0, core_1.hrTime)(inp + this._performanceOffset);
+        }
+        if (typeof inp === 'number') {
+            return (0, core_1.millisToHrTime)(inp);
+        }
+        if (inp instanceof Date) {
+            return (0, core_1.millisToHrTime)(inp.getTime());
+        }
+        if ((0, core_1.isTimeInputHrTime)(inp)) {
+            return inp;
+        }
+        if (this._startTimeProvided) {
+            // if user provided a time for the start manually
+            // we can't use duration to calculate event/end times
+            return (0, core_1.millisToHrTime)(Date.now());
+        }
+        const msDuration = core_1.otperformance.now() - this._performanceStartTime;
+        return (0, core_1.addHrTimes)(this.startTime, (0, core_1.millisToHrTime)(msDuration));
+    }
+    isRecording() {
+        return this._ended === false;
+    }
+    recordException(exception, time) {
+        const attributes = {};
+        if (typeof exception === 'string') {
+            attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_MESSAGE] = exception;
+        }
+        else if (exception) {
+            if (exception.code) {
+                attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_TYPE] = exception.code.toString();
+            }
+            else if (exception.name) {
+                attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_TYPE] = exception.name;
+            }
+            if (exception.message) {
+                attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_MESSAGE] = exception.message;
+            }
+            if (exception.stack) {
+                attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
+            }
+        }
+        // these are minimum requirements from spec
+        if (attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_TYPE] ||
+            attributes[semantic_conventions_1.SEMATTRS_EXCEPTION_MESSAGE]) {
+            this.addEvent(enums_1.ExceptionEventName, attributes, time);
+        }
+        else {
+            api_1.diag.warn(`Failed to record an exception ${exception}`);
+        }
+    }
+    get duration() {
+        return this._duration;
+    }
+    get ended() {
+        return this._ended;
+    }
+    get droppedAttributesCount() {
+        return this._droppedAttributesCount;
+    }
+    get droppedEventsCount() {
+        return this._droppedEventsCount;
+    }
+    get droppedLinksCount() {
+        return this._droppedLinksCount;
+    }
+    _isSpanEnded() {
+        if (this._ended) {
+            api_1.diag.warn(`Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);
+        }
+        return this._ended;
+    }
+    // Utility function to truncate given value within size
+    // for value type of string, will truncate to given limit
+    // for type of non-string, will return same value
+    _truncateToLimitUtil(value, limit) {
+        if (value.length <= limit) {
+            return value;
+        }
+        return value.substr(0, limit);
+    }
+    /**
+     * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
+     * return string with truncated to {@code attributeValueLengthLimit} characters
+     *
+     * If the given attribute value is array of strings then
+     * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
+     *
+     * Otherwise return same Attribute {@code value}
+     *
+     * @param value Attribute value
+     * @returns truncated attribute value if required, otherwise same value
+     */
+    _truncateToSize(value) {
+        const limit = this._attributeValueLengthLimit;
+        // Check limit
+        if (limit <= 0) {
+            // Negative values are invalid, so do not truncate
+            api_1.diag.warn(`Attribute value limit must be positive, got ${limit}`);
+            return value;
+        }
+        // String
+        if (typeof value === 'string') {
+            return this._truncateToLimitUtil(value, limit);
+        }
+        // Array of strings
+        if (Array.isArray(value)) {
+            return value.map(val => typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val);
+        }
+        // Other types, no need to apply value length limit
+        return value;
+    }
+}
+exports.Span = Span;
+//# sourceMappingURL=Span.js.map
+
+/***/ }),
+
+/***/ 3806:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Tracer = void 0;
+const api = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+const Span_1 = __nccwpck_require__(1301);
+const utility_1 = __nccwpck_require__(4324);
+const platform_1 = __nccwpck_require__(262);
+/**
+ * This class represents a basic tracer.
+ */
+class Tracer {
+    /**
+     * Constructs a new Tracer instance.
+     */
+    constructor(instrumentationLibrary, config, _tracerProvider) {
+        this._tracerProvider = _tracerProvider;
+        const localConfig = (0, utility_1.mergeConfig)(config);
+        this._sampler = localConfig.sampler;
+        this._generalLimits = localConfig.generalLimits;
+        this._spanLimits = localConfig.spanLimits;
+        this._idGenerator = config.idGenerator || new platform_1.RandomIdGenerator();
+        this.resource = _tracerProvider.resource;
+        this.instrumentationLibrary = instrumentationLibrary;
+    }
+    /**
+     * Starts a new Span or returns the default NoopSpan based on the sampling
+     * decision.
+     */
+    startSpan(name, options = {}, context = api.context.active()) {
+        var _a, _b, _c;
+        // remove span from context in case a root span is requested via options
+        if (options.root) {
+            context = api.trace.deleteSpan(context);
+        }
+        const parentSpan = api.trace.getSpan(context);
+        if ((0, core_1.isTracingSuppressed)(context)) {
+            api.diag.debug('Instrumentation suppressed, returning Noop Span');
+            const nonRecordingSpan = api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
+            return nonRecordingSpan;
+        }
+        const parentSpanContext = parentSpan === null || parentSpan === void 0 ? void 0 : parentSpan.spanContext();
+        const spanId = this._idGenerator.generateSpanId();
+        let traceId;
+        let traceState;
+        let parentSpanId;
+        if (!parentSpanContext ||
+            !api.trace.isSpanContextValid(parentSpanContext)) {
+            // New root span.
+            traceId = this._idGenerator.generateTraceId();
+        }
+        else {
+            // New child span.
+            traceId = parentSpanContext.traceId;
+            traceState = parentSpanContext.traceState;
+            parentSpanId = parentSpanContext.spanId;
+        }
+        const spanKind = (_a = options.kind) !== null && _a !== void 0 ? _a : api.SpanKind.INTERNAL;
+        const links = ((_b = options.links) !== null && _b !== void 0 ? _b : []).map(link => {
+            return {
+                context: link.context,
+                attributes: (0, core_1.sanitizeAttributes)(link.attributes),
+            };
+        });
+        const attributes = (0, core_1.sanitizeAttributes)(options.attributes);
+        // make sampling decision
+        const samplingResult = this._sampler.shouldSample(context, traceId, name, spanKind, attributes, links);
+        traceState = (_c = samplingResult.traceState) !== null && _c !== void 0 ? _c : traceState;
+        const traceFlags = samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
+            ? api.TraceFlags.SAMPLED
+            : api.TraceFlags.NONE;
+        const spanContext = { traceId, spanId, traceFlags, traceState };
+        if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
+            api.diag.debug('Recording is off, propagating context in a non-recording span');
+            const nonRecordingSpan = api.trace.wrapSpanContext(spanContext);
+            return nonRecordingSpan;
+        }
+        // Set initial span attributes. The attributes object may have been mutated
+        // by the sampler, so we sanitize the merged attributes before setting them.
+        const initAttributes = (0, core_1.sanitizeAttributes)(Object.assign(attributes, samplingResult.attributes));
+        const span = new Span_1.Span(this, context, name, spanContext, spanKind, parentSpanId, links, options.startTime, undefined, initAttributes);
+        return span;
+    }
+    startActiveSpan(name, arg2, arg3, arg4) {
+        let opts;
+        let ctx;
+        let fn;
+        if (arguments.length < 2) {
+            return;
+        }
+        else if (arguments.length === 2) {
+            fn = arg2;
+        }
+        else if (arguments.length === 3) {
+            opts = arg2;
+            fn = arg3;
+        }
+        else {
+            opts = arg2;
+            ctx = arg3;
+            fn = arg4;
+        }
+        const parentContext = ctx !== null && ctx !== void 0 ? ctx : api.context.active();
+        const span = this.startSpan(name, opts, parentContext);
+        const contextWithSpanSet = api.trace.setSpan(parentContext, span);
+        return api.context.with(contextWithSpanSet, fn, undefined, span);
+    }
+    /** Returns the active {@link GeneralLimits}. */
+    getGeneralLimits() {
+        return this._generalLimits;
+    }
+    /** Returns the active {@link SpanLimits}. */
+    getSpanLimits() {
+        return this._spanLimits;
+    }
+    getActiveSpanProcessor() {
+        return this._tracerProvider.getActiveSpanProcessor();
+    }
+}
+exports.Tracer = Tracer;
+//# sourceMappingURL=Tracer.js.map
+
+/***/ }),
+
+/***/ 91:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.buildSamplerFromEnv = exports.loadDefaultConfig = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+const AlwaysOffSampler_1 = __nccwpck_require__(8118);
+const AlwaysOnSampler_1 = __nccwpck_require__(3032);
+const ParentBasedSampler_1 = __nccwpck_require__(8070);
+const TraceIdRatioBasedSampler_1 = __nccwpck_require__(6712);
+const env = (0, core_1.getEnv)();
+const FALLBACK_OTEL_TRACES_SAMPLER = core_1.TracesSamplerValues.AlwaysOn;
+const DEFAULT_RATIO = 1;
+/**
+ * Load default configuration. For fields with primitive values, any user-provided
+ * value will override the corresponding default value. For fields with
+ * non-primitive values (like `spanLimits`), the user-provided value will be
+ * used to extend the default value.
+ */
+// object needs to be wrapped in this function and called when needed otherwise
+// envs are parsed before tests are ran - causes tests using these envs to fail
+function loadDefaultConfig() {
+    const _env = (0, core_1.getEnv)();
+    return {
+        sampler: buildSamplerFromEnv(env),
+        forceFlushTimeoutMillis: 30000,
+        generalLimits: {
+            attributeValueLengthLimit: _env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+            attributeCountLimit: _env.OTEL_ATTRIBUTE_COUNT_LIMIT,
+        },
+        spanLimits: {
+            attributeValueLengthLimit: _env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+            attributeCountLimit: _env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+            linkCountLimit: _env.OTEL_SPAN_LINK_COUNT_LIMIT,
+            eventCountLimit: _env.OTEL_SPAN_EVENT_COUNT_LIMIT,
+            attributePerEventCountLimit: _env.OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
+            attributePerLinkCountLimit: _env.OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
+        },
+    };
+}
+exports.loadDefaultConfig = loadDefaultConfig;
+/**
+ * Based on environment, builds a sampler, complies with specification.
+ * @param environment optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
+ */
+function buildSamplerFromEnv(environment = (0, core_1.getEnv)()) {
+    switch (environment.OTEL_TRACES_SAMPLER) {
+        case core_1.TracesSamplerValues.AlwaysOn:
+            return new AlwaysOnSampler_1.AlwaysOnSampler();
+        case core_1.TracesSamplerValues.AlwaysOff:
+            return new AlwaysOffSampler_1.AlwaysOffSampler();
+        case core_1.TracesSamplerValues.ParentBasedAlwaysOn:
+            return new ParentBasedSampler_1.ParentBasedSampler({
+                root: new AlwaysOnSampler_1.AlwaysOnSampler(),
+            });
+        case core_1.TracesSamplerValues.ParentBasedAlwaysOff:
+            return new ParentBasedSampler_1.ParentBasedSampler({
+                root: new AlwaysOffSampler_1.AlwaysOffSampler(),
+            });
+        case core_1.TracesSamplerValues.TraceIdRatio:
+            return new TraceIdRatioBasedSampler_1.TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment));
+        case core_1.TracesSamplerValues.ParentBasedTraceIdRatio:
+            return new ParentBasedSampler_1.ParentBasedSampler({
+                root: new TraceIdRatioBasedSampler_1.TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment)),
+            });
+        default:
+            api_1.diag.error(`OTEL_TRACES_SAMPLER value "${environment.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`);
+            return new AlwaysOnSampler_1.AlwaysOnSampler();
+    }
+}
+exports.buildSamplerFromEnv = buildSamplerFromEnv;
+function getSamplerProbabilityFromEnv(environment) {
+    if (environment.OTEL_TRACES_SAMPLER_ARG === undefined ||
+        environment.OTEL_TRACES_SAMPLER_ARG === '') {
+        api_1.diag.error(`OTEL_TRACES_SAMPLER_ARG is blank, defaulting to ${DEFAULT_RATIO}.`);
+        return DEFAULT_RATIO;
+    }
+    const probability = Number(environment.OTEL_TRACES_SAMPLER_ARG);
+    if (isNaN(probability)) {
+        api_1.diag.error(`OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is invalid, defaulting to ${DEFAULT_RATIO}.`);
+        return DEFAULT_RATIO;
+    }
+    if (probability < 0 || probability > 1) {
+        api_1.diag.error(`OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is out of range ([0..1]), defaulting to ${DEFAULT_RATIO}.`);
+        return DEFAULT_RATIO;
+    }
+    return probability;
+}
+//# sourceMappingURL=config.js.map
+
+/***/ }),
+
+/***/ 5092:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ExceptionEventName = void 0;
+// Event name definitions
+exports.ExceptionEventName = 'exception';
+//# sourceMappingURL=enums.js.map
+
+/***/ }),
+
+/***/ 9727:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BatchSpanProcessorBase = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+/**
+ * Implementation of the {@link SpanProcessor} that batches spans exported by
+ * the SDK then pushes them to the exporter pipeline.
+ */
+class BatchSpanProcessorBase {
+    constructor(_exporter, config) {
+        this._exporter = _exporter;
+        this._isExporting = false;
+        this._finishedSpans = [];
+        this._droppedSpansCount = 0;
+        const env = (0, core_1.getEnv)();
+        this._maxExportBatchSize =
+            typeof (config === null || config === void 0 ? void 0 : config.maxExportBatchSize) === 'number'
+                ? config.maxExportBatchSize
+                : env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
+        this._maxQueueSize =
+            typeof (config === null || config === void 0 ? void 0 : config.maxQueueSize) === 'number'
+                ? config.maxQueueSize
+                : env.OTEL_BSP_MAX_QUEUE_SIZE;
+        this._scheduledDelayMillis =
+            typeof (config === null || config === void 0 ? void 0 : config.scheduledDelayMillis) === 'number'
+                ? config.scheduledDelayMillis
+                : env.OTEL_BSP_SCHEDULE_DELAY;
+        this._exportTimeoutMillis =
+            typeof (config === null || config === void 0 ? void 0 : config.exportTimeoutMillis) === 'number'
+                ? config.exportTimeoutMillis
+                : env.OTEL_BSP_EXPORT_TIMEOUT;
+        this._shutdownOnce = new core_1.BindOnceFuture(this._shutdown, this);
+        if (this._maxExportBatchSize > this._maxQueueSize) {
+            api_1.diag.warn('BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize');
+            this._maxExportBatchSize = this._maxQueueSize;
+        }
+    }
+    forceFlush() {
+        if (this._shutdownOnce.isCalled) {
+            return this._shutdownOnce.promise;
+        }
+        return this._flushAll();
+    }
+    // does nothing.
+    onStart(_span, _parentContext) { }
+    onEnd(span) {
+        if (this._shutdownOnce.isCalled) {
+            return;
+        }
+        if ((span.spanContext().traceFlags & api_1.TraceFlags.SAMPLED) === 0) {
+            return;
+        }
+        this._addToBuffer(span);
+    }
+    shutdown() {
+        return this._shutdownOnce.call();
+    }
+    _shutdown() {
+        return Promise.resolve()
+            .then(() => {
+            return this.onShutdown();
+        })
+            .then(() => {
+            return this._flushAll();
+        })
+            .then(() => {
+            return this._exporter.shutdown();
+        });
+    }
+    /** Add a span in the buffer. */
+    _addToBuffer(span) {
+        if (this._finishedSpans.length >= this._maxQueueSize) {
+            // limit reached, drop span
+            if (this._droppedSpansCount === 0) {
+                api_1.diag.debug('maxQueueSize reached, dropping spans');
+            }
+            this._droppedSpansCount++;
+            return;
+        }
+        if (this._droppedSpansCount > 0) {
+            // some spans were dropped, log once with count of spans dropped
+            api_1.diag.warn(`Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`);
+            this._droppedSpansCount = 0;
+        }
+        this._finishedSpans.push(span);
+        this._maybeStartTimer();
+    }
+    /**
+     * Send all spans to the exporter respecting the batch size limit
+     * This function is used only on forceFlush or shutdown,
+     * for all other cases _flush should be used
+     * */
+    _flushAll() {
+        return new Promise((resolve, reject) => {
+            const promises = [];
+            // calculate number of batches
+            const count = Math.ceil(this._finishedSpans.length / this._maxExportBatchSize);
+            for (let i = 0, j = count; i < j; i++) {
+                promises.push(this._flushOneBatch());
+            }
+            Promise.all(promises)
+                .then(() => {
+                resolve();
+            })
+                .catch(reject);
+        });
+    }
+    _flushOneBatch() {
+        this._clearTimer();
+        if (this._finishedSpans.length === 0) {
+            return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                // don't wait anymore for export, this way the next batch can start
+                reject(new Error('Timeout'));
+            }, this._exportTimeoutMillis);
+            // prevent downstream exporter calls from generating spans
+            api_1.context.with((0, core_1.suppressTracing)(api_1.context.active()), () => {
+                // Reset the finished spans buffer here because the next invocations of the _flush method
+                // could pass the same finished spans to the exporter if the buffer is cleared
+                // outside the execution of this callback.
+                let spans;
+                if (this._finishedSpans.length <= this._maxExportBatchSize) {
+                    spans = this._finishedSpans;
+                    this._finishedSpans = [];
+                }
+                else {
+                    spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+                }
+                const doExport = () => this._exporter.export(spans, result => {
+                    var _a;
+                    clearTimeout(timer);
+                    if (result.code === core_1.ExportResultCode.SUCCESS) {
+                        resolve();
+                    }
+                    else {
+                        reject((_a = result.error) !== null && _a !== void 0 ? _a : new Error('BatchSpanProcessor: span export failed'));
+                    }
+                });
+                let pendingResources = null;
+                for (let i = 0, len = spans.length; i < len; i++) {
+                    const span = spans[i];
+                    if (span.resource.asyncAttributesPending &&
+                        span.resource.waitForAsyncAttributes) {
+                        pendingResources !== null && pendingResources !== void 0 ? pendingResources : (pendingResources = []);
+                        pendingResources.push(span.resource.waitForAsyncAttributes());
+                    }
+                }
+                // Avoid scheduling a promise to make the behavior more predictable and easier to test
+                if (pendingResources === null) {
+                    doExport();
+                }
+                else {
+                    Promise.all(pendingResources).then(doExport, err => {
+                        (0, core_1.globalErrorHandler)(err);
+                        reject(err);
+                    });
+                }
+            });
+        });
+    }
+    _maybeStartTimer() {
+        if (this._isExporting)
+            return;
+        const flush = () => {
+            this._isExporting = true;
+            this._flushOneBatch()
+                .finally(() => {
+                this._isExporting = false;
+                if (this._finishedSpans.length > 0) {
+                    this._clearTimer();
+                    this._maybeStartTimer();
+                }
+            })
+                .catch(e => {
+                this._isExporting = false;
+                (0, core_1.globalErrorHandler)(e);
+            });
+        };
+        // we only wait if the queue doesn't have enough elements yet
+        if (this._finishedSpans.length >= this._maxExportBatchSize) {
+            return flush();
+        }
+        if (this._timer !== undefined)
+            return;
+        this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
+        (0, core_1.unrefTimer)(this._timer);
+    }
+    _clearTimer() {
+        if (this._timer !== undefined) {
+            clearTimeout(this._timer);
+            this._timer = undefined;
+        }
+    }
+}
+exports.BatchSpanProcessorBase = BatchSpanProcessorBase;
+//# sourceMappingURL=BatchSpanProcessorBase.js.map
+
+/***/ }),
+
+/***/ 6784:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConsoleSpanExporter = void 0;
+const core_1 = __nccwpck_require__(9736);
+/**
+ * This is implementation of {@link SpanExporter} that prints spans to the
+ * console. This class can be used for diagnostic purposes.
+ *
+ * NOTE: This {@link SpanExporter} is intended for diagnostics use only, output rendered to the console may change at any time.
+ */
+/* eslint-disable no-console */
+class ConsoleSpanExporter {
+    /**
+     * Export spans.
+     * @param spans
+     * @param resultCallback
+     */
+    export(spans, resultCallback) {
+        return this._sendSpans(spans, resultCallback);
+    }
+    /**
+     * Shutdown the exporter.
+     */
+    shutdown() {
+        this._sendSpans([]);
+        return this.forceFlush();
+    }
+    /**
+     * Exports any pending spans in exporter
+     */
+    forceFlush() {
+        return Promise.resolve();
+    }
+    /**
+     * converts span info into more readable format
+     * @param span
+     */
+    _exportInfo(span) {
+        var _a;
+        return {
+            resource: {
+                attributes: span.resource.attributes,
+            },
+            instrumentationScope: span.instrumentationLibrary,
+            traceId: span.spanContext().traceId,
+            parentId: span.parentSpanId,
+            traceState: (_a = span.spanContext().traceState) === null || _a === void 0 ? void 0 : _a.serialize(),
+            name: span.name,
+            id: span.spanContext().spanId,
+            kind: span.kind,
+            timestamp: (0, core_1.hrTimeToMicroseconds)(span.startTime),
+            duration: (0, core_1.hrTimeToMicroseconds)(span.duration),
+            attributes: span.attributes,
+            status: span.status,
+            events: span.events,
+            links: span.links,
+        };
+    }
+    /**
+     * Showing spans in console
+     * @param spans
+     * @param done
+     */
+    _sendSpans(spans, done) {
+        for (const span of spans) {
+            console.dir(this._exportInfo(span), { depth: 3 });
+        }
+        if (done) {
+            return done({ code: core_1.ExportResultCode.SUCCESS });
+        }
+    }
+}
+exports.ConsoleSpanExporter = ConsoleSpanExporter;
+//# sourceMappingURL=ConsoleSpanExporter.js.map
+
+/***/ }),
+
+/***/ 4093:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.InMemorySpanExporter = void 0;
+const core_1 = __nccwpck_require__(9736);
+/**
+ * This class can be used for testing purposes. It stores the exported spans
+ * in a list in memory that can be retrieved using the `getFinishedSpans()`
+ * method.
+ */
+class InMemorySpanExporter {
+    constructor() {
+        this._finishedSpans = [];
+        /**
+         * Indicates if the exporter has been "shutdown."
+         * When false, exported spans will not be stored in-memory.
+         */
+        this._stopped = false;
+    }
+    export(spans, resultCallback) {
+        if (this._stopped)
+            return resultCallback({
+                code: core_1.ExportResultCode.FAILED,
+                error: new Error('Exporter has been stopped'),
+            });
+        this._finishedSpans.push(...spans);
+        setTimeout(() => resultCallback({ code: core_1.ExportResultCode.SUCCESS }), 0);
+    }
+    shutdown() {
+        this._stopped = true;
+        this._finishedSpans = [];
+        return this.forceFlush();
+    }
+    /**
+     * Exports any pending spans in the exporter
+     */
+    forceFlush() {
+        return Promise.resolve();
+    }
+    reset() {
+        this._finishedSpans = [];
+    }
+    getFinishedSpans() {
+        return this._finishedSpans;
+    }
+}
+exports.InMemorySpanExporter = InMemorySpanExporter;
+//# sourceMappingURL=InMemorySpanExporter.js.map
+
+/***/ }),
+
+/***/ 9252:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NoopSpanProcessor = void 0;
+/** No-op implementation of SpanProcessor */
+class NoopSpanProcessor {
+    onStart(_span, _context) { }
+    onEnd(_span) { }
+    shutdown() {
+        return Promise.resolve();
+    }
+    forceFlush() {
+        return Promise.resolve();
+    }
+}
+exports.NoopSpanProcessor = NoopSpanProcessor;
+//# sourceMappingURL=NoopSpanProcessor.js.map
+
+/***/ }),
+
+/***/ 9802:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SimpleSpanProcessor = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+/**
+ * An implementation of the {@link SpanProcessor} that converts the {@link Span}
+ * to {@link ReadableSpan} and passes it to the configured exporter.
+ *
+ * Only spans that are sampled are converted.
+ *
+ * NOTE: This {@link SpanProcessor} exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the {@link BatchSpanProcessor} instead.
+ */
+class SimpleSpanProcessor {
+    constructor(_exporter) {
+        this._exporter = _exporter;
+        this._shutdownOnce = new core_1.BindOnceFuture(this._shutdown, this);
+        this._unresolvedExports = new Set();
+    }
+    async forceFlush() {
+        // await unresolved resources before resolving
+        await Promise.all(Array.from(this._unresolvedExports));
+        if (this._exporter.forceFlush) {
+            await this._exporter.forceFlush();
+        }
+    }
+    onStart(_span, _parentContext) { }
+    onEnd(span) {
+        var _a, _b;
+        if (this._shutdownOnce.isCalled) {
+            return;
+        }
+        if ((span.spanContext().traceFlags & api_1.TraceFlags.SAMPLED) === 0) {
+            return;
+        }
+        const doExport = () => core_1.internal
+            ._export(this._exporter, [span])
+            .then((result) => {
+            var _a;
+            if (result.code !== core_1.ExportResultCode.SUCCESS) {
+                (0, core_1.globalErrorHandler)((_a = result.error) !== null && _a !== void 0 ? _a : new Error(`SimpleSpanProcessor: span export failed (status ${result})`));
+            }
+        })
+            .catch(error => {
+            (0, core_1.globalErrorHandler)(error);
+        });
+        // Avoid scheduling a promise to make the behavior more predictable and easier to test
+        if (span.resource.asyncAttributesPending) {
+            const exportPromise = (_b = (_a = span.resource).waitForAsyncAttributes) === null || _b === void 0 ? void 0 : _b.call(_a).then(() => {
+                if (exportPromise != null) {
+                    this._unresolvedExports.delete(exportPromise);
+                }
+                return doExport();
+            }, err => (0, core_1.globalErrorHandler)(err));
+            // store the unresolved exports
+            if (exportPromise != null) {
+                this._unresolvedExports.add(exportPromise);
+            }
+        }
+        else {
+            void doExport();
+        }
+    }
+    shutdown() {
+        return this._shutdownOnce.call();
+    }
+    _shutdown() {
+        return this._exporter.shutdown();
+    }
+}
+exports.SimpleSpanProcessor = SimpleSpanProcessor;
+//# sourceMappingURL=SimpleSpanProcessor.js.map
+
+/***/ }),
+
+/***/ 9253:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Span = exports.SamplingDecision = exports.TraceIdRatioBasedSampler = exports.ParentBasedSampler = exports.AlwaysOnSampler = exports.AlwaysOffSampler = exports.NoopSpanProcessor = exports.SimpleSpanProcessor = exports.InMemorySpanExporter = exports.ConsoleSpanExporter = exports.RandomIdGenerator = exports.BatchSpanProcessor = exports.ForceFlushState = exports.BasicTracerProvider = exports.Tracer = void 0;
+var Tracer_1 = __nccwpck_require__(3806);
+Object.defineProperty(exports, "Tracer", ({ enumerable: true, get: function () { return Tracer_1.Tracer; } }));
+var BasicTracerProvider_1 = __nccwpck_require__(8920);
+Object.defineProperty(exports, "BasicTracerProvider", ({ enumerable: true, get: function () { return BasicTracerProvider_1.BasicTracerProvider; } }));
+Object.defineProperty(exports, "ForceFlushState", ({ enumerable: true, get: function () { return BasicTracerProvider_1.ForceFlushState; } }));
+var platform_1 = __nccwpck_require__(262);
+Object.defineProperty(exports, "BatchSpanProcessor", ({ enumerable: true, get: function () { return platform_1.BatchSpanProcessor; } }));
+Object.defineProperty(exports, "RandomIdGenerator", ({ enumerable: true, get: function () { return platform_1.RandomIdGenerator; } }));
+var ConsoleSpanExporter_1 = __nccwpck_require__(6784);
+Object.defineProperty(exports, "ConsoleSpanExporter", ({ enumerable: true, get: function () { return ConsoleSpanExporter_1.ConsoleSpanExporter; } }));
+var InMemorySpanExporter_1 = __nccwpck_require__(4093);
+Object.defineProperty(exports, "InMemorySpanExporter", ({ enumerable: true, get: function () { return InMemorySpanExporter_1.InMemorySpanExporter; } }));
+var SimpleSpanProcessor_1 = __nccwpck_require__(9802);
+Object.defineProperty(exports, "SimpleSpanProcessor", ({ enumerable: true, get: function () { return SimpleSpanProcessor_1.SimpleSpanProcessor; } }));
+var NoopSpanProcessor_1 = __nccwpck_require__(9252);
+Object.defineProperty(exports, "NoopSpanProcessor", ({ enumerable: true, get: function () { return NoopSpanProcessor_1.NoopSpanProcessor; } }));
+var AlwaysOffSampler_1 = __nccwpck_require__(8118);
+Object.defineProperty(exports, "AlwaysOffSampler", ({ enumerable: true, get: function () { return AlwaysOffSampler_1.AlwaysOffSampler; } }));
+var AlwaysOnSampler_1 = __nccwpck_require__(3032);
+Object.defineProperty(exports, "AlwaysOnSampler", ({ enumerable: true, get: function () { return AlwaysOnSampler_1.AlwaysOnSampler; } }));
+var ParentBasedSampler_1 = __nccwpck_require__(8070);
+Object.defineProperty(exports, "ParentBasedSampler", ({ enumerable: true, get: function () { return ParentBasedSampler_1.ParentBasedSampler; } }));
+var TraceIdRatioBasedSampler_1 = __nccwpck_require__(6712);
+Object.defineProperty(exports, "TraceIdRatioBasedSampler", ({ enumerable: true, get: function () { return TraceIdRatioBasedSampler_1.TraceIdRatioBasedSampler; } }));
+var Sampler_1 = __nccwpck_require__(7446);
+Object.defineProperty(exports, "SamplingDecision", ({ enumerable: true, get: function () { return Sampler_1.SamplingDecision; } }));
+var Span_1 = __nccwpck_require__(1301);
+Object.defineProperty(exports, "Span", ({ enumerable: true, get: function () { return Span_1.Span; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 262:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RandomIdGenerator = exports.BatchSpanProcessor = void 0;
+var node_1 = __nccwpck_require__(6573);
+Object.defineProperty(exports, "BatchSpanProcessor", ({ enumerable: true, get: function () { return node_1.BatchSpanProcessor; } }));
+Object.defineProperty(exports, "RandomIdGenerator", ({ enumerable: true, get: function () { return node_1.RandomIdGenerator; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 7670:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RandomIdGenerator = void 0;
+const SPAN_ID_BYTES = 8;
+const TRACE_ID_BYTES = 16;
+class RandomIdGenerator {
+    constructor() {
+        /**
+         * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
+         * characters corresponding to 128 bits.
+         */
+        this.generateTraceId = getIdGenerator(TRACE_ID_BYTES);
+        /**
+         * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
+         * characters corresponding to 64 bits.
+         */
+        this.generateSpanId = getIdGenerator(SPAN_ID_BYTES);
+    }
+}
+exports.RandomIdGenerator = RandomIdGenerator;
+const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
+function getIdGenerator(bytes) {
+    return function generateId() {
+        for (let i = 0; i < bytes / 4; i++) {
+            // unsigned right shift drops decimal part of the number
+            // it is required because if a number between 2**32 and 2**32 - 1 is generated, an out of range error is thrown by writeUInt32BE
+            SHARED_BUFFER.writeUInt32BE((Math.random() * 2 ** 32) >>> 0, i * 4);
+        }
+        // If buffer is all 0, set the last byte to 1 to guarantee a valid w3c id is generated
+        for (let i = 0; i < bytes; i++) {
+            if (SHARED_BUFFER[i] > 0) {
+                break;
+            }
+            else if (i === bytes - 1) {
+                SHARED_BUFFER[bytes - 1] = 1;
+            }
+        }
+        return SHARED_BUFFER.toString('hex', 0, bytes);
+    };
+}
+//# sourceMappingURL=RandomIdGenerator.js.map
+
+/***/ }),
+
+/***/ 7913:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BatchSpanProcessor = void 0;
+const BatchSpanProcessorBase_1 = __nccwpck_require__(9727);
+class BatchSpanProcessor extends BatchSpanProcessorBase_1.BatchSpanProcessorBase {
+    onShutdown() { }
+}
+exports.BatchSpanProcessor = BatchSpanProcessor;
+//# sourceMappingURL=BatchSpanProcessor.js.map
+
+/***/ }),
+
+/***/ 6573:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RandomIdGenerator = exports.BatchSpanProcessor = void 0;
+var BatchSpanProcessor_1 = __nccwpck_require__(7913);
+Object.defineProperty(exports, "BatchSpanProcessor", ({ enumerable: true, get: function () { return BatchSpanProcessor_1.BatchSpanProcessor; } }));
+var RandomIdGenerator_1 = __nccwpck_require__(7670);
+Object.defineProperty(exports, "RandomIdGenerator", ({ enumerable: true, get: function () { return RandomIdGenerator_1.RandomIdGenerator; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 8118:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AlwaysOffSampler = void 0;
+const Sampler_1 = __nccwpck_require__(7446);
+/** Sampler that samples no traces. */
+class AlwaysOffSampler {
+    shouldSample() {
+        return {
+            decision: Sampler_1.SamplingDecision.NOT_RECORD,
+        };
+    }
+    toString() {
+        return 'AlwaysOffSampler';
+    }
+}
+exports.AlwaysOffSampler = AlwaysOffSampler;
+//# sourceMappingURL=AlwaysOffSampler.js.map
+
+/***/ }),
+
+/***/ 3032:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AlwaysOnSampler = void 0;
+const Sampler_1 = __nccwpck_require__(7446);
+/** Sampler that samples all traces. */
+class AlwaysOnSampler {
+    shouldSample() {
+        return {
+            decision: Sampler_1.SamplingDecision.RECORD_AND_SAMPLED,
+        };
+    }
+    toString() {
+        return 'AlwaysOnSampler';
+    }
+}
+exports.AlwaysOnSampler = AlwaysOnSampler;
+//# sourceMappingURL=AlwaysOnSampler.js.map
+
+/***/ }),
+
+/***/ 8070:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ParentBasedSampler = void 0;
+const api_1 = __nccwpck_require__(5163);
+const core_1 = __nccwpck_require__(9736);
+const AlwaysOffSampler_1 = __nccwpck_require__(8118);
+const AlwaysOnSampler_1 = __nccwpck_require__(3032);
+/**
+ * A composite sampler that either respects the parent span's sampling decision
+ * or delegates to `delegateSampler` for root spans.
+ */
+class ParentBasedSampler {
+    constructor(config) {
+        var _a, _b, _c, _d;
+        this._root = config.root;
+        if (!this._root) {
+            (0, core_1.globalErrorHandler)(new Error('ParentBasedSampler must have a root sampler configured'));
+            this._root = new AlwaysOnSampler_1.AlwaysOnSampler();
+        }
+        this._remoteParentSampled =
+            (_a = config.remoteParentSampled) !== null && _a !== void 0 ? _a : new AlwaysOnSampler_1.AlwaysOnSampler();
+        this._remoteParentNotSampled =
+            (_b = config.remoteParentNotSampled) !== null && _b !== void 0 ? _b : new AlwaysOffSampler_1.AlwaysOffSampler();
+        this._localParentSampled =
+            (_c = config.localParentSampled) !== null && _c !== void 0 ? _c : new AlwaysOnSampler_1.AlwaysOnSampler();
+        this._localParentNotSampled =
+            (_d = config.localParentNotSampled) !== null && _d !== void 0 ? _d : new AlwaysOffSampler_1.AlwaysOffSampler();
+    }
+    shouldSample(context, traceId, spanName, spanKind, attributes, links) {
+        const parentContext = api_1.trace.getSpanContext(context);
+        if (!parentContext || !(0, api_1.isSpanContextValid)(parentContext)) {
+            return this._root.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+        }
+        if (parentContext.isRemote) {
+            if (parentContext.traceFlags & api_1.TraceFlags.SAMPLED) {
+                return this._remoteParentSampled.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+            }
+            return this._remoteParentNotSampled.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+        }
+        if (parentContext.traceFlags & api_1.TraceFlags.SAMPLED) {
+            return this._localParentSampled.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+        }
+        return this._localParentNotSampled.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+    }
+    toString() {
+        return `ParentBased{root=${this._root.toString()}, remoteParentSampled=${this._remoteParentSampled.toString()}, remoteParentNotSampled=${this._remoteParentNotSampled.toString()}, localParentSampled=${this._localParentSampled.toString()}, localParentNotSampled=${this._localParentNotSampled.toString()}}`;
+    }
+}
+exports.ParentBasedSampler = ParentBasedSampler;
+//# sourceMappingURL=ParentBasedSampler.js.map
+
+/***/ }),
+
+/***/ 6712:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TraceIdRatioBasedSampler = void 0;
+const api_1 = __nccwpck_require__(5163);
+const Sampler_1 = __nccwpck_require__(7446);
+/** Sampler that samples a given fraction of traces based of trace id deterministically. */
+class TraceIdRatioBasedSampler {
+    constructor(_ratio = 0) {
+        this._ratio = _ratio;
+        this._ratio = this._normalize(_ratio);
+        this._upperBound = Math.floor(this._ratio * 0xffffffff);
+    }
+    shouldSample(context, traceId) {
+        return {
+            decision: (0, api_1.isValidTraceId)(traceId) && this._accumulate(traceId) < this._upperBound
+                ? Sampler_1.SamplingDecision.RECORD_AND_SAMPLED
+                : Sampler_1.SamplingDecision.NOT_RECORD,
+        };
+    }
+    toString() {
+        return `TraceIdRatioBased{${this._ratio}}`;
+    }
+    _normalize(ratio) {
+        if (typeof ratio !== 'number' || isNaN(ratio))
+            return 0;
+        return ratio >= 1 ? 1 : ratio <= 0 ? 0 : ratio;
+    }
+    _accumulate(traceId) {
+        let accumulation = 0;
+        for (let i = 0; i < traceId.length / 8; i++) {
+            const pos = i * 8;
+            const part = parseInt(traceId.slice(pos, pos + 8), 16);
+            accumulation = (accumulation ^ part) >>> 0;
+        }
+        return accumulation;
+    }
+}
+exports.TraceIdRatioBasedSampler = TraceIdRatioBasedSampler;
+//# sourceMappingURL=TraceIdRatioBasedSampler.js.map
+
+/***/ }),
+
+/***/ 4324:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.reconfigureLimits = exports.mergeConfig = void 0;
+const config_1 = __nccwpck_require__(91);
+const core_1 = __nccwpck_require__(9736);
+/**
+ * Function to merge Default configuration (as specified in './config') with
+ * user provided configurations.
+ */
+function mergeConfig(userConfig) {
+    const perInstanceDefaults = {
+        sampler: (0, config_1.buildSamplerFromEnv)(),
+    };
+    const DEFAULT_CONFIG = (0, config_1.loadDefaultConfig)();
+    const target = Object.assign({}, DEFAULT_CONFIG, perInstanceDefaults, userConfig);
+    target.generalLimits = Object.assign({}, DEFAULT_CONFIG.generalLimits, userConfig.generalLimits || {});
+    target.spanLimits = Object.assign({}, DEFAULT_CONFIG.spanLimits, userConfig.spanLimits || {});
+    return target;
+}
+exports.mergeConfig = mergeConfig;
+/**
+ * When general limits are provided and model specific limits are not,
+ * configures the model specific limits by using the values from the general ones.
+ * @param userConfig User provided tracer configuration
+ */
+function reconfigureLimits(userConfig) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    const spanLimits = Object.assign({}, userConfig.spanLimits);
+    const parsedEnvConfig = (0, core_1.getEnvWithoutDefaults)();
+    /**
+     * Reassign span attribute count limit to use first non null value defined by user or use default value
+     */
+    spanLimits.attributeCountLimit =
+        (_f = (_e = (_d = (_b = (_a = userConfig.spanLimits) === null || _a === void 0 ? void 0 : _a.attributeCountLimit) !== null && _b !== void 0 ? _b : (_c = userConfig.generalLimits) === null || _c === void 0 ? void 0 : _c.attributeCountLimit) !== null && _d !== void 0 ? _d : parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT) !== null && _e !== void 0 ? _e : parsedEnvConfig.OTEL_ATTRIBUTE_COUNT_LIMIT) !== null && _f !== void 0 ? _f : core_1.DEFAULT_ATTRIBUTE_COUNT_LIMIT;
+    /**
+     * Reassign span attribute value length limit to use first non null value defined by user or use default value
+     */
+    spanLimits.attributeValueLengthLimit =
+        (_m = (_l = (_k = (_h = (_g = userConfig.spanLimits) === null || _g === void 0 ? void 0 : _g.attributeValueLengthLimit) !== null && _h !== void 0 ? _h : (_j = userConfig.generalLimits) === null || _j === void 0 ? void 0 : _j.attributeValueLengthLimit) !== null && _k !== void 0 ? _k : parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT) !== null && _l !== void 0 ? _l : parsedEnvConfig.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT) !== null && _m !== void 0 ? _m : core_1.DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+    return Object.assign({}, userConfig, { spanLimits });
+}
+exports.reconfigureLimits = reconfigureLimits;
+//# sourceMappingURL=utility.js.map
+
+/***/ }),
+
 /***/ 7275:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -45946,7 +48001,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(4408)
-const { stringify, getHeadersList } = __nccwpck_require__(6576)
+const { stringify, getHeadersList } = __nccwpck_require__(3121)
 const { webidl } = __nccwpck_require__(1744)
 const { Headers } = __nccwpck_require__(554)
 
@@ -46137,7 +48192,7 @@ module.exports = {
 
 
 const { maxNameValuePairSize, maxAttributeValueSize } = __nccwpck_require__(663)
-const { isCTLExcludingHtab } = __nccwpck_require__(6576)
+const { isCTLExcludingHtab } = __nccwpck_require__(3121)
 const { collectASequenceOfCodePointsFast } = __nccwpck_require__(685)
 const assert = __nccwpck_require__(9491)
 
@@ -46455,7 +48510,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 6576:
+/***/ 3121:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -68920,7 +70975,7 @@ const calcDiffSec = (startDate, endDate) => {
     return Math.floor(diffMs / 1000);
 };
 
-;// CONCATENATED MODULE: ./src/metrics/github-metrics.ts
+;// CONCATENATED MODULE: ./src/metrics/github.ts
 
 
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
@@ -69013,7 +71068,72 @@ const shutdown = async (provider) => {
 
 
 
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-trace-base/build/src/index.js
+var sdk_trace_base_build_src = __nccwpck_require__(9253);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-trace-otlp-proto/build/src/index.js
+var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7859);
+;// CONCATENATED MODULE: ./src/traces/create-provider.ts
+
+
+const create_provider_createExporter = () => new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.M({
+    // optional - collection of custom headers to be sent with each request, empty by default
+    headers: {}
+});
+const create_provider_createProvider = (exporter) => {
+    const provider = new sdk_trace_base_build_src.BasicTracerProvider();
+    provider.addSpanProcessor(new sdk_trace_base_build_src.BatchSpanProcessor(exporter));
+    provider.register();
+    return provider;
+};
+
+;// CONCATENATED MODULE: ./src/traces/setup-provider.ts
+
+
+const setupTracerProvider = () => {
+    const exporter = create_provider_createExporter();
+    const provider = create_provider_createProvider(exporter);
+    const result = src.trace.setGlobalTracerProvider(provider);
+    if (!result) {
+        console.warn('Global meter provider can not be set.');
+    }
+    return provider;
+};
+const setup_provider_shutdown = async (provider) => {
+    try {
+        await provider.forceFlush();
+        await provider.shutdown();
+    }
+    catch (error) {
+        console.log('Error terminating TraceProvider', error);
+        process.exit(1);
+    }
+    process.exit(0);
+};
+
+;// CONCATENATED MODULE: ./src/traces/github.ts
+
+
+const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
+    console.log(workflowRunJobs);
+    const tracer = src.trace.getTracer('hoge-test');
+    const startTime = new Date(workflowRun.run_started_at || workflowRun.created_at);
+    const rootSpan = tracer.startSpan(workflowRun.name || `${workflowRun.workflow_id}`, {
+        root: true,
+        attributes: {},
+        startTime
+    }, src.ROOT_CONTEXT);
+    return src.trace.setSpan(src.ROOT_CONTEXT, rootSpan);
+};
+const createWorkflowRunJobSpan = (ctx, workflowRunJob) => {
+    console.log(ctx, workflowRunJob);
+    return {};
+};
+const createWorkflowRunStepSpan = (ctx, workflowRunJob) => {
+    console.log(ctx, workflowRunJob);
+};
+
 ;// CONCATENATED MODULE: ./src/main.ts
+
 
 
 
@@ -69023,15 +71143,33 @@ const shutdown = async (provider) => {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
-    const provider = setupMeterProvider();
     const token = core.getInput('GITHUB_TOKEN');
     const octokit = createOctokit(token);
     const workflowRunContext = getWorkflowRunContext(github.context);
+    let workflowRun;
+    let workflowRunJobs;
+    // Get Workflow Run Results
     try {
-        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
-        const workflowJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
-        createJobGauges(workflowRun, workflowJobs);
-        createWorkflowGauges(workflowRun, workflowJobs);
+        workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
+        workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
+    }
+    catch (error) {
+        if (error instanceof Error)
+            core.setFailed(error.message);
+        process.exit(1);
+    }
+    const meterProvider = setupMeterProvider();
+    const tracerProvider = setupTracerProvider();
+    try {
+        // Create Gauges
+        createJobGauges(workflowRun, workflowRunJobs);
+        createWorkflowGauges(workflowRun, workflowRunJobs);
+        // Create Traces
+        const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
+        workflowRunJobs.map(job => {
+            const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
+            createWorkflowRunStepSpan(jobCtx, job);
+        });
     }
     catch (error) {
         if (error instanceof Error)
@@ -69039,7 +71177,8 @@ async function run() {
         process.exit(1);
     }
     finally {
-        await shutdown(provider);
+        await shutdown(meterProvider);
+        await setup_provider_shutdown(tracerProvider);
     }
     process.exit(0);
 }
