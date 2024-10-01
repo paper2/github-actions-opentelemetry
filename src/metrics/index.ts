@@ -1,2 +1,2 @@
-export * from './github-metrics.js'
+export * from './github.js'
 export * from './setup-provider.js'

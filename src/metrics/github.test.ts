@@ -1,5 +1,5 @@
 import { describe, test, beforeEach, expect, vi, MockedFunction } from 'vitest'
-import { createWorkflowGauges, createJobGauges } from './github-metrics.js'
+import { createWorkflowGauges, createJobGauges } from './github.js'
 import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 import { createGauge } from './create-gauge.js'
 
