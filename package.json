@@ -33,7 +33,7 @@
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
-    "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry npx tsx ./src/index.ts",
+    "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry OTEL_EXPORTER_OTLP_HEADERS='Authorization=Basic dGVzdEBleGFtcGxlLmNvbTp0ZXN0' OTEL_EXPORTER_OTLP_ENDPOINT=http://openobserve:5080/api/default npx tsx ./src/index.ts",
     "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
