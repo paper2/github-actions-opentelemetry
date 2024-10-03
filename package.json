@@ -53,17 +53,17 @@
     "@opentelemetry/semantic-conventions": "^1.27.0"
   },
   "devDependencies": {
-    "@octokit/types": "^13.5.0",
-    "@types/node": "^22.5.1",
+    "@octokit/types": "^13.6.1",
+    "@types/node": "^22.7.4",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "@vercel/ncc": "^0.38.1",
-    "@vitest/coverage-v8": "^2.0.5",
+    "@vercel/ncc": "^0.38.2",
+    "@vitest/coverage-v8": "^2.1.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-github": "^5.0.1",
-    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsonc": "^2.16.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-vitest": "^0.5.4",
@@ -71,7 +71,7 @@
     "prettier": "^3.3.3",
     "prettier-eslint": "^16.3.0",
     "tsx": "^4.19.0",
-    "typescript": "~5.5.4",
+    "typescript": "~5.6.2",
     "vitest": "^2.0.5"
   }
 }
