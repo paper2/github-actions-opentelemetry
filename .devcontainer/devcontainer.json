@@ -1,10 +1,12 @@
 {
   "name": "GitHub Actions (TypeScript)",
-  "postCreateCommand": "npm install",
   "workspaceFolder": "/workspaces/github-actions-opentelemetry",
+  "postAttachCommand": {
+    "npm": "npm install",
+    "add-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}"
+  },
   "dockerComposeFile": ["./compose.yml"],
   "service": "dev-container",
-  "forwardPorts": [5080],
   "customizations": {
     "codespaces": {
       "openFiles": ["README.md"]
