@@ -71071,34 +71071,65 @@ const shutdown = async (provider) => {
 ;// CONCATENATED MODULE: ./src/traces/github.ts
 
 
-const createWorkflowRunTrace = (workflowRun, 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-workflowRunJobs) => {
-    const tracer = src.trace.getTracer('github-actions-opentelemetry-github');
-    const startTime = new Date(workflowRun.run_started_at || workflowRun.created_at);
-    const rootSpan = tracer.startSpan(workflowRun.name || `${workflowRun.workflow_id}`, {
-        root: true,
-        attributes: {},
-        startTime
-    }, src.ROOT_CONTEXT);
+const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
     // TODO: metricsと同じロジックの部分はgithubディレクトリに切り出す
+    // TODO: completed_atだけ確認するようにする。queueの時間計測する前提なので両方見ると不整合が発生する。
     const jobCompletedAtDates = workflowRunJobs.map(job => new Date(job.completed_at || job.created_at));
-    const endTime = new Date(Math.max(...jobCompletedAtDates.map(Number)));
-    rootSpan.end(endTime);
-    return src.trace.setSpan(src.ROOT_CONTEXT, rootSpan);
+    const endAt = new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString();
+    const span = createSpan(src.ROOT_CONTEXT, workflowRun.name || `${workflowRun.workflow_id}`, workflowRun.run_started_at || workflowRun.created_at, endAt, 
+    // TODO: Set Attributes
+    {});
+    return src.trace.setSpan(src.ROOT_CONTEXT, span);
 };
-const createWorkflowRunJobSpan = (
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-ctx, 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-workflowRunJob) => {
-    return {};
+const createWorkflowRunJobSpan = (ctx, job) => {
+    if (job.status !== 'completed' || job.completed_at === null) {
+        console.error(`job is not completed. (${job.name})`);
+        return null;
+    }
+    if (job.steps === undefined || job.steps.length === 0) {
+        console.warn(`job (${job.name}) has no steps.`);
+        return null;
+    }
+    const spanWithWaiting = createSpan(ctx, `${job.name} with time of waiting runner`, job.created_at, job.completed_at, 
+    // TODO: Set Attributes
+    {});
+    const ctxWithWaiting = src.trace.setSpan(ctx, spanWithWaiting);
+    createWaitRunnerSpan(ctxWithWaiting, job);
+    const span = createSpan(ctxWithWaiting, job.name, job.started_at, job.completed_at, 
+    // TODO: Set Attributes
+    {});
+    return src.trace.setSpan(ctxWithWaiting, span);
 };
-const createWorkflowRunStepSpan = (
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-ctx, 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-workflowRunJob) => { };
+const createWaitRunnerSpan = (ctx, job) => {
+    createSpan(ctx, 'Wait Runner', job.created_at, job.started_at, 
+    // TODO: Set Attributes
+    {});
+};
+const createWorkflowRunStepSpan = (ctx, job) => {
+    if (job.steps === undefined || job.steps.length === 0) {
+        console.warn(`job (${job.name}) has no steps.`);
+        return;
+    }
+    // NOTE: GitHub Action's first step (Set up job) is flaky. :(
+    // Sometimes it starts before job.started.
+    job.steps.map(step => {
+        if (step.started_at == null || step.completed_at == null) {
+            console.warn(`step (${step.name}) time is null|undifined. (started_at:${step.started_at}, complated_at:${step.completed_at})`);
+            return;
+        }
+        createSpan(ctx, step.name, step.started_at, step.completed_at, 
+        // TODO: Set Attributes
+        {});
+    });
+};
+const tracer = src.trace.getTracer('github-actions-opentelemetry-github');
+const createSpan = (ctx, name, startedAt, endAt, attributes) => {
+    const startTime = new Date(startedAt);
+    const endTime = new Date(endAt);
+    const span = tracer.startSpan(name, { startTime, attributes }, ctx);
+    span.end(endTime);
+    return span;
+};
 
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-trace-base/build/src/index.js
 var sdk_trace_base_build_src = __nccwpck_require__(9253);
@@ -71212,6 +71243,8 @@ const createTraces = async (results) => {
         const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
         workflowRunJobs.map(job => {
             const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
+            if (jobCtx === null)
+                return;
             createWorkflowRunStepSpan(jobCtx, job);
         });
     }
