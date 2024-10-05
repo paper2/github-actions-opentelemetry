@@ -43,6 +43,9 @@ jobs:
       - name: Test
         id: npm-test
         run: npm run test
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
 
   test-action:
     name: GitHub Actions Test
