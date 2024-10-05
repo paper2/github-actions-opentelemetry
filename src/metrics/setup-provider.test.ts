@@ -17,12 +17,6 @@ vi.mock('./create-provider.js', async importOriginal => {
 })
 
 describe('Metrics Exporter Tests', () => {
-  const mockExit = vi
-    .spyOn(process, 'exit')
-    .mockImplementation((code?: number | string | null | undefined): never => {
-      throw new Error(`process.exit called with code: ${code}`)
-    })
-
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -46,9 +40,7 @@ describe('Metrics Exporter Tests', () => {
       result.observe(1234, { testKey: 'testValue' })
     })
 
-    await expect(shutdown(provider)).rejects.toThrow(
-      'process.exit called with code: 0'
-    )
+    await shutdown(provider)
     expect(inMemoryMetricExporter.getMetrics()).toMatchObject([
       {
         scopeMetrics: [
@@ -78,17 +70,15 @@ describe('Metrics Exporter Tests', () => {
         ]
       }
     ])
-    expect(mockExit).toHaveBeenCalledWith(0)
   })
-  test('should exit 1', async () => {
+  test('should not throw error', async () => {
     const provider: Partial<MeterProvider> = {
       forceFlush: vi
         .fn()
         .mockRejectedValueOnce(new Error('mocked forceFlush throw error'))
     }
     await expect(shutdown(provider as MeterProvider)).rejects.toThrow(
-      'process.exit called with code: 1'
+      'process.exit unexpectedly called with "1"'
     )
-    expect(mockExit).toHaveBeenCalledWith(1)
   })
 })

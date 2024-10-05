@@ -31,46 +31,77 @@ if (settings.logLevel === 'debug') {
   )
 }
 
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-export async function run(): Promise<void> {
+type WorkflowResults = {
+  workflowRun: WorkflowRun
+  workflowRunJobs: WorkflowRunJobs
+}
+
+const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
   const token = core.getInput('GITHUB_TOKEN')
   const octokit = createOctokit(token)
   const workflowRunContext = getWorkflowRunContext(github.context)
-  let workflowRun: WorkflowRun
-  let workflowRunJobs: WorkflowRunJobs
-
-  // Get Workflow Run Results
   try {
-    workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
-    workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext)
+    const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
+    const workflowRunJobs = await fetchWorkflowRunJobs(
+      octokit,
+      workflowRunContext
+    )
+    return { workflowRun, workflowRunJobs }
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
-    process.exit(1)
+    core.error('faild to get results of workflow run')
+    throw error
   }
+}
+
+const createMetrics = async (results: WorkflowResults): Promise<void> => {
+  const workflowRun = results.workflowRun
+  const workflowRunJobs = results.workflowRunJobs
 
   const meterProvider = setupMeterProvider()
-  const tracerProvider = setupTracerProvider()
+
   try {
-    // Create Gauges
     createJobGauges(workflowRun, workflowRunJobs)
     createWorkflowGauges(workflowRun, workflowRunJobs)
+  } catch (error) {
+    core.error('faild to create metrics')
+    throw error
+  } finally {
+    // TODO: テスト通るようにとりあえず名前をshutdownのままにしているので、修正
+    // Providers Shutdown
+    await shutdown(meterProvider)
+  }
+}
+const createTraces = async (results: WorkflowResults): Promise<void> => {
+  const workflowRun = results.workflowRun
+  const workflowRunJobs = results.workflowRunJobs
 
-    // Create Traces
+  const tracerProvider = setupTracerProvider()
+  try {
     const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
     workflowRunJobs.map(job => {
       const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
       createWorkflowRunStepSpan(jobCtx, job)
     })
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
-    process.exit(1)
+    core.error('faild to create traces')
+    throw error
   } finally {
-    await shutdown(meterProvider)
     await tracerShutdown(tracerProvider)
   }
+}
 
+/**
+ * The main function for the action.
+ * @returns {Promise<void>} Resolves when the action is complete.
+ */
+export async function run(): Promise<void> {
+  try {
+    const results = await fetchWorkflowResults()
+    await createMetrics(results)
+    await createTraces(results)
+  } catch (error) {
+    if (error instanceof Error) core.setFailed(error.message)
+    process.exit(1)
+  }
   process.exit(0)
 }

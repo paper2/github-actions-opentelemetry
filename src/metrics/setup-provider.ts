@@ -7,7 +7,7 @@ export const setupMeterProvider = (): MeterProvider => {
   const provider = createProvider(exporter)
   const result = opentelemetry.metrics.setGlobalMeterProvider(provider)
   if (!result) {
-    console.warn('Global meter provider can not be set.')
+    throw new Error('Global meter provider can not be set.')
   }
   return provider
 }
@@ -18,7 +18,8 @@ export const shutdown = async (provider: MeterProvider): Promise<void> => {
     await provider.shutdown()
   } catch (error) {
     console.log('Error terminating MetricProvider', error)
+    // Not Recaverable
     process.exit(1)
   }
-  process.exit(0)
+  console.log('Success to shutdown meterProvider')
 }

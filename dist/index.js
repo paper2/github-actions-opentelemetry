@@ -67344,6 +67344,8 @@ var __webpack_exports__ = {};
 var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
+var src = __nccwpck_require__(5163);
 ;// CONCATENATED MODULE: ./node_modules/@octokit/rest/node_modules/universal-user-agent/index.js
 function getUserAgent() {
   if (typeof navigator === "object" && "userAgent" in navigator) {
@@ -70906,7 +70908,10 @@ const settings = {
         : undefined,
     owner: process.env.OWNER,
     repository: process.env.REPOSITORY,
-    logLevel: process.env.LOG_LEVEL || 'info'
+    logLevel: process.env.LOG_LEVEL || 'info',
+    isCi: process.env.CI === 'true',
+    localOtlpMetricsEndpoint: 'http://prometheus:9090/api/v1/otlp/v1/metrics',
+    localOtlpTracesEndpoint: 'http://jaeger:4318/v1/traces'
 };
 /* harmony default export */ const src_settings = (settings);
 
@@ -70955,8 +70960,6 @@ const getWorkflowRunContext = (context) => {
 ;// CONCATENATED MODULE: ./src/github/index.ts
 
 
-// EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
-var src = __nccwpck_require__(5163);
 ;// CONCATENATED MODULE: ./src/metrics/create-gauge.ts
 
 const createGauge = (name, value, attributes, option) => {
@@ -71022,9 +71025,9 @@ var sdk_metrics_build_src = __nccwpck_require__(7349);
 ;// CONCATENATED MODULE: ./src/metrics/create-provider.ts
 
 
+
 const createExporter = () => new build_src.OTLPMetricExporter({
-    //   url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
-    headers: {} // an optional object containing custom headers to be sent with each request
+    url: src_settings.isCi ? undefined : src_settings.localOtlpMetricsEndpoint
 });
 const createProvider = (exporter) => new sdk_metrics_build_src.MeterProvider({
     readers: [
@@ -71039,16 +71042,12 @@ const createProvider = (exporter) => new sdk_metrics_build_src.MeterProvider({
 ;// CONCATENATED MODULE: ./src/metrics/setup-provider.ts
 
 
-
-if (src_settings.logLevel === 'debug') {
-    src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
-}
 const setupMeterProvider = () => {
     const exporter = createExporter();
     const provider = createProvider(exporter);
     const result = src.metrics.setGlobalMeterProvider(provider);
     if (!result) {
-        console.warn('Global meter provider can not be set.');
+        throw new Error('Global meter provider can not be set.');
     }
     return provider;
 };
@@ -71059,30 +71058,77 @@ const shutdown = async (provider) => {
     }
     catch (error) {
         console.log('Error terminating MetricProvider', error);
+        // Not Recaverable
         process.exit(1);
     }
-    process.exit(0);
+    console.log('Success to shutdown meterProvider');
 };
 
 ;// CONCATENATED MODULE: ./src/metrics/index.ts
 
 
 
+;// CONCATENATED MODULE: ./src/traces/github.ts
+
+
+const createWorkflowRunTrace = (workflowRun, 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+workflowRunJobs) => {
+    const tracer = src.trace.getTracer('github-actions-opentelemetry-github');
+    const startTime = new Date(workflowRun.run_started_at || workflowRun.created_at);
+    const rootSpan = tracer.startSpan(workflowRun.name || `${workflowRun.workflow_id}`, {
+        root: true,
+        attributes: {},
+        startTime
+    }, src.ROOT_CONTEXT);
+    // TODO: metricsと同じロジックの部分はgithubディレクトリに切り出す
+    const jobCompletedAtDates = workflowRunJobs.map(job => new Date(job.completed_at || job.created_at));
+    const endTime = new Date(Math.max(...jobCompletedAtDates.map(Number)));
+    rootSpan.end(endTime);
+    return src.trace.setSpan(src.ROOT_CONTEXT, rootSpan);
+};
+const createWorkflowRunJobSpan = (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ctx, 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+workflowRunJob) => {
+    return {};
+};
+const createWorkflowRunStepSpan = (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ctx, 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+workflowRunJob) => { };
+
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-trace-base/build/src/index.js
 var sdk_trace_base_build_src = __nccwpck_require__(9253);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-trace-otlp-proto/build/src/index.js
 var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7859);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/resources/build/src/index.js
+var resources_build_src = __nccwpck_require__(3871);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/semantic-conventions/build/src/index.js
+var semantic_conventions_build_src = __nccwpck_require__(7275);
 ;// CONCATENATED MODULE: ./src/traces/create-provider.ts
 
 
-const create_provider_createExporter = () => new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.M({
-    // optional - collection of custom headers to be sent with each request, empty by default
-    headers: {}
-});
+
+
+
+const create_provider_createExporter = () => {
+    return new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.M({
+        url: src_settings.isCi ? undefined : src_settings.localOtlpTracesEndpoint
+    });
+};
+// TODO: metrcsでも使うからもうちょっと汎用的に
+const serviceName = process.env.OTEL_SERVICE_NAME || 'github-actions-opentelemetry';
 const create_provider_createProvider = (exporter) => {
-    const provider = new sdk_trace_base_build_src.BasicTracerProvider();
+    const provider = new sdk_trace_base_build_src.BasicTracerProvider({
+        resource: new resources_build_src.Resource({
+            // TODO: Deprecatedなのでやめる。Resouce作ればOTEL_SERVICE_NAMEから読み取ってくれたりしないかな。
+            [semantic_conventions_build_src.SemanticResourceAttributes.SERVICE_NAME]: serviceName
+        })
+    });
     provider.addSpanProcessor(new sdk_trace_base_build_src.BatchSpanProcessor(exporter));
-    provider.register();
     return provider;
 };
 
@@ -71094,7 +71140,7 @@ const setupTracerProvider = () => {
     const provider = create_provider_createProvider(exporter);
     const result = src.trace.setGlobalTracerProvider(provider);
     if (!result) {
-        console.warn('Global meter provider can not be set.');
+        throw new Error('Global tracer provider can not be set.');
     }
     return provider;
 };
@@ -71104,33 +71150,16 @@ const setup_provider_shutdown = async (provider) => {
         await provider.shutdown();
     }
     catch (error) {
-        console.log('Error terminating TraceProvider', error);
+        console.error('Error terminating TraceProvider', error);
+        // Not Recaverable
         process.exit(1);
     }
-    process.exit(0);
+    console.log('Success to shutdown traceProvider');
 };
 
-;// CONCATENATED MODULE: ./src/traces/github.ts
+;// CONCATENATED MODULE: ./src/traces/index.ts
 
 
-const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
-    console.log(workflowRunJobs);
-    const tracer = src.trace.getTracer('hoge-test');
-    const startTime = new Date(workflowRun.run_started_at || workflowRun.created_at);
-    const rootSpan = tracer.startSpan(workflowRun.name || `${workflowRun.workflow_id}`, {
-        root: true,
-        attributes: {},
-        startTime
-    }, src.ROOT_CONTEXT);
-    return src.trace.setSpan(src.ROOT_CONTEXT, rootSpan);
-};
-const createWorkflowRunJobSpan = (ctx, workflowRunJob) => {
-    console.log(ctx, workflowRunJob);
-    return {};
-};
-const createWorkflowRunStepSpan = (ctx, workflowRunJob) => {
-    console.log(ctx, workflowRunJob);
-};
 
 ;// CONCATENATED MODULE: ./src/main.ts
 
@@ -71138,33 +71167,48 @@ const createWorkflowRunStepSpan = (ctx, workflowRunJob) => {
 
 
 
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-async function run() {
+
+
+if (src_settings.logLevel === 'debug') {
+    src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
+}
+const fetchWorkflowResults = async () => {
     const token = core.getInput('GITHUB_TOKEN');
     const octokit = createOctokit(token);
     const workflowRunContext = getWorkflowRunContext(github.context);
-    let workflowRun;
-    let workflowRunJobs;
-    // Get Workflow Run Results
     try {
-        workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
-        workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
+        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
+        const workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
+        return { workflowRun, workflowRunJobs };
     }
     catch (error) {
-        if (error instanceof Error)
-            core.setFailed(error.message);
-        process.exit(1);
+        core.error('faild to get results of workflow run');
+        throw error;
     }
+};
+const createMetrics = async (results) => {
+    const workflowRun = results.workflowRun;
+    const workflowRunJobs = results.workflowRunJobs;
     const meterProvider = setupMeterProvider();
-    const tracerProvider = setupTracerProvider();
     try {
-        // Create Gauges
         createJobGauges(workflowRun, workflowRunJobs);
         createWorkflowGauges(workflowRun, workflowRunJobs);
-        // Create Traces
+    }
+    catch (error) {
+        core.error('faild to create metrics');
+        throw error;
+    }
+    finally {
+        // TODO: テスト通るようにとりあえず名前をshutdownのままにしているので、修正
+        // Providers Shutdown
+        await shutdown(meterProvider);
+    }
+};
+const createTraces = async (results) => {
+    const workflowRun = results.workflowRun;
+    const workflowRunJobs = results.workflowRunJobs;
+    const tracerProvider = setupTracerProvider();
+    try {
         const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
         workflowRunJobs.map(job => {
             const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
@@ -71172,13 +71216,27 @@ async function run() {
         });
     }
     catch (error) {
+        core.error('faild to create traces');
+        throw error;
+    }
+    finally {
+        await setup_provider_shutdown(tracerProvider);
+    }
+};
+/**
+ * The main function for the action.
+ * @returns {Promise<void>} Resolves when the action is complete.
+ */
+async function run() {
+    try {
+        const results = await fetchWorkflowResults();
+        await createMetrics(results);
+        await createTraces(results);
+    }
+    catch (error) {
         if (error instanceof Error)
             core.setFailed(error.message);
         process.exit(1);
-    }
-    finally {
-        await shutdown(meterProvider);
-        await setup_provider_shutdown(tracerProvider);
     }
     process.exit(0);
 }

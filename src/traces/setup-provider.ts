@@ -7,7 +7,7 @@ export const setupTracerProvider = (): BasicTracerProvider => {
   const provider = createProvider(exporter)
   const result = opentelemetry.trace.setGlobalTracerProvider(provider)
   if (!result) {
-    console.warn('Global meter provider can not be set.')
+    throw new Error('Global tracer provider can not be set.')
   }
   return provider
 }
@@ -19,8 +19,9 @@ export const shutdown = async (
     await provider.forceFlush()
     await provider.shutdown()
   } catch (error) {
-    console.log('Error terminating TraceProvider', error)
+    console.error('Error terminating TraceProvider', error)
+    // Not Recaverable
     process.exit(1)
   }
-  process.exit(0)
+  console.log('Success to shutdown traceProvider')
 }
