@@ -4,11 +4,11 @@ import {
   PeriodicExportingMetricReader,
   PushMetricExporter
 } from '@opentelemetry/sdk-metrics'
+import settings from '../settings.js'
 
 export const createExporter = (): PushMetricExporter =>
   new OTLPMetricExporter({
-    //   url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
-    headers: {} // an optional object containing custom headers to be sent with each request
+    url: settings.isCi ? undefined : settings.localOtlpMetricsEndpoint
   })
 
 export const createProvider = (exporter: PushMetricExporter): MeterProvider =>
