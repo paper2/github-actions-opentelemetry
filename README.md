@@ -73,6 +73,20 @@ To configure the action, you need to set the following environment variables:
 1. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
    workflows as shown in the examples above.
 
+## Development
+
+### Dev Container
+
+- Dev Container runs Jaeger and Prometheus for local testing.
+  - Jaeger: http://localhost:16686
+  - Prometheus: http://localhost:9090
+
+### Local test
+
+```
+npm run test-local
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE)
