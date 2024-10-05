@@ -80,6 +80,7 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
     const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
     workflowRunJobs.map(job => {
       const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
+      if (jobCtx === null) return
       createWorkflowRunStepSpan(jobCtx, job)
     })
   } catch (error) {
