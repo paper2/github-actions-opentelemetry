@@ -56,6 +56,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      # テストも兼ねてsleepとか使った複雑なワークフローを作って試してみる。
       - name: Test Local Action
         id: test-action
         uses: ./
