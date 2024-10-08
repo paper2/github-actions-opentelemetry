@@ -18,9 +18,7 @@ const createMeterProvider = (): InMemoryProvider => {
   const provider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
-        exporter,
-        // exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
-        exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
+        exporter
       })
     ]
   })
