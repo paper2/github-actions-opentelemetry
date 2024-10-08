@@ -65,6 +65,9 @@ To configure the action, you need to set the following environment variables:
 
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: The OTLP endpoint where telemetry data will be
   sent.
+  - able to use `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and
+    `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` too.
+- `OTEL_SERVICE_NAME`: service.name attribute.
 
 ## Setup Instructions
 
