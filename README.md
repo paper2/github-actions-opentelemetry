@@ -86,7 +86,7 @@ To configure the action, you need to set the following environment variables:
 
 ### Local test
 
-```
+```sh
 npm run test-local
 ```
 
