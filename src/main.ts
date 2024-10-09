@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as opentelemetry from '@opentelemetry/api'
 import {
   createOctokit,
   fetchWorkflowRun,
@@ -10,26 +9,18 @@ import {
   WorkflowRunJobs
 } from './github/index.js'
 import {
-  shutdown,
   createJobGauges,
   createWorkflowGauges,
-  setupMeterProvider
+  setupMeterProvider,
+  shutdown
 } from './metrics/index.js'
 import {
-  shutdown as tracerShutdown,
-  setupTracerProvider,
   createWorkflowRunTrace,
   createWorkflowRunJobSpan,
   createWorkflowRunStepSpan
 } from './traces/index.js'
-import settings from './settings.js'
-
-if (settings.logLevel === 'debug') {
-  opentelemetry.diag.setLogger(
-    new opentelemetry.DiagConsoleLogger(),
-    opentelemetry.DiagLogLevel.DEBUG
-  )
-}
+import { NodeSDK } from '@opentelemetry/sdk-node'
+import { envDetector } from '@opentelemetry/resources'
 
 type WorkflowResults = {
   workflowRun: WorkflowRun
@@ -53,6 +44,33 @@ const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
   }
 }
 
+const initializeNodeSDK = (): NodeSDK => {
+  const sdk = new NodeSDK({
+    // if omitted, the tracing SDK will be initialized from environment variables
+    traceExporter: undefined,
+    // OTLP Exporter seemed not flushing metrics withoud forceflush().
+    // sdk.shutdown() alone maybe not enough.
+    // NodeSDK support is little for metrics now and merit is low.
+    metricReader: undefined,
+    // Need for using OTEL_XXX environment variable.
+    resourceDetectors: [envDetector]
+  })
+
+  sdk.start()
+
+  return sdk
+}
+
+const shutdownSDK = async (sdk: NodeSDK): Promise<void> => {
+  try {
+    await sdk.shutdown()
+    console.log('SDK shut down successfully')
+  } catch (error) {
+    console.log('Error shutting down SDK', error)
+    process.exit(1)
+  }
+}
+
 const createMetrics = async (results: WorkflowResults): Promise<void> => {
   const workflowRun = results.workflowRun
   const workflowRunJobs = results.workflowRunJobs
@@ -66,29 +84,20 @@ const createMetrics = async (results: WorkflowResults): Promise<void> => {
     core.error('faild to create metrics')
     throw error
   } finally {
-    // TODO: テスト通るようにとりあえず名前をshutdownのままにしているので、修正
-    // Providers Shutdown
     await shutdown(meterProvider)
   }
 }
-const createTraces = async (results: WorkflowResults): Promise<void> => {
+
+const createTraces = (results: WorkflowResults): void => {
   const workflowRun = results.workflowRun
   const workflowRunJobs = results.workflowRunJobs
 
-  const tracerProvider = setupTracerProvider()
-  try {
-    const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
-    workflowRunJobs.map(job => {
-      const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
-      if (jobCtx === null) return
-      createWorkflowRunStepSpan(jobCtx, job)
-    })
-  } catch (error) {
-    core.error('faild to create traces')
-    throw error
-  } finally {
-    await tracerShutdown(tracerProvider)
-  }
+  const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
+  workflowRunJobs.map(job => {
+    const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
+    if (jobCtx === null) return
+    createWorkflowRunStepSpan(jobCtx, job)
+  })
 }
 
 /**
@@ -96,13 +105,16 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
+  const sdk = initializeNodeSDK()
   try {
     const results = await fetchWorkflowResults()
     await createMetrics(results)
-    await createTraces(results)
+    createTraces(results)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
     process.exit(1)
+  } finally {
+    await shutdownSDK(sdk)
   }
   process.exit(0)
 }
