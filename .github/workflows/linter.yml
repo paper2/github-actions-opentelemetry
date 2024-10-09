@@ -19,9 +19,11 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      # To write linting fixes
+      contents: write
       packages: read
       # To report GitHub Actions status checks
+      # To write Super-linter status checks
       statuses: write
 
     steps:
