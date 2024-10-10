@@ -101,3 +101,7 @@ __tests__/runner/*
 .idea
 .vscode
 *.code-workspace
+
+# Super Linter Output
+github_conf/
+super-linter-output/
