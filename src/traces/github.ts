@@ -97,7 +97,7 @@ export const createWorkflowRunStepSpan = (
       )
       return
     }
-    createSpan(
+    const span = createSpan(
       ctx,
       step.name,
       step.started_at,
@@ -105,6 +105,11 @@ export const createWorkflowRunStepSpan = (
       // TODO: Set Attributes
       {}
     )
+    if (step.conclusion === 'success') {
+      span.setStatus({ code: opentelemetry.SpanStatusCode.OK })
+    } else {
+      span.setStatus({ code: opentelemetry.SpanStatusCode.ERROR })
+    }
   })
 }
 
