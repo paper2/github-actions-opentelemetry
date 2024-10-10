@@ -16,5 +16,6 @@ export const createProvider = (exporter: PushMetricExporter): MeterProvider =>
         exporter
       })
     ],
+    // TODO: Detectorについて再度調査する。
     resource: detectResourcesSync({ detectors: [envDetector] })
   })

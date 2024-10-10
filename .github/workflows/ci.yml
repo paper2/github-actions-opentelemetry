@@ -53,7 +53,6 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      # テストも兼ねてsleepとか使った複雑なワークフローを作って試してみる。
       - name: Test Local Action
         id: test-action
         uses: ./
@@ -61,6 +60,7 @@ jobs:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
           OTEL_EXPORTER_OTLP_HEADERS: ''
+          FEATURE_TRACE: true
 
           # If this job is removed, update it.
           # https://github.com/paper2/github-actions-opentelemetry/actions/runs/10856659171

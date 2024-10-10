@@ -22,6 +22,7 @@ import {
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { envDetector } from '@opentelemetry/resources'
 import settings from './settings.js'
+import * as opentelemetry from '@opentelemetry/api'
 
 type WorkflowResults = {
   workflowRun: WorkflowRun
@@ -68,6 +69,7 @@ const shutdownSDK = async (sdk: NodeSDK): Promise<void> => {
     console.log('SDK shut down successfully')
   } catch (error) {
     console.log('Error shutting down SDK', error)
+    // TODO: Fail safeに倒すか考える
     process.exit(1)
   }
 }
@@ -89,7 +91,7 @@ const createMetrics = async (results: WorkflowResults): Promise<void> => {
   }
 }
 
-const createTraces = (results: WorkflowResults): void => {
+const createTraces = async (results: WorkflowResults): Promise<void> => {
   const workflowRun = results.workflowRun
   const workflowRunJobs = results.workflowRunJobs
 
@@ -99,6 +101,13 @@ const createTraces = (results: WorkflowResults): void => {
     if (jobCtx === null) return
     createWorkflowRunStepSpan(jobCtx, job)
   })
+  if (settings.isGitHubActions)
+    await core.summary
+      .addHeading('GitHub Actions OpenTelemetry')
+      .addRaw(
+        `TraceID: ${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}`
+      )
+      .write()
 }
 
 /**
@@ -110,7 +119,7 @@ export async function run(): Promise<void> {
   try {
     const results = await fetchWorkflowResults()
     await createMetrics(results)
-    if (settings.FeatureFlagTrace) createTraces(results)
+    if (settings.FeatureFlagTrace) await createTraces(results)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
     process.exit(1)
