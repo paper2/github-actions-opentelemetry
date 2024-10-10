@@ -65,6 +65,9 @@ To configure the action, you need to set the following environment variables:
 
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: The OTLP endpoint where telemetry data will be
   sent.
+  - able to use `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and
+    `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` too.
+- `OTEL_SERVICE_NAME`: service.name attribute.
 
 ## Setup Instructions
 
@@ -72,6 +75,20 @@ To configure the action, you need to set the following environment variables:
    receive telemetry data (e.g., Jaeger, Prometheus, or other monitoring tools).
 1. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
    workflows as shown in the examples above.
+
+## Development
+
+### Dev Container
+
+- Dev Container runs Jaeger and Prometheus for local testing.
+  - Jaeger: <http://localhost:16686>
+  - Prometheus: <http://localhost:9090>
+
+### Local test
+
+```sh
+npm run test-local
+```
 
 ## License
 

@@ -10,6 +10,7 @@ export type WorkflowRun =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data']
 export type WorkflowRunJobs =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
+export type WorkflowRunJob = WorkflowRunJobs[number]
 
 export interface WorkflowRunContext {
   readonly owner: string

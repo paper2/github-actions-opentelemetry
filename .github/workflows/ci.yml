@@ -53,6 +53,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      # TODO: 複雑なworkflow作ってそれをテストで利用する
       - name: Test Local Action
         id: test-action
         uses: ./
@@ -60,6 +61,8 @@ jobs:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
           OTEL_EXPORTER_OTLP_HEADERS: ''
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+          FEATURE_TRACE: true
 
           # If this job is removed, update it.
           # https://github.com/paper2/github-actions-opentelemetry/actions/runs/10856659171

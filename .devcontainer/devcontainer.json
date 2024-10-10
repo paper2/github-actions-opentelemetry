@@ -1,7 +1,12 @@
 {
   "name": "GitHub Actions (TypeScript)",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
-  "postCreateCommand": "npm install",
+  "workspaceFolder": "/workspaces/github-actions-opentelemetry",
+  "postAttachCommand": {
+    "npm": "npm install",
+    "add-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}"
+  },
+  "dockerComposeFile": ["./compose.yml"],
+  "service": "dev-container",
   "customizations": {
     "codespaces": {
       "openFiles": ["README.md"]

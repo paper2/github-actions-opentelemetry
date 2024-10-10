@@ -1,0 +1,36 @@
+# FYI: https://containers.dev/guide/dockerfile#docker-compose
+version: '3'
+services:
+  dev-container:
+    image: mcr.microsoft.com/devcontainers/typescript-node:20
+    container_name: dev_container
+    command: sleep infinity
+    volumes:
+      - ../..:/workspaces:cached
+    networks:
+      - default
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    ports:
+      - '9090:9090'
+    command:
+      - '--enable-feature=otlp-write-receiver'
+      # Copy Default CMD
+      # FYI: https://hub.docker.com/layers/prom/prometheus/v2.54.1/images/sha256-69961df6ffa67598048a31aa2822d61f3c93b91d7db24e44d9bb03f99d520da9?context=explore
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - default
+  jaeger:
+    image: jaegertracing/all-in-one:1.61.0
+    ports:
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge

@@ -19,9 +19,11 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      # To write linting fixes
+      contents: write
       packages: read
       # To report GitHub Actions status checks
+      # To write Super-linter status checks
       statuses: write
 
     steps:
@@ -43,6 +45,8 @@ jobs:
         id: install
         run: npm ci
 
+      # TODO: 一旦雰囲気で使っているのであとでしっかりみる
+      # FYI: https://github.com/super-linter/super-linter?tab=readme-ov-file#github-actions-workflow-example-pull-request
       - name: Super-linter
         uses: super-linter/super-linter@v7.1.0
         env:
@@ -55,3 +59,18 @@ jobs:
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          FIX_SHELL_SHFMT: true
+          FIX_MARKDOWN: true
+          FIX_ENV: true
+      - name: Commit and push linting fixes
+        if: >
+          github.event_name == 'pull_request' && github.ref_name !=
+          github.event.repository.default_branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch:
+            ${{ github.event.pull_request.head.ref || github.head_ref ||
+            github.ref }}
+          commit_message: 'chore: fix linting issues'
+          commit_user_name: super-linter
+          commit_user_email: super-linter@super-linter.dev

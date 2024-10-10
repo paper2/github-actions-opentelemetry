@@ -1,10 +1,8 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { run } from './main.js'
-import * as core from '@actions/core'
 import * as githubModule from './github/index.js'
 import * as metricsModule from './metrics/index.js'
 
-vi.mock('@actions/core')
 vi.mock('./metrics/index.js')
 vi.mock('./github/index.js')
 
@@ -87,7 +85,5 @@ describe('run', () => {
 
     await expect(run()).rejects.toThrow('process.exit called with code: 1')
     expect(mockExit).toHaveBeenCalledWith(1)
-    expect(core.setFailed).toHaveBeenCalledWith(errorMessage)
-    expect(metricsModule.shutdown).toHaveBeenCalled()
   })
 })

@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.0.4",
+  "version": "v0.0.5",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -33,7 +33,7 @@
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
-    "test-local": "WORKFLOW_RUN_ID=10640837411 OWNER=paper2 REPOSITORY=github-actions-opentelemetry npx tsx ./src/index.ts",
+    "test-local": "npx tsx --env-file=.env.local ./src/index.ts",
     "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
@@ -48,12 +48,14 @@
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.49.2",
     "@opentelemetry/exporter-metrics-otlp-proto": "^0.53.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.53.0",
     "@opentelemetry/resources": "^1.26.0",
-    "@opentelemetry/sdk-node": "^0.53.0",
-    "@opentelemetry/semantic-conventions": "^1.27.0"
+    "@opentelemetry/sdk-trace-base": "^1.26.0"
   },
   "devDependencies": {
     "@octokit/types": "^13.5.0",
+    "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
     "@types/node": "^22.5.1",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
