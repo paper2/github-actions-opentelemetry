@@ -105,7 +105,7 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
     await core.summary
       .addHeading('GitHub Actions OpenTelemetry')
       .addRaw(
-        `TraceID: ${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}`
+        `TraceID: ${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}\n`
       )
       .addLink(
         // TODO: 検証を終えたら削除するか考える
