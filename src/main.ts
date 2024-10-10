@@ -21,6 +21,7 @@ import {
 } from './traces/index.js'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { envDetector } from '@opentelemetry/resources'
+import settings from './settings.js'
 
 type WorkflowResults = {
   workflowRun: WorkflowRun
@@ -109,7 +110,7 @@ export async function run(): Promise<void> {
   try {
     const results = await fetchWorkflowResults()
     await createMetrics(results)
-    createTraces(results)
+    if (settings.FeatureFlagTrace) createTraces(results)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
     process.exit(1)
