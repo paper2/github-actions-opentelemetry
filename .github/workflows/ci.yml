@@ -60,6 +60,7 @@ jobs:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
           OTEL_EXPORTER_OTLP_HEADERS: ''
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
           FEATURE_TRACE: true
 
           # If this job is removed, update it.
