@@ -107,6 +107,11 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
       .addRaw(
         `TraceID: ${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}`
       )
+      .addLink(
+        // TODO: 検証を終えたら削除するか考える
+        'Google Cloud Trace Helper',
+        `https://console.cloud.google.com/traces/list?tid=${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}`
+      )
       .write()
 }
 
