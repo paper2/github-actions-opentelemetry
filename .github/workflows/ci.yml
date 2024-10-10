@@ -53,6 +53,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      # TODO: 複雑なworkflow作ってそれをテストで利用する
       - name: Test Local Action
         id: test-action
         uses: ./

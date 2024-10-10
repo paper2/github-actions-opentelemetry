@@ -115,6 +115,8 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
       .write()
 }
 
+// TODO: mainここだけにしたい。
+// TODO: Memory Exporterをインジェクトできるようにして main でのOTelの動きを一定担保したい
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
