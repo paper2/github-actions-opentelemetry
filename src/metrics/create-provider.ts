@@ -13,7 +13,10 @@ export const createProvider = (exporter: PushMetricExporter): MeterProvider =>
   new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
-        exporter
+        exporter,
+        // Exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
+        // This settings prvents from generating duplicate metrics.
+        exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
       })
     ],
     // TODO: Detectorについて再度調査する。
