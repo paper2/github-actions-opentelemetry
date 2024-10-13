@@ -16,7 +16,6 @@ export const initialize = (
   meterExporter?: PushMetricExporter,
   traceExporter?: SpanExporter
 ): void => {
-  // Setup Meter Provider
   // NOTE: NodeSDK and OTLP Exporter seemed not flushing metrics withoud forceflush().
   //       Please try integrate NodeSDK again in the future.
   meterProvider = new MeterProvider({
