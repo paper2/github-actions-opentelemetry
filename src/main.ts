@@ -69,7 +69,8 @@ const shutdownSDK = async (sdk: NodeSDK): Promise<void> => {
     console.log('SDK shut down successfully')
   } catch (error) {
     console.log('Error shutting down SDK', error)
-    // TODO: Fail safeに倒すか考える
+    // TODO: Fail safeに倒すか考える -> 初期設定時のエラーのみ例外を出す。
+    // https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
     process.exit(1)
   }
 }
