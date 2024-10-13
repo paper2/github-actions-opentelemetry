@@ -1,20 +1,27 @@
-import { describe, test, expect } from 'vitest'
-import settings from './settings.js'
-settings.owner = 'paper2'
-settings.repository = 'github-actions-opentelemetry'
-// NOTE: maybe sometimes change this value because deleting this job in GitHub.
-settings.workflowRunId = 10640837411
-
-// import after change setting for test
-// eslint-disable-next-line import/first
+import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { run } from './main.js'
+import * as githubModule from './github/index.js'
+import * as opentelemetry from '@opentelemetry/api'
 
-// TODO: もうちょっと良い方法考える。exportできてないし。
-// .     いらないかも？外部依存のところあるし、、、そこはそこでテストするのが良いかも。
 describe('e2e', () => {
-  test('run by using real api', async () => {
+  beforeEach(() => {
+    // disable global providers for test
+    opentelemetry.metrics.disable()
+    opentelemetry.trace.disable()
+  })
+
+  test('should run successfully by using real api', async () => {
     await expect(run()).rejects.toThrow(
       'process.exit unexpectedly called with "0"' // 0 is success
+    )
+  })
+  test('should handle errors correctly', async () => {
+    const errorMessage = 'Fetch failed'
+    vi.spyOn(githubModule, 'fetchWorkflowRun').mockRejectedValueOnce(
+      new Error(errorMessage)
+    )
+    await expect(run()).rejects.toThrow(
+      'process.exit unexpectedly called with "1"'
     )
   })
 })

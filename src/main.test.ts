@@ -49,21 +49,6 @@ describe('run', () => {
     opentelemetry.trace.disable()
   })
 
-  // TODO: e2e testとして切り離す
-  // test('should run successfully by using real api', async () => {
-  //   await expect(run()).rejects.toThrow(
-  //     'process.exit unexpectedly called with "0"' // 0 is success
-  //   )
-  // })
-  // test('should handle errors correctly', async () => {
-  //   const errorMessage = 'Fetch failed'
-  //   vi.spyOn(githubModule, 'fetchWorkflowRun').mockRejectedValueOnce(
-  //     new Error(errorMessage)
-  //   )
-
-  //   await expect(run()).rejects.toThrow('process.exit called with code: 1')
-  //   expect(mockExit).toHaveBeenCalledWith(1)
-
   test('should run successfully by using in memory metric exporter', async () => {
     const exporter = new InMemoryMetricExporter(AggregationTemporality.DELTA)
     await expect(run(exporter)).rejects.toThrow(
