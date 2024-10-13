@@ -1,5 +1,9 @@
 import { describe, test, expect, vi } from 'vitest'
 import { getWorkflowRunContext, GitHubContext } from './github.js'
+import { settings } from '../settings.js'
+settings.owner = undefined
+settings.repository = undefined
+settings.workflowRunId = undefined
 
 vi.mock('@actions/github')
 vi.mock('@octokit/rest')
