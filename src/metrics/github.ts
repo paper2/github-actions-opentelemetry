@@ -49,7 +49,6 @@ interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly 'cicd.pipeline.name': string
   readonly 'cicd.pipeline.repository': string
   readonly 'cicd.pipeline.task.name': string
-  readonly 'cicd.pipeline.task.status': string
 }
 
 export const createJobGauges = (
@@ -64,8 +63,7 @@ export const createJobGauges = (
     const jobMetricsAttributes: JobMetricsAttributes = {
       'cicd.pipeline.name': job.workflow_name || '',
       'cicd.pipeline.repository': `${workflow.repository.full_name}`,
-      'cicd.pipeline.task.name': job.name,
-      'cicd.pipeline.task.status': job.status
+      'cicd.pipeline.task.name': job.name
     }
 
     createGauge(

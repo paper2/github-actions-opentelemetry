@@ -2,11 +2,13 @@ import { describe, test, expect } from 'vitest'
 import { initialize, shutdown } from './instrumentation.js'
 
 describe('initialize', () => {
-  test('should initialize once', () => {
+  test('should initialize successfully', () => {
     expect(() => initialize()).not.toThrow()
-    expect(() => initialize()).toThrow(
-      'Global meter provider can not be set. Please check meter provider settings.'
-    )
+  })
+  test('should initilize be run in any times', async () => {
+    expect(() => initialize()).not.toThrow()
+    expect(() => initialize()).not.toThrow()
+    expect(() => initialize()).not.toThrow()
   })
 })
 describe('shutdown', () => {

@@ -17,6 +17,8 @@ import {
 import settings from './settings.js'
 import * as opentelemetry from '@opentelemetry/api'
 import { shutdown, initialize } from './instrumentation/instrumentation.js'
+import { PushMetricExporter } from '@opentelemetry/sdk-metrics'
+import { SpanExporter } from '@opentelemetry/sdk-trace-base'
 
 type WorkflowResults = {
   workflowRun: WorkflowRun
@@ -83,11 +85,14 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-export async function run(): Promise<void> {
+export async function run(
+  meterExporter?: PushMetricExporter,
+  traceExporter?: SpanExporter
+): Promise<void> {
   // required: run initialize() first.
   // usually use --required runtime option for first reading.
   // for simple use this action, this is satisfied on here.
-  initialize()
+  initialize(meterExporter, traceExporter)
 
   try {
     const results = await fetchWorkflowResults()
@@ -95,6 +100,7 @@ export async function run(): Promise<void> {
     if (settings.FeatureFlagTrace) await createTraces(results)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+    console.error(error)
     process.exit(1)
   } finally {
     await shutdown()

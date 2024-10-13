@@ -7,12 +7,14 @@ import {
   PushMetricExporter
 } from '@opentelemetry/sdk-metrics'
 import * as opentelemetry from '@opentelemetry/api'
+import { SpanExporter } from '@opentelemetry/sdk-trace-base'
 
 let sdk: NodeSDK
 let meterProvider: MeterProvider
 
 export const initialize = (
-  exporter: PushMetricExporter = new OTLPMetricExporter()
+  meterExporter?: PushMetricExporter,
+  traceExporter?: SpanExporter
 ): void => {
   // Setup Meter Provider
   // NOTE: NodeSDK and OTLP Exporter seemed not flushing metrics withoud forceflush().
@@ -20,7 +22,7 @@ export const initialize = (
   meterProvider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
-        exporter,
+        exporter: meterExporter ?? new OTLPMetricExporter(),
         // Exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
         // This settings prvents from generating duplicate metrics.
         exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
@@ -30,14 +32,14 @@ export const initialize = (
   })
   const result = opentelemetry.metrics.setGlobalMeterProvider(meterProvider)
   if (!result) {
-    throw new Error(
-      'Global meter provider can not be set. Please check meter provider settings.'
+    console.warn(
+      'setGlobalMeterProvider failed. pease check settings or duplicate registeration.'
     )
   }
 
   sdk = new NodeSDK({
     // omit this value for the tracing SDK to be initialized from environment variables
-    traceExporter: undefined,
+    traceExporter,
     // if omitted, will not be initialized
     metricReader: undefined,
     // Need for using OTEL_XXX environment variable
