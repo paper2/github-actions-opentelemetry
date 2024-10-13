@@ -8,21 +8,15 @@ import {
   WorkflowRun,
   WorkflowRunJobs
 } from './github/index.js'
-import {
-  createJobGauges,
-  createWorkflowGauges,
-  setupMeterProvider,
-  shutdown
-} from './metrics/index.js'
+import { createJobGauges, createWorkflowGauges } from './metrics/index.js'
 import {
   createWorkflowRunTrace,
   createWorkflowRunJobSpan,
   createWorkflowRunStepSpan
 } from './traces/index.js'
-import { NodeSDK } from '@opentelemetry/sdk-node'
-import { envDetector } from '@opentelemetry/resources'
 import settings from './settings.js'
 import * as opentelemetry from '@opentelemetry/api'
+import { shutdown, initialize } from './instrumentation/instrumentation.js'
 
 type WorkflowResults = {
   workflowRun: WorkflowRun
@@ -46,40 +40,9 @@ const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
   }
 }
 
-const initializeNodeSDK = (): NodeSDK => {
-  const sdk = new NodeSDK({
-    // if omitted, the tracing SDK will be initialized from environment variables
-    traceExporter: undefined,
-    // OTLP Exporter seemed not flushing metrics withoud forceflush().
-    // sdk.shutdown() alone maybe not enough.
-    // NodeSDK support is little for metrics now and merit is low.
-    metricReader: undefined,
-    // Need for using OTEL_XXX environment variable.
-    resourceDetectors: [envDetector]
-  })
-
-  sdk.start()
-
-  return sdk
-}
-
-const shutdownSDK = async (sdk: NodeSDK): Promise<void> => {
-  try {
-    await sdk.shutdown()
-    console.log('SDK shut down successfully')
-  } catch (error) {
-    console.log('Error shutting down SDK', error)
-    // TODO: Fail safeに倒すか考える -> 初期設定時のエラーのみ例外を出す。
-    // https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles
-    process.exit(1)
-  }
-}
-
 const createMetrics = async (results: WorkflowResults): Promise<void> => {
   const workflowRun = results.workflowRun
   const workflowRunJobs = results.workflowRunJobs
-
-  const meterProvider = setupMeterProvider()
 
   try {
     createJobGauges(workflowRun, workflowRunJobs)
@@ -87,8 +50,6 @@ const createMetrics = async (results: WorkflowResults): Promise<void> => {
   } catch (error) {
     core.error('faild to create metrics')
     throw error
-  } finally {
-    await shutdown(meterProvider)
   }
 }
 
@@ -123,7 +84,11 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
-  const sdk = initializeNodeSDK()
+  // required: run initialize() first.
+  // usually use --required runtime option for first reading.
+  // for simple use this action, this is satisfied on here.
+  initialize()
+
   try {
     const results = await fetchWorkflowResults()
     await createMetrics(results)
@@ -132,7 +97,7 @@ export async function run(): Promise<void> {
     if (error instanceof Error) core.setFailed(error.message)
     process.exit(1)
   } finally {
-    await shutdownSDK(sdk)
+    await shutdown()
   }
   process.exit(0)
 }

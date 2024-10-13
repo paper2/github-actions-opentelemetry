@@ -9,6 +9,8 @@ settings.workflowRunId = 10640837411
 // eslint-disable-next-line import/first
 import { run } from './main.js'
 
+// TODO: もうちょっと良い方法考える。exportできてないし。
+// .     いらないかも？外部依存のところあるし、、、そこはそこでテストするのが良いかも。
 describe('e2e', () => {
   test('run by using real api', async () => {
     await expect(run()).rejects.toThrow(

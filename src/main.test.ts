@@ -5,6 +5,7 @@ import * as metricsModule from './metrics/index.js'
 
 vi.mock('./metrics/index.js')
 vi.mock('./github/index.js')
+vi.mock('./instrumentation/instrumentation.js')
 
 describe('run', () => {
   const mockOctokit = {}
@@ -74,7 +75,6 @@ describe('run', () => {
       mockWorkflowRun,
       mockWorkflowRunJobs
     )
-    expect(metricsModule.shutdown).toHaveBeenCalled()
   })
 
   test('should handle errors correctly', async () => {
