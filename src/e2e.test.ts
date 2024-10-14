@@ -8,6 +8,9 @@ describe('e2e', () => {
     // disable global providers for test
     opentelemetry.metrics.disable()
     opentelemetry.trace.disable()
+    opentelemetry.diag.disable()
+    opentelemetry.context.disable()
+    opentelemetry.propagation.disable()
   })
 
   test('should run successfully by using real api', async () => {
