@@ -51,7 +51,7 @@ describe('createGauge', () => {
               {
                 descriptor: {
                   name: 'testGauge',
-                  type: 'OBSERVABLE_GAUGE',
+                  type: 'GAUGE',
                   description: '',
                   unit: '',
                   valueType: 1,

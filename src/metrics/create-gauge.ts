@@ -9,10 +9,7 @@ export const createGauge = (
   // TODO: Examplarsの活用できないか検討
   // FYI: https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars
   const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
-  const gauge = meter.createObservableGauge(name, option)
-  // NOTE: Usually, this callback is called by interval. But in this library, we call it manually last once.
-  gauge.addCallback(result => {
-    result.observe(value, attributes)
-    console.log(`Gauge: ${name} ${value} ${JSON.stringify(attributes)}`)
-  })
+
+  const gauge = meter.createGauge(name, option)
+  gauge.record(value, attributes)
 }

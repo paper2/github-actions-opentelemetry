@@ -82,5 +82,6 @@ rules:
     '@typescript-eslint/semi': ['error', 'never'],
     '@typescript-eslint/space-before-function-paren': 'off',
     '@typescript-eslint/type-annotation-spacing': 'error',
-    '@typescript-eslint/unbound-method': 'error'
+    '@typescript-eslint/unbound-method': 'error',
+    '@typescript-eslint/no-floating-promises': 'error'
   }
