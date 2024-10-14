@@ -65,6 +65,9 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
     if (jobCtx === null) return
     createWorkflowRunStepSpan(jobCtx, job)
   })
+  console.log(
+    `TraceID: ${opentelemetry.trace.getSpanContext(rootCtx)?.traceId}`
+  )
   if (settings.isGitHubActions)
     await core.summary
       .addHeading('GitHub Actions OpenTelemetry')
