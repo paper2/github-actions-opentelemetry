@@ -30,7 +30,15 @@ vi.mock(import('./github/index.js'), async importOriginal => {
       name: 'Run Github Actions OpenTelemetry',
       run_id: 10856659171,
       workflow_name: 'Send Telemetry after Other Workflow',
-      status: 'completed'
+      status: 'completed',
+      steps: [
+        {
+          name: 'step1',
+          started_at: '2024-09-01T00:05:10Z',
+          completed_at: '2024-09-01T00:05:20Z',
+          conclusion: 'success'
+        }
+      ]
     }
   ] as WorkflowRunJobs
 
