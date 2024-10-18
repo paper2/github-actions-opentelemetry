@@ -9,52 +9,84 @@ import * as opentelemetry from '@opentelemetry/api'
 import { InMemorySpanExporter } from '@opentelemetry/sdk-trace-base'
 import * as instrumentation from './instrumentation/instrumentation.js'
 
-vi.mock(import('./github/index.js'), async importOriginal => {
-  // TODO: hoistedしてテストのコードで以下を利用してexpectedを作りたい
-  const workflowRun = {
-    created_at: '2024-09-01T00:00:00Z',
-    status: 'completed',
-    id: 10856659171,
-    name: 'Send Telemetry after Other Workflow',
-    run_number: 14,
-    repository: {
-      full_name: 'paper2/github-actions-opentelemetry'
-    }
-  } as WorkflowRun
-
-  const workflowRunJobs = [
-    {
-      created_at: '2024-09-01T00:02:00Z',
-      started_at: '2024-09-01T00:05:00Z',
-      completed_at: '2024-09-01T00:10:00Z',
-      id: 30131735230,
-      name: 'Run Github Actions OpenTelemetry',
-      run_id: 10856659171,
-      workflow_name: 'Send Telemetry after Other Workflow',
+const { workflowRun, workflowRunJobs } = vi.hoisted(() => {
+  return {
+    workflowRun: {
+      created_at: '2024-09-01T00:00:00Z',
       status: 'completed',
-      steps: [
-        {
-          name: 'step1',
-          started_at: '2024-09-01T00:05:10Z',
-          completed_at: '2024-09-01T00:05:20Z',
-          conclusion: 'success'
-        },
-        {
-          name: 'step2',
-          started_at: '2024-09-01T00:05:30Z',
-          completed_at: '2024-09-01T00:05:35',
-          conclusion: 'success'
-        },
-        {
-          name: 'step3',
-          started_at: '2024-09-01T00:05:40',
-          completed_at: '2024-09-01T00:05:50',
-          conclusion: 'success'
-        }
-      ]
-    }
-  ] as WorkflowRunJobs
+      id: 10856659171,
+      name: 'Test Run',
+      run_number: 14,
+      repository: {
+        full_name: 'paper2/github-actions-opentelemetry'
+      }
+    } as WorkflowRun,
+    workflowRunJobs: [
+      {
+        created_at: '2024-09-01T00:02:00Z',
+        started_at: '2024-09-01T00:05:00Z',
+        completed_at: '2024-09-01T00:10:00Z',
+        id: 30131735230,
+        name: 'job1',
+        run_id: 10856659171,
+        workflow_name: 'Test Run',
+        status: 'completed',
+        steps: [
+          {
+            name: 'step1',
+            started_at: '2024-09-01T00:05:10Z',
+            completed_at: '2024-09-01T00:05:20Z',
+            conclusion: 'success'
+          },
+          {
+            name: 'step2',
+            started_at: '2024-09-01T00:05:30Z',
+            completed_at: '2024-09-01T00:05:35',
+            conclusion: 'success'
+          },
+          {
+            name: 'step3',
+            started_at: '2024-09-01T00:05:40',
+            completed_at: '2024-09-01T00:05:50',
+            conclusion: 'success'
+          }
+        ]
+      }
+      //     {
+      //       created_at: '2024-09-01T00:12:00Z',
+      //       started_at: '2024-09-01T00:15:00Z',
+      //       completed_at: '2024-09-01T00:20:00Z',
+      //       id: 30131735231,
+      //       name: 'job2',
+      //       run_id: 10856659171,
+      //       workflow_name: 'Test Run',
+      //       status: 'completed',
+      //       steps: [
+      //         {
+      //           name: 'step1',
+      //           started_at: '2024-09-01T00:15:10Z',
+      //           completed_at: '2024-09-01T00:15:20Z',
+      //           conclusion: 'success'
+      //         },
+      //         {
+      //           name: 'step2',
+      //           started_at: '2024-09-01T00:15:30Z',
+      //           completed_at: '2024-09-01T00:15:35',
+      //           conclusion: 'success'
+      //         },
+      //         {
+      //           name: 'step3',
+      //           started_at: '2024-09-01T00:15:40',
+      //           completed_at: '2024-09-01T00:15:50',
+      //           conclusion: 'success'
+      //         }
+      //       ]
+      //     }
+    ] as WorkflowRunJobs
+  }
+})
 
+vi.mock(import('./github/index.js'), async importOriginal => {
   const mod = await importOriginal()
   return {
     ...mod,
@@ -86,7 +118,7 @@ describe('run', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): any => {
       const attributes = {
-        'cicd.pipeline.name': 'Send Telemetry after Other Workflow',
+        'cicd.pipeline.name': 'Test Run',
         'cicd.pipeline.repository': 'paper2/github-actions-opentelemetry',
         ...(taskName !== undefined && { 'cicd.pipeline.task.name': taskName })
       }
@@ -111,16 +143,8 @@ describe('run', () => {
     const metrics = exporter.getMetrics()[0].scopeMetrics[0].metrics
     expect(metrics).toHaveLength(4)
     expect(metrics).toMatchObject([
-      genMetric(
-        'cicd.pipeline.task.duration',
-        300,
-        'Run Github Actions OpenTelemetry'
-      ),
-      genMetric(
-        'cicd.pipeline.task.queued_duration',
-        180,
-        'Run Github Actions OpenTelemetry'
-      ),
+      genMetric('cicd.pipeline.task.duration', 300, 'job1'),
+      genMetric('cicd.pipeline.task.queued_duration', 180, 'job1'),
       genMetric('cicd.pipeline.queued_duration', 300),
       genMetric('cicd.pipeline.duration', 600)
     ])
@@ -157,7 +181,7 @@ describe('run', () => {
         attributes: {},
         endTime: [1725149400, 0],
         _duration: [600, 0],
-        name: 'Send Telemetry after Other Workflow',
+        name: 'Test Run',
         // Check Root Span
         parentSpanId: undefined,
         startTime: [1725148800, 0],
@@ -179,7 +203,7 @@ describe('run', () => {
         instrumentationLibrary: {
           name: 'github-actions-opentelemetry-github'
         },
-        name: 'Run Github Actions OpenTelemetry with time of waiting runner',
+        name: 'job1 with time of waiting runner',
         resource: {
           attributes: {
             'service.name': 'github-actions-opentelemetry',
@@ -213,7 +237,7 @@ describe('run', () => {
         instrumentationLibrary: {
           name: 'github-actions-opentelemetry-github'
         },
-        name: 'Run Github Actions OpenTelemetry',
+        name: 'job1',
         resource: {
           attributes: {
             'service.name': 'github-actions-opentelemetry',
