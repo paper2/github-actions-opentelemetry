@@ -61,15 +61,20 @@ const initializeTracer = (exporter?: SpanExporter): void => {
   }
 }
 
-export const shutdown = async (): Promise<void> => {
+export const forceFlush = async (): Promise<void> => {
   try {
     await meterProvider.forceFlush()
-    await meterProvider.shutdown()
     await traceProvider.forceFlush()
-    await traceProvider.shutdown()
-    console.log('success providers shutdown.')
   } catch (error) {
-    console.log('fail providers shutdown.', error)
-    process.exit(1)
+    console.log('provider failed forceFlush.', error)
+  }
+}
+
+export const shutdown = async (): Promise<void> => {
+  try {
+    await meterProvider.shutdown()
+    await traceProvider.shutdown()
+  } catch (error) {
+    console.log('provider failed shutdown.', error)
   }
 }

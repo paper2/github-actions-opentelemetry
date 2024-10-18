@@ -16,7 +16,11 @@ import {
 } from './traces/index.js'
 import settings from './settings.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { shutdown, initialize } from './instrumentation/instrumentation.js'
+import {
+  forceFlush,
+  initialize,
+  shutdown
+} from './instrumentation/instrumentation.js'
 import { PushMetricExporter } from '@opentelemetry/sdk-metrics'
 import { SpanExporter } from '@opentelemetry/sdk-trace-base'
 
@@ -83,7 +87,6 @@ const createTraces = async (results: WorkflowResults): Promise<void> => {
 }
 
 // TODO: mainここだけにしたい。
-// TODO: Memory Exporterをインジェクトできるようにして main でのOTelの動きを一定担保したい
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -106,7 +109,9 @@ export async function run(
     console.error(error)
     process.exit(1)
   } finally {
+    await forceFlush()
     await shutdown()
+    console.log('providers shutdown successfully.')
   }
   process.exit(0)
 }

@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { initialize, shutdown } from './instrumentation.js'
+import { initialize, forceFlush } from './instrumentation.js'
 import * as opentelemetry from '@opentelemetry/api'
 
 describe('initialize', () => {
@@ -17,6 +17,6 @@ describe('initialize', () => {
 })
 describe('shutdown', () => {
   test('should shutdown be success', async () => {
-    await expect(shutdown()).resolves.not.toThrow()
+    await expect(forceFlush()).resolves.not.toThrow()
   })
 })
