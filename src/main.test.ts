@@ -15,13 +15,13 @@ import {
   AggregationTemporality,
   MetricData
 } from '@opentelemetry/sdk-metrics'
-import * as opentelemetry from '@opentelemetry/api'
 import {
   InMemorySpanExporter,
   ReadableSpan
 } from '@opentelemetry/sdk-trace-base'
 import * as instrumentation from './instrumentation/index.js'
 import { calcDiffSec } from './utils/calc-diff-sec.js'
+import { opentelemetryAllDisable } from './utils/opentelemetry-all-disable.js'
 
 const workflowRunResults = vi.hoisted(() => {
   return {
@@ -113,13 +113,7 @@ vi.mock(import('./github/index.js'), async importOriginal => {
 
 describe('run', () => {
   beforeEach(() => {
-    // TODO: create util
-    // disable global providers for test
-    opentelemetry.metrics.disable()
-    opentelemetry.trace.disable()
-    opentelemetry.diag.disable()
-    opentelemetry.context.disable()
-    opentelemetry.propagation.disable()
+    opentelemetryAllDisable()
   })
 
   describe('should export expected metrics', () => {

@@ -1,15 +1,10 @@
 import { describe, test, expect, beforeEach } from 'vitest'
 import { initialize, forceFlush } from './instrumentation.js'
-import * as opentelemetry from '@opentelemetry/api'
+import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 
 describe('initialize', () => {
   beforeEach(() => {
-    // disable global providers for test
-    opentelemetry.metrics.disable()
-    opentelemetry.trace.disable()
-    opentelemetry.diag.disable()
-    opentelemetry.context.disable()
-    opentelemetry.propagation.disable()
+    opentelemetryAllDisable()
   })
   test('should initialize successfully', () => {
     expect(() => initialize()).not.toThrow()
