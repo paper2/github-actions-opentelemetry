@@ -1,14 +1,6 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
-import {
-  createOctokit,
-  fetchWorkflowRun,
-  fetchWorkflowRunJobs,
-  getWorkflowRunContext,
-  WorkflowRun,
-  WorkflowRunJobs
-} from './github/index.js'
-import { createJobGauges, createWorkflowGauges } from './metrics/index.js'
+import { fetchWorkflowResults, WorkflowResults } from './github/index.js'
+import { createMetrics } from './metrics/index.js'
 import {
   createWorkflowRunTrace,
   createWorkflowRunJobSpan,
@@ -19,40 +11,6 @@ import * as opentelemetry from '@opentelemetry/api'
 import { forceFlush, initialize, shutdown } from './instrumentation/index.js'
 import { PushMetricExporter } from '@opentelemetry/sdk-metrics'
 import { SpanExporter } from '@opentelemetry/sdk-trace-base'
-
-type WorkflowResults = {
-  workflowRun: WorkflowRun
-  workflowRunJobs: WorkflowRunJobs
-}
-
-const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
-  const token = core.getInput('GITHUB_TOKEN')
-  const octokit = createOctokit(token)
-  const workflowRunContext = getWorkflowRunContext(github.context)
-  try {
-    const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
-    const workflowRunJobs = await fetchWorkflowRunJobs(
-      octokit,
-      workflowRunContext
-    )
-    return { workflowRun, workflowRunJobs }
-  } catch (error) {
-    core.error('faild to get results of workflow run')
-    throw error
-  }
-}
-
-const createMetrics = async (results: WorkflowResults): Promise<void> => {
-  const { workflowRun, workflowRunJobs } = results
-
-  try {
-    createWorkflowGauges(workflowRun, workflowRunJobs)
-    createJobGauges(workflowRun, workflowRunJobs)
-  } catch (error) {
-    core.error('failed to create metrics')
-    throw error
-  }
-}
 
 const createTraces = async (results: WorkflowResults): Promise<void> => {
   const workflowRun = results.workflowRun

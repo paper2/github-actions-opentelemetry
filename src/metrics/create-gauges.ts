@@ -1,7 +1,20 @@
-import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge } from './create-gauge.js'
+import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
+
+export const createGauge = (
+  name: string,
+  value: number,
+  attributes: opentelemetry.Attributes,
+  option?: opentelemetry.MetricOptions
+): void => {
+  // TODO: Examplarsの活用できないか検討
+  // FYI: https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars
+  const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
+
+  const gauge = meter.createGauge(name, option)
+  gauge.record(value, attributes)
+}
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)

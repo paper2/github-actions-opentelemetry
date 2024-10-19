@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge } from './create-gauge.js'
+import { createGauge } from './create-gauges.js'
 import {
   InMemoryMetricExporter,
   AggregationTemporality,

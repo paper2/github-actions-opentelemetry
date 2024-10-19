@@ -20,7 +20,7 @@ describe('e2e', () => {
   })
   test('should handle errors correctly', async () => {
     const errorMessage = 'Fetch failed'
-    vi.spyOn(githubModule, 'fetchWorkflowRun').mockRejectedValueOnce(
+    vi.spyOn(githubModule, 'fetchWorkflowResults').mockRejectedValueOnce(
       new Error(errorMessage)
     )
     await expect(run()).rejects.toThrow(

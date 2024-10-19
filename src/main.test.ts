@@ -8,13 +8,12 @@ import {
   beforeEach,
   MockInstance
 } from 'vitest'
-import { WorkflowRun, WorkflowRunJobs } from './github/index.js'
+import { fetchWorkflowResults, WorkflowResults } from './github/index.js'
 import { run } from './main.js'
 import {
   InMemoryMetricExporter,
   AggregationTemporality,
-  MetricData,
-  PeriodicExportingMetricReader
+  MetricData
 } from '@opentelemetry/sdk-metrics'
 import * as opentelemetry from '@opentelemetry/api'
 import {
@@ -24,7 +23,7 @@ import {
 import * as instrumentation from './instrumentation/index.js'
 import { calcDiffSec } from './utils/calc-diff-sec.js'
 
-const { workflowRun, workflowRunJobs } = vi.hoisted(() => {
+const workflowRunResults = vi.hoisted(() => {
   return {
     workflowRun: {
       created_at: '2024-09-01T00:00:00Z',
@@ -35,8 +34,7 @@ const { workflowRun, workflowRunJobs } = vi.hoisted(() => {
       repository: {
         full_name: 'paper2/github-actions-opentelemetry'
       }
-    } as WorkflowRun,
-
+    },
     workflowRunJobs: [
       {
         created_at: '2024-09-01T00:02:00Z',
@@ -98,16 +96,18 @@ const { workflowRun, workflowRunJobs } = vi.hoisted(() => {
           }
         ]
       }
-    ] as WorkflowRunJobs
-  }
+    ]
+  } as WorkflowResults
 })
+const { workflowRun, workflowRunJobs } = workflowRunResults
 
 vi.mock(import('./github/index.js'), async importOriginal => {
   const mod = await importOriginal()
   return {
     ...mod,
-    fetchWorkflowRun: vi.fn().mockResolvedValue(workflowRun),
-    fetchWorkflowRunJobs: vi.fn().mockResolvedValue(workflowRunJobs)
+    fetchWorkflowResults: vi
+      .fn<typeof fetchWorkflowResults>()
+      .mockResolvedValue(workflowRunResults)
   }
 })
 

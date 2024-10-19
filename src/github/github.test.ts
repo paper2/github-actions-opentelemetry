@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
-import { getWorkflowRunContext, GitHubContext } from './github.js'
+import { getWorkflowRunContext } from './github.js'
+import { GitHubContext } from './types.js'
 import { settings } from '../settings.js'
 settings.owner = undefined
 settings.repository = undefined
