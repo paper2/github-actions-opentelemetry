@@ -73,6 +73,7 @@ export const createJobGauges = (
       { unit: 's' }
     )
 
+    // TODO: 計算ロジックをトレース側と合わせる
     const jobQueuedDuration = calcDiffSec(
       new Date(job.created_at),
       new Date(job.started_at)

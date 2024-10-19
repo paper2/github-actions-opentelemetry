@@ -47,14 +47,13 @@ const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
 }
 
 const createMetrics = async (results: WorkflowResults): Promise<void> => {
-  const workflowRun = results.workflowRun
-  const workflowRunJobs = results.workflowRunJobs
+  const { workflowRun, workflowRunJobs } = results
 
   try {
-    createJobGauges(workflowRun, workflowRunJobs)
     createWorkflowGauges(workflowRun, workflowRunJobs)
+    createJobGauges(workflowRun, workflowRunJobs)
   } catch (error) {
-    core.error('faild to create metrics')
+    core.error('failed to create metrics')
     throw error
   }
 }
