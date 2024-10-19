@@ -57,7 +57,7 @@ export const createWorkflowRunJobSpan = (
   // create wait runner span
   createSpan(
     ctxWithWaiting,
-    'Wait Runner',
+    `waiting runner for ${job.name}`,
     job.created_at,
     job.started_at,
     // TODO: Set Attributes
@@ -113,9 +113,7 @@ const createSpan = (
   endAt: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
-  const tracer = opentelemetry.trace.getTracer(
-    'github-actions-opentelemetry-github'
-  )
+  const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
   const startTime = new Date(startedAt)
   const endTime = new Date(endAt)
 
