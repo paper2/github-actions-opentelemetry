@@ -16,11 +16,7 @@ import {
 } from './traces/index.js'
 import settings from './settings.js'
 import * as opentelemetry from '@opentelemetry/api'
-import {
-  forceFlush,
-  initialize,
-  shutdown
-} from './instrumentation/instrumentation.js'
+import { forceFlush, initialize, shutdown } from './instrumentation/index.js'
 import { PushMetricExporter } from '@opentelemetry/sdk-metrics'
 import { SpanExporter } from '@opentelemetry/sdk-trace-base'
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   describe,
   test,
@@ -11,14 +12,17 @@ import { WorkflowRun, WorkflowRunJobs } from './github/index.js'
 import { run } from './main.js'
 import {
   InMemoryMetricExporter,
-  AggregationTemporality
+  AggregationTemporality,
+  MetricData,
+  PeriodicExportingMetricReader
 } from '@opentelemetry/sdk-metrics'
 import * as opentelemetry from '@opentelemetry/api'
 import {
   InMemorySpanExporter,
   ReadableSpan
 } from '@opentelemetry/sdk-trace-base'
-import * as instrumentation from './instrumentation/instrumentation.js'
+import * as instrumentation from './instrumentation/index.js'
+import { calcDiffSec } from './utils/calc-diff-sec.js'
 
 const { workflowRun, workflowRunJobs } = vi.hoisted(() => {
   return {
@@ -118,50 +122,117 @@ describe('run', () => {
     opentelemetry.propagation.disable()
   })
 
-  // describe('should export expected metrics', () => {
-  //   test('should run successfully by using in memory metric exporter', async () => {
-  //     const exporter = new InMemoryMetricExporter(AggregationTemporality.DELTA)
-  //     await expect(run(exporter)).rejects.toThrow(
-  //       'process.exit unexpectedly called with "0"' // 0 is success
-  //     )
-  //     const genMetric = (
-  //       descriptorName: string,
-  //       value: number,
-  //       taskName?: string
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     ): any => {
-  //       const attributes = {
-  //         'cicd.pipeline.name': 'Test Run',
-  //         'cicd.pipeline.repository': 'paper2/github-actions-opentelemetry',
-  //         ...(taskName !== undefined && { 'cicd.pipeline.task.name': taskName })
-  //       }
-  //       const descriptor = {
-  //         name: descriptorName,
-  //         type: 'GAUGE',
-  //         unit: 's',
-  //         valueType: 1
-  //       }
-  //       return {
-  //         dataPointType: 2,
-  //         dataPoints: [
-  //           {
-  //             attributes,
-  //             value
-  //           }
-  //         ],
-  //         descriptor
-  //       }
-  //     }
-  //     const metrics = exporter.getMetrics()[0].scopeMetrics[0].metrics
-  //     expect(metrics).toHaveLength(4)
-  //     expect(metrics).toMatchObject([
-  //       genMetric('cicd.pipeline.task.duration', 300, 'job1'),
-  //       genMetric('cicd.pipeline.task.queued_duration', 180, 'job1'),
-  //       genMetric('cicd.pipeline.queued_duration', 300),
-  //       genMetric('cicd.pipeline.duration', 600)
-  //     ])
-  //   })
-  // })
+  describe('should export expected metrics', () => {
+    let exporter: InMemoryMetricExporter
+    // TODO: testじゃなくてコード上で定義したい
+    const descriptorNames = {
+      TASK_DURATION: 'cicd.pipeline.task.duration',
+      TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
+      PIPELINE_DURATION: 'cicd.pipeline.duration',
+      PIPELINE_QUEUED_DURATION: 'cicd.pipeline.queued_duration'
+    }
+
+    beforeEach(() => {
+      // new instance because exporter.reset() is not work well.
+      exporter = new InMemoryMetricExporter(AggregationTemporality.DELTA)
+    })
+
+    test('should export expected descriptor name only', async () => {
+      await expect(run(exporter)).rejects.toThrow(
+        'process.exit unexpectedly called with "0"' // 0 is success
+      )
+      const expectedDescriptorNames = Object.values(descriptorNames)
+
+      const metrics = exporter.getMetrics()[0].scopeMetrics[0].metrics
+      for (const metric of metrics) {
+        expect(expectedDescriptorNames).toContain(metric.descriptor.name)
+      }
+    })
+
+    test('should verify cicd.pipeline.task.duration', async () => {
+      await expect(run(exporter)).rejects.toThrow(
+        'process.exit unexpectedly called with "0"' // 0 is success
+      )
+      const metric = findMetricByDescriptorName(
+        exporter,
+        descriptorNames.TASK_DURATION
+      )
+      const dataPoints = metric.dataPoints.map(dataPoint => ({
+        taskName: dataPoint.attributes['cicd.pipeline.task.name'],
+        value: dataPoint.value
+      }))
+
+      for (const job of workflowRunJobs) {
+        expect(dataPoints).toContainEqual({
+          taskName: job.name,
+          value: calcDiffSec(
+            new Date(job.started_at),
+            new Date(job.completed_at!)
+          )
+        })
+      }
+      expect(dataPoints).toHaveLength(workflowRunJobs.length)
+    })
+
+    test('should verify cicd.pipeline.task.queued_duration', async () => {
+      await expect(run(exporter)).rejects.toThrow(
+        'process.exit unexpectedly called with "0"' // 0 is success
+      )
+      const metric = findMetricByDescriptorName(
+        exporter,
+        descriptorNames.TASK_QUEUED_DURATION
+      )
+
+      const dataPoints = metric.dataPoints.map(dataPoint => ({
+        taskName: dataPoint.attributes['cicd.pipeline.task.name'],
+        value: dataPoint.value
+      }))
+
+      for (const job of workflowRunJobs) {
+        expect(dataPoints).toContainEqual({
+          taskName: job.name,
+          value: calcDiffSec(new Date(job.created_at), new Date(job.started_at))
+        })
+      }
+      expect(dataPoints).toHaveLength(workflowRunJobs.length)
+    })
+
+    test('should verify cicd.pipeline.duration', async () => {
+      await expect(run(exporter)).rejects.toThrow(
+        'process.exit unexpectedly called with "0"' // 0 is success
+      )
+      const metric = findMetricByDescriptorName(
+        exporter,
+        descriptorNames.PIPELINE_DURATION
+      )
+
+      expect(metric.dataPoints).toHaveLength(1)
+      expect(metric.dataPoints[0].value).toEqual(
+        calcDiffSec(
+          new Date(workflowRun.created_at),
+          new Date(workflowRunJobs[1].completed_at!) // last job's complete_at
+        )
+      )
+    })
+
+    test('should verify cicd.pipeline.queued_duration', async () => {
+      await expect(run(exporter)).rejects.toThrow(
+        'process.exit unexpectedly called with "0"' // 0 is success
+      )
+      const metric = findMetricByDescriptorName(
+        exporter,
+        descriptorNames.PIPELINE_QUEUED_DURATION
+      )
+
+      expect(metric.dataPoints).toHaveLength(1)
+      expect(metric.dataPoints[0].value).toEqual(
+        calcDiffSec(
+          new Date(workflowRun.created_at),
+          new Date(workflowRunJobs[0].started_at)
+        )
+      )
+    })
+  })
 
   describe('should export expected spans', () => {
     const exporter = new InMemorySpanExporter()
@@ -330,6 +401,19 @@ describe('run', () => {
     })
   })
 })
+
+const findMetricByDescriptorName = (
+  exporter: InMemoryMetricExporter,
+  name: string
+): MetricData => {
+  const metric = exporter
+    .getMetrics()[0]
+    .scopeMetrics[0].metrics.find(v => v.descriptor.name === name)
+  if (metric === undefined) {
+    throw new Error(`${name} descriptor is not found`)
+  }
+  return metric
+}
 
 const toEpochSec = (date: string): number => {
   return Math.floor(new Date(date).getTime() / 1000)
