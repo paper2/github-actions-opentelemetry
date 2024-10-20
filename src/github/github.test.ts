@@ -1,37 +1,21 @@
-import { describe, test, expect, vi } from 'vitest'
-import { getWorkflowRunContext } from './github.js'
-import { GitHubContext } from './types.js'
-import { settings } from '../settings.js'
-settings.owner = undefined
-settings.repository = undefined
-settings.workflowRunId = undefined
+import { describe, test, expect } from 'vitest'
+import { fetchWorkflowResults } from './github.js'
 
-vi.mock('@actions/github')
-vi.mock('@octokit/rest')
+describe('fetchWorkflowResults', () => {
+  test('should fetch results using real api', async () => {
+    const { workflowRun, workflowRunJobs } = await fetchWorkflowResults()
 
-describe('getWorkflowRunContext', () => {
-  test('should return the workflow run context', () => {
-    const context = {
-      repo: { owner: 'mock-owner', repo: 'mock-repo' },
-      payload: { workflow_run: { id: 456 } }
-    } as unknown as GitHubContext
-
-    const result = getWorkflowRunContext(context)
-    expect(result).toEqual({
-      owner: 'mock-owner',
-      repo: 'mock-repo',
-      runId: 456
-    })
-  })
-
-  test('should throw an error if runId is undefined', () => {
-    const context = {
-      repo: { owner: 'mock-owner', repo: 'mock-repo' },
-      payload: {}
-    } as unknown as GitHubContext
-
-    expect(() => getWorkflowRunContext(context)).toThrow(
-      'Workflow run id is undefined.'
-    )
+    // check some properties used by this actions, these are not all.
+    expect(workflowRun.name).toBeDefined()
+    expect(workflowRun.workflow_id).toBeDefined()
+    expect(workflowRun.run_started_at).toBeDefined()
+    expect(workflowRun.created_at).toBeDefined()
+    expect(workflowRunJobs[0].name).toBeDefined()
+    expect(workflowRunJobs[0].started_at).toBeDefined()
+    expect(workflowRunJobs[0].created_at).toBeDefined()
+    expect(workflowRunJobs[0].completed_at).toBeDefined()
+    expect(workflowRunJobs[0].workflow_name).toBeDefined()
+    expect(workflowRunJobs[0].status).toBe('completed')
+    expect(workflowRunJobs[0].steps).toBeDefined()
   })
 })

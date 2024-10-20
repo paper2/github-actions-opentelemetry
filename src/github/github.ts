@@ -56,7 +56,6 @@ const fetchWorkflowRunJobs = async (
   return res.data.jobs
 }
 
-// TODO: testのためのexportになっていないか検討
 export const getWorkflowRunContext = (
   context: GitHubContext
 ): WorkflowRunContext => {
