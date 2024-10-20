@@ -1,30 +1,34 @@
 import { Octokit } from '@octokit/rest'
 import * as github from '@actions/github'
 import { EventPayloadMap } from '@octokit/webhooks-types'
-import { Endpoints } from '@octokit/types'
 import settings from '../settings.js'
+import {
+  WorkflowRun,
+  WorkflowRunJobs,
+  WorkflowRunContext,
+  WorkflowResults,
+  GitHubContext
+} from './types.js'
+import * as core from '@actions/core'
 
-// TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
-
-export type WorkflowRun =
-  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data']
-export type WorkflowRunJobs =
-  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
-export type WorkflowRunJob = WorkflowRunJobs[number]
-
-export interface WorkflowRunContext {
-  readonly owner: string
-  readonly repo: string
-  readonly runId: number
+export const fetchWorkflowResults = async (): Promise<WorkflowResults> => {
+  const token = core.getInput('GITHUB_TOKEN')
+  const octokit = new Octokit({ auth: token })
+  const workflowRunContext = getWorkflowRunContext(github.context)
+  try {
+    const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext)
+    const workflowRunJobs = await fetchWorkflowRunJobs(
+      octokit,
+      workflowRunContext
+    )
+    return { workflowRun, workflowRunJobs }
+  } catch (error) {
+    core.error('failed to get results of workflow run')
+    throw error
+  }
 }
 
-export const createOctokit = (token: string): Octokit => {
-  return new Octokit({
-    auth: token
-  })
-}
-
-export const fetchWorkflowRun = async (
+const fetchWorkflowRun = async (
   octokit: Octokit,
   workflowContext: WorkflowRunContext
 ): Promise<WorkflowRun> => {
@@ -38,7 +42,8 @@ export const fetchWorkflowRun = async (
   }
 }
 
-export const fetchWorkflowRunJobs = async (
+// TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
+const fetchWorkflowRunJobs = async (
   octokit: Octokit,
   workflowContext: WorkflowRunContext
 ): Promise<WorkflowRunJobs> => {
@@ -50,8 +55,6 @@ export const fetchWorkflowRunJobs = async (
   })
   return res.data.jobs
 }
-
-export type GitHubContext = typeof github.context
 
 export const getWorkflowRunContext = (
   context: GitHubContext
@@ -73,4 +76,14 @@ export const getWorkflowRunContext = (
     repo: settings.repository ?? context.repo.repo,
     runId
   }
+}
+
+export const getLatestCompletedAt = (jobs: WorkflowRunJobs): string => {
+  const jobCompletedAtDates = jobs
+    .map(job => {
+      if (job.completed_at === null) return null
+      return new Date(job.completed_at)
+    })
+    .filter(v => v !== null)
+  return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString()
 }

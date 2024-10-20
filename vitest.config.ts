@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import dotenv from 'dotenv'
 
 export default defineConfig({
   test: {
@@ -6,6 +7,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['json-summary', 'text', 'lcov'],
       include: ['src']
-    }
+    },
+    env: dotenv.config({ path: '.env.local' }).parsed
   }
 })
