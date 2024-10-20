@@ -1,5 +1,9 @@
 import * as opentelemetry from '@opentelemetry/api'
-import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
+import {
+  getLatestCompletedAt,
+  WorkflowRun,
+  WorkflowRunJobs
+} from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 
 export const createGauge = (
@@ -29,13 +33,9 @@ export const createWorkflowGauges = (
   if (workflow.status !== 'completed') {
     throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
   }
-  const jobCompletedAtDates = workflowRunJobs.map(
-    job => new Date(job.completed_at || job.created_at)
-  )
-  const jobCompletedAtMax = new Date(
-    Math.max(...jobCompletedAtDates.map(Number))
-  )
+  const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
 
+  // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
   const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {

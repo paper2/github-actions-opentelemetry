@@ -78,3 +78,13 @@ export const getWorkflowRunContext = (
     runId
   }
 }
+
+export const getLatestCompletedAt = (jobs: WorkflowRunJobs): string => {
+  const jobCompletedAtDates = jobs
+    .map(job => {
+      if (job.completed_at === null) return null
+      return new Date(job.completed_at)
+    })
+    .filter(v => v !== null)
+  return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString()
+}

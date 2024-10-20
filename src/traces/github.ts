@@ -2,7 +2,8 @@ import { Context, ROOT_CONTEXT } from '@opentelemetry/api'
 import {
   WorkflowRun,
   WorkflowRunJobs,
-  WorkflowRunJob
+  WorkflowRunJob,
+  getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
 
@@ -10,20 +11,11 @@ export const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): Context => {
-  // TODO: metricsと同じロジックの部分はgithubディレクトリに切り出す
-  // TODO: completed_atだけ確認するようにする。queueの時間計測する前提なので両方見ると不整合が発生する。
-  const jobCompletedAtDates = workflowRunJobs.map(
-    job => new Date(job.completed_at || job.created_at)
-  )
-  const endAt = new Date(
-    Math.max(...jobCompletedAtDates.map(Number))
-  ).toISOString()
-
   const span = createSpan(
     ROOT_CONTEXT,
     workflowRun.name || `${workflowRun.workflow_id}`,
     workflowRun.run_started_at || workflowRun.created_at,
-    endAt,
+    getLatestCompletedAt(workflowRunJobs),
     // TODO: Set Attributes
     {}
   )
