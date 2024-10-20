@@ -3,11 +3,41 @@ import {
   WorkflowRun,
   WorkflowRunJobs,
   WorkflowRunJob,
-  getLatestCompletedAt
+  getLatestCompletedAt,
+  WorkflowResults
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
+import settings from '../settings.js'
+import * as core from '@actions/core'
 
-export const createWorkflowRunTrace = (
+export const createTraces = async (
+  results: WorkflowResults
+): Promise<string | undefined> => {
+  if (settings.FeatureFlagTrace) {
+    console.log('trace feature is enabled.')
+  } else {
+    return undefined
+  }
+
+  const { workflowRun, workflowRunJobs } = results
+  const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
+  for (const job of workflowRunJobs) {
+    const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
+    if (jobCtx === null) continue
+    createWorkflowRunStepSpan(jobCtx, job)
+  }
+
+  const traceId = opentelemetry.trace.getSpanContext(rootCtx)?.traceId
+  console.log(`TraceID: ${traceId}`)
+
+  // TODO: actions output traceID
+  // TODO: Delete this feature.
+  await createSummary(traceId)
+
+  return traceId
+}
+
+const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): Context => {
@@ -23,12 +53,12 @@ export const createWorkflowRunTrace = (
   return opentelemetry.trace.setSpan(ROOT_CONTEXT, span)
 }
 
-export const createWorkflowRunJobSpan = (
+const createWorkflowRunJobSpan = (
   ctx: Context,
   job: WorkflowRunJob
 ): Context | null => {
   if (job.status !== 'completed' || job.completed_at === null) {
-    console.error(`job is not completed. (${job.name})`)
+    console.warn(`job is not completed. (${job.name})`)
     return null
   }
   if (job.steps === undefined || job.steps.length === 0) {
@@ -68,10 +98,7 @@ export const createWorkflowRunJobSpan = (
   return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
 }
 
-export const createWorkflowRunStepSpan = (
-  ctx: Context,
-  job: WorkflowRunJob
-): void => {
+const createWorkflowRunStepSpan = (ctx: Context, job: WorkflowRunJob): void => {
   if (job.steps === undefined || job.steps.length === 0) {
     console.warn(`job (${job.name}) has no steps.`)
     return
@@ -112,4 +139,16 @@ const createSpan = (
   const span = tracer.startSpan(name, { startTime, attributes }, ctx)
   span.end(endTime)
   return span
+}
+
+const createSummary = async (traceId: string | undefined): Promise<void> => {
+  if (settings.isGitHubActions)
+    await core.summary
+      .addHeading('GitHub Actions OpenTelemetry')
+      .addRaw(`TraceID: ${traceId}\n`)
+      .addLink(
+        'Google Cloud Trace Helper',
+        `https://console.cloud.google.com/traces/list?tid=${traceId}`
+      )
+      .write()
 }
