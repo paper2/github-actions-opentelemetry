@@ -28,8 +28,7 @@ export const createTrace = async (
   const traceId = opentelemetry.trace.getSpanContext(rootCtx)?.traceId
   console.log(`TraceID: ${traceId}`)
 
-  // TODO: actions output traceID
-  // TODO: Delete this feature.
+  // TODO: actions output traceID and Delete this feature.
   await createSummary(traceId)
 
   return traceId
