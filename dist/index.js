@@ -67342,8 +67342,6 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./node_modules/@octokit/rest/node_modules/universal-user-agent/index.js
 function getUserAgent() {
   if (typeof navigator === "object" && "userAgent" in navigator) {
@@ -70899,6 +70897,8 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 );
 
 
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./src/settings.ts
 const settings = {
     workflowRunId: process.env.WORKFLOW_RUN_ID
@@ -70917,10 +70917,21 @@ const settings = {
 ;// CONCATENATED MODULE: ./src/github/github.ts
 
 
-const createOctokit = (token) => {
-    return new dist_src_Octokit({
-        auth: token
-    });
+
+
+const fetchWorkflowResults = async () => {
+    const token = core.getInput('GITHUB_TOKEN');
+    const octokit = new dist_src_Octokit({ auth: token });
+    const workflowRunContext = getWorkflowRunContext(github.context);
+    try {
+        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
+        const workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
+        return { workflowRun, workflowRunJobs };
+    }
+    catch (error) {
+        core.error('failed to get results of workflow run');
+        throw error;
+    }
 };
 const fetchWorkflowRun = async (octokit, workflowContext) => {
     const res = await octokit.rest.actions.getWorkflowRun({
@@ -70932,6 +70943,7 @@ const fetchWorkflowRun = async (octokit, workflowContext) => {
         ...res.data
     };
 };
+// TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
 const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
     const res = await octokit.rest.actions.listJobsForWorkflowRun({
         owner: workflowContext.owner,
@@ -70955,37 +70967,44 @@ const getWorkflowRunContext = (context) => {
         runId
     };
 };
+const getLatestCompletedAt = (jobs) => {
+    const jobCompletedAtDates = jobs
+        .map(job => {
+        if (job.completed_at === null)
+            return null;
+        return new Date(job.completed_at);
+    })
+        .filter(v => v !== null);
+    return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString();
+};
 
 ;// CONCATENATED MODULE: ./src/github/index.ts
 
 
+
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/api/build/src/index.js
 var src = __nccwpck_require__(5163);
-;// CONCATENATED MODULE: ./src/metrics/create-gauge.ts
-
-const createGauge = (name, value, attributes, option) => {
-    // TODO: Examplarsの活用できないか検討
-    // FYI: https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars
-    const meter = src.metrics.getMeter('github-actions-metrics');
-    const gauge = meter.createGauge(name, option);
-    gauge.record(value, attributes);
-};
-
 ;// CONCATENATED MODULE: ./src/utils/calc-diff-sec.ts
 const calcDiffSec = (startDate, endDate) => {
     const diffMs = endDate.getTime() - startDate.getTime();
     return Math.floor(diffMs / 1000);
 };
 
-;// CONCATENATED MODULE: ./src/metrics/github.ts
+;// CONCATENATED MODULE: ./src/metrics/create-gauges.ts
 
 
+
+const createGauge = (name, value, attributes, option) => {
+    const meter = src.metrics.getMeter('github-actions-metrics');
+    const gauge = meter.createGauge(name, option);
+    gauge.record(value, attributes);
+};
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
         throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
     }
-    const jobCompletedAtDates = workflowRunJobs.map(job => new Date(job.completed_at || job.created_at));
-    const jobCompletedAtMax = new Date(Math.max(...jobCompletedAtDates.map(Number)));
+    const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs));
+    // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
     const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
     const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
     const workflowMetricsAttributes = {
@@ -71017,22 +71036,36 @@ const createJobGauges = (workflow, workflowRunJobs) => {
     }
 };
 
-;// CONCATENATED MODULE: ./src/traces/github.ts
+;// CONCATENATED MODULE: ./src/metrics/create-metrics.ts
+
+const createMetrics = async (results) => {
+    const { workflowRun, workflowRunJobs } = results;
+    try {
+        createWorkflowGauges(workflowRun, workflowRunJobs);
+        createJobGauges(workflowRun, workflowRunJobs);
+    }
+    catch (error) {
+        console.error('failed to create metrics');
+        throw error;
+    }
+};
+
+;// CONCATENATED MODULE: ./src/metrics/index.ts
+
+
+;// CONCATENATED MODULE: ./src/traces/create-spans.ts
+
 
 
 const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
-    // TODO: metricsと同じロジックの部分はgithubディレクトリに切り出す
-    // TODO: completed_atだけ確認するようにする。queueの時間計測する前提なので両方見ると不整合が発生する。
-    const jobCompletedAtDates = workflowRunJobs.map(job => new Date(job.completed_at || job.created_at));
-    const endAt = new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString();
-    const span = createSpan(src.ROOT_CONTEXT, workflowRun.name || `${workflowRun.workflow_id}`, workflowRun.run_started_at || workflowRun.created_at, endAt, 
+    const span = createSpan(src.ROOT_CONTEXT, workflowRun.name || `${workflowRun.workflow_id}`, workflowRun.run_started_at || workflowRun.created_at, getLatestCompletedAt(workflowRunJobs), 
     // TODO: Set Attributes
     {});
     return src.trace.setSpan(src.ROOT_CONTEXT, span);
 };
 const createWorkflowRunJobSpan = (ctx, job) => {
     if (job.status !== 'completed' || job.completed_at === null) {
-        console.error(`job is not completed. (${job.name})`);
+        console.warn(`job is not completed. (${job.name})`);
         return null;
     }
     if (job.steps === undefined || job.steps.length === 0) {
@@ -71077,6 +71110,43 @@ const createSpan = (ctx, name, startedAt, endAt, attributes) => {
     span.end(endTime);
     return span;
 };
+
+;// CONCATENATED MODULE: ./src/traces/create-trace.ts
+
+
+
+
+const createTrace = async (results) => {
+    if (src_settings.FeatureFlagTrace) {
+        console.log('trace feature is enabled.');
+    }
+    else {
+        return undefined;
+    }
+    const { workflowRun, workflowRunJobs } = results;
+    const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
+    for (const job of workflowRunJobs) {
+        const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
+        if (jobCtx === null)
+            continue;
+        createWorkflowRunStepSpan(jobCtx, job);
+    }
+    const traceId = src.trace.getSpanContext(rootCtx)?.traceId;
+    console.log(`TraceID: ${traceId}`);
+    // TODO: actions output traceID and Delete this feature.
+    await createSummary(traceId);
+    return traceId;
+};
+const createSummary = async (traceId) => {
+    if (src_settings.isGitHubActions)
+        await core.summary.addHeading('GitHub Actions OpenTelemetry')
+            .addRaw(`TraceID: ${traceId}\n`)
+            .addLink('Google Cloud Trace Helper', `https://console.cloud.google.com/traces/list?tid=${traceId}`)
+            .write();
+};
+
+;// CONCATENATED MODULE: ./src/traces/index.ts
+
 
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/resources/build/src/index.js
 var build_src = __nccwpck_require__(3871);
@@ -71155,81 +71225,38 @@ const shutdown = async () => {
 
 
 
-
-
-
-const fetchWorkflowResults = async () => {
-    const token = core.getInput('GITHUB_TOKEN');
-    const octokit = createOctokit(token);
-    const workflowRunContext = getWorkflowRunContext(github.context);
-    try {
-        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
-        const workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
-        return { workflowRun, workflowRunJobs };
-    }
-    catch (error) {
-        core.error('faild to get results of workflow run');
-        throw error;
-    }
-};
-const createMetrics = async (results) => {
-    const { workflowRun, workflowRunJobs } = results;
-    try {
-        createWorkflowGauges(workflowRun, workflowRunJobs);
-        createJobGauges(workflowRun, workflowRunJobs);
-    }
-    catch (error) {
-        core.error('failed to create metrics');
-        throw error;
-    }
-};
-const createTraces = async (results) => {
-    const workflowRun = results.workflowRun;
-    const workflowRunJobs = results.workflowRunJobs;
-    const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
-    workflowRunJobs.map(job => {
-        const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
-        if (jobCtx === null)
-            return;
-        createWorkflowRunStepSpan(jobCtx, job);
-    });
-    console.log(`TraceID: ${src.trace.getSpanContext(rootCtx)?.traceId}`);
-    if (src_settings.isGitHubActions)
-        await core.summary.addHeading('GitHub Actions OpenTelemetry')
-            .addRaw(`TraceID: ${src.trace.getSpanContext(rootCtx)?.traceId}\n`)
-            .addLink(
-        // TODO: 検証を終えたら削除するか考える
-        'Google Cloud Trace Helper', `https://console.cloud.google.com/traces/list?tid=${src.trace.getSpanContext(rootCtx)?.traceId}`)
-            .write();
-};
-// TODO: mainここだけにしたい。
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(meterExporter, traceExporter) {
+async function run() {
     // required: run initialize() first.
     // usually use --required runtime option for first reading.
     // for simple use this action, this is satisfied on here.
-    initialize(meterExporter, traceExporter);
+    initialize();
+    let exitCode = 0;
     try {
         const results = await fetchWorkflowResults();
         await createMetrics(results);
-        if (src_settings.FeatureFlagTrace)
-            await createTraces(results);
+        await createTrace(results);
     }
     catch (error) {
         if (error instanceof Error)
             core.setFailed(error.message);
-        console.error(error);
-        process.exit(1);
+        exitCode = 1;
     }
-    finally {
+    try {
         await forceFlush();
+        console.log('Providers force flush successfully.');
         await shutdown();
-        console.log('providers shutdown successfully.');
+        console.log('Providers shutdown successfully.');
     }
-    process.exit(0);
+    catch (error) {
+        if (error instanceof Error)
+            core.setFailed(error.message);
+        exitCode = 1;
+    }
+    process.exit(exitCode);
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
