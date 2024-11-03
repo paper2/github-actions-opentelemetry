@@ -2,7 +2,8 @@ import { Context, ROOT_CONTEXT } from '@opentelemetry/api'
 import {
   WorkflowRun,
   WorkflowRunJobs,
-  WorkflowRunJob
+  WorkflowRunJob,
+  getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
 
@@ -10,20 +11,11 @@ export const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): Context => {
-  // TODO: metricsと同じロジックの部分はgithubディレクトリに切り出す
-  // TODO: completed_atだけ確認するようにする。queueの時間計測する前提なので両方見ると不整合が発生する。
-  const jobCompletedAtDates = workflowRunJobs.map(
-    job => new Date(job.completed_at || job.created_at)
-  )
-  const endAt = new Date(
-    Math.max(...jobCompletedAtDates.map(Number))
-  ).toISOString()
-
   const span = createSpan(
     ROOT_CONTEXT,
     workflowRun.name || `${workflowRun.workflow_id}`,
     workflowRun.run_started_at || workflowRun.created_at,
-    endAt,
+    getLatestCompletedAt(workflowRunJobs),
     // TODO: Set Attributes
     {}
   )
@@ -36,7 +28,7 @@ export const createWorkflowRunJobSpan = (
   job: WorkflowRunJob
 ): Context | null => {
   if (job.status !== 'completed' || job.completed_at === null) {
-    console.error(`job is not completed. (${job.name})`)
+    console.warn(`job is not completed. (${job.name})`)
     return null
   }
   if (job.steps === undefined || job.steps.length === 0) {
@@ -54,9 +46,17 @@ export const createWorkflowRunJobSpan = (
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
-  createWaitRunnerSpan(ctxWithWaiting, job)
+  // create wait runner span
+  createSpan(
+    ctxWithWaiting,
+    `waiting runner for ${job.name}`,
+    job.created_at,
+    job.started_at,
+    // TODO: Set Attributes
+    {}
+  )
 
-  const span = createSpan(
+  const jobSpan = createSpan(
     ctxWithWaiting,
     job.name,
     job.started_at,
@@ -65,18 +65,7 @@ export const createWorkflowRunJobSpan = (
     {}
   )
 
-  return opentelemetry.trace.setSpan(ctxWithWaiting, span)
-}
-
-const createWaitRunnerSpan = (ctx: Context, job: WorkflowRunJob): void => {
-  createSpan(
-    ctx,
-    'Wait Runner',
-    job.created_at,
-    job.started_at,
-    // TODO: Set Attributes
-    {}
-  )
+  return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
 }
 
 export const createWorkflowRunStepSpan = (
@@ -97,7 +86,8 @@ export const createWorkflowRunStepSpan = (
       )
       return
     }
-    const span = createSpan(
+
+    createSpan(
       ctx,
       step.name,
       step.started_at,
@@ -105,17 +95,8 @@ export const createWorkflowRunStepSpan = (
       // TODO: Set Attributes
       {}
     )
-    if (step.conclusion === 'success') {
-      span.setStatus({ code: opentelemetry.SpanStatusCode.OK })
-    } else {
-      span.setStatus({ code: opentelemetry.SpanStatusCode.ERROR })
-    }
   })
 }
-
-const tracer = opentelemetry.trace.getTracer(
-  'github-actions-opentelemetry-github'
-)
 
 const createSpan = (
   ctx: Context,
@@ -124,6 +105,7 @@ const createSpan = (
   endAt: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
+  const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
   const startTime = new Date(startedAt)
   const endTime = new Date(endAt)
 

@@ -24,7 +24,9 @@
         "me-dutour-mathieu.vscode-github-actions",
         "redhat.vscode-yaml",
         "rvest.vs-code-prettier-eslint",
-        "yzhang.markdown-all-in-one"
+        "yzhang.markdown-all-in-one",
+        "streetsidesoftware.code-spell-checker",
+        "vitest.explorer"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

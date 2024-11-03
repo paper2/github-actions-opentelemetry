@@ -1,7 +1,22 @@
-import { WorkflowRun, WorkflowRunJobs } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { createGauge } from './create-gauge.js'
+import {
+  getLatestCompletedAt,
+  WorkflowRun,
+  WorkflowRunJobs
+} from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
+
+export const createGauge = (
+  name: string,
+  value: number,
+  attributes: opentelemetry.Attributes,
+  option?: opentelemetry.MetricOptions
+): void => {
+  const meter = opentelemetry.metrics.getMeter('github-actions-metrics')
+
+  const gauge = meter.createGauge(name, option)
+  gauge.record(value, attributes)
+}
 
 interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
   // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
@@ -16,13 +31,9 @@ export const createWorkflowGauges = (
   if (workflow.status !== 'completed') {
     throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
   }
-  const jobCompletedAtDates = workflowRunJobs.map(
-    job => new Date(job.completed_at || job.created_at)
-  )
-  const jobCompletedAtMax = new Date(
-    Math.max(...jobCompletedAtDates.map(Number))
-  )
+  const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
 
+  // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
   const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
   const workflowMetricsAttributes: WorkflowMetricsAttributes = {
@@ -49,7 +60,6 @@ interface JobMetricsAttributes extends opentelemetry.Attributes {
   readonly 'cicd.pipeline.name': string
   readonly 'cicd.pipeline.repository': string
   readonly 'cicd.pipeline.task.name': string
-  readonly 'cicd.pipeline.task.status': string
 }
 
 export const createJobGauges = (
@@ -64,8 +74,7 @@ export const createJobGauges = (
     const jobMetricsAttributes: JobMetricsAttributes = {
       'cicd.pipeline.name': job.workflow_name || '',
       'cicd.pipeline.repository': `${workflow.repository.full_name}`,
-      'cicd.pipeline.task.name': job.name,
-      'cicd.pipeline.task.status': job.status
+      'cicd.pipeline.task.name': job.name
     }
 
     createGauge(
@@ -75,6 +84,7 @@ export const createJobGauges = (
       { unit: 's' }
     )
 
+    // TODO: 計算ロジックをトレース側と合わせる
     const jobQueuedDuration = calcDiffSec(
       new Date(job.created_at),
       new Date(job.started_at)
