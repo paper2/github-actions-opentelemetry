@@ -25,14 +25,12 @@ export const initialize = (
 }
 
 const initializeMeter = (exporter?: PushMetricExporter): void => {
-  // NOTE: NodeSDK and OTLP Exporter seemed not flushing metrics without forceflush().
-  //       Please try integrate NodeSDK again in the future.
   meterProvider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
         exporter: exporter ?? new OTLPMetricExporter(),
-        // Exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
-        // This settings prevents from generating duplicate metrics.
+        // Exporter has not implemented the manual flush method yet.
+        // High interval prevents from generating duplicate metrics.
         exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
       })
     ],
@@ -41,7 +39,7 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
   const result = opentelemetry.metrics.setGlobalMeterProvider(meterProvider)
   if (!result) {
     throw new Error(
-      'setGlobalMeterProvider failed. pease check settings or duplicate registration.'
+      'setGlobalMeterProvider failed. please check settings or duplicate registration.'
     )
   }
 }
@@ -56,7 +54,7 @@ const initializeTracer = (exporter?: SpanExporter): void => {
   const result = opentelemetry.trace.setGlobalTracerProvider(traceProvider)
   if (!result) {
     throw new Error(
-      'setGlobalTracerProvider failed. pease check settings or duplicate registration.'
+      'setGlobalTracerProvider failed. please check settings or duplicate registration.'
     )
   }
 }
