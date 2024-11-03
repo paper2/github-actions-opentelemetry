@@ -71172,14 +71172,12 @@ const initialize = (meterExporter, spanExporter) => {
     initializeTracer(spanExporter);
 };
 const initializeMeter = (exporter) => {
-    // NOTE: NodeSDK and OTLP Exporter seemed not flushing metrics without forceflush().
-    //       Please try integrate NodeSDK again in the future.
     meterProvider = new sdk_metrics_build_src.MeterProvider({
         readers: [
             new sdk_metrics_build_src.PeriodicExportingMetricReader({
                 exporter: exporter ?? new exporter_metrics_otlp_proto_build_src.OTLPMetricExporter(),
-                // Exporter has not implemented the manual flush method yet, so we need to set the interval to a value that is not too high.
-                // This settings prevents from generating duplicate metrics.
+                // Exporter has not implemented the manual flush method yet.
+                // High interval prevents from generating duplicate metrics.
                 exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
             })
         ],
@@ -71187,7 +71185,7 @@ const initializeMeter = (exporter) => {
     });
     const result = src.metrics.setGlobalMeterProvider(meterProvider);
     if (!result) {
-        throw new Error('setGlobalMeterProvider failed. pease check settings or duplicate registration.');
+        throw new Error('setGlobalMeterProvider failed. please check settings or duplicate registration.');
     }
 };
 const initializeTracer = (exporter) => {
@@ -71197,7 +71195,7 @@ const initializeTracer = (exporter) => {
     traceProvider.addSpanProcessor(new sdk_trace_base_build_src.BatchSpanProcessor(exporter || new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.M({})));
     const result = src.trace.setGlobalTracerProvider(traceProvider);
     if (!result) {
-        throw new Error('setGlobalTracerProvider failed. pease check settings or duplicate registration.');
+        throw new Error('setGlobalTracerProvider failed. please check settings or duplicate registration.');
     }
 };
 const forceFlush = async () => {
