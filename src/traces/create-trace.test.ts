@@ -120,37 +120,37 @@ describe('should export expected spans', () => {
     testedSpanCount++
 
     // jobs span
-    workflowRunJobs.map(job => {
+    for (const job of workflowRunJobs) {
       expect(spans).toContainEqual({
         name: job.name,
         startTime: [toEpochSec(job.started_at), 0],
         endTime: [toEpochSec(job.completed_at!), 0]
       })
       testedSpanCount++
-    })
+    }
 
     // with waiting for a job span
-    workflowRunJobs.map(job => {
+    for (const job of workflowRunJobs) {
       expect(spans).toContainEqual({
         name: `${job.name} with time of waiting runner`,
         startTime: [toEpochSec(job.created_at), 0],
         endTime: [toEpochSec(job.completed_at!), 0]
       })
       testedSpanCount++
-    })
+    }
 
     // waiting for a job span
-    workflowRunJobs.map(job => {
+    for (const job of workflowRunJobs) {
       expect(spans).toContainEqual({
         name: `waiting runner for ${job.name}`,
         startTime: [toEpochSec(job.created_at), 0],
         endTime: [toEpochSec(job.started_at), 0]
       })
       testedSpanCount++
-    })
+    }
 
     // steps span
-    workflowRunJobs.map(job => {
+    for (const job of workflowRunJobs) {
       job.steps?.map(step => {
         expect(spans).toContainEqual({
           name: step.name,
@@ -159,7 +159,7 @@ describe('should export expected spans', () => {
         })
         testedSpanCount++
       })
-    })
+    }
 
     expect(spans).toHaveLength(testedSpanCount)
   })
