@@ -14,18 +14,26 @@ export async function run(): Promise<void> {
   // for simple use this action, this is satisfied on here.
   initialize()
 
+  let exitCode = 0
+
   try {
     const results = await fetchWorkflowResults()
     await createMetrics(results)
     await createTrace(results)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
-    console.error(error)
-    process.exit(1)
-  } finally {
-    await forceFlush()
-    await shutdown()
-    console.log('providers shutdown successfully.')
+    exitCode = 1
   }
-  process.exit(0)
+
+  try {
+    await forceFlush()
+    console.log('Providers force flush successfully.')
+    await shutdown()
+    console.log('Providers shutdown successfully.')
+  } catch (error) {
+    if (error instanceof Error) core.setFailed(error.message)
+    exitCode = 1
+  }
+
+  process.exit(exitCode)
 }
