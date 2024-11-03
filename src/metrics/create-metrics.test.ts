@@ -112,6 +112,8 @@ describe('should export expected metrics', () => {
     await forceFlush()
     const expectedDescriptorNames = Object.values(descriptorNames)
 
+    expect(exporter.getMetrics()).toHaveLength(1)
+    expect(exporter.getMetrics()[0].scopeMetrics).toHaveLength(1)
     const metrics = exporter.getMetrics()[0].scopeMetrics[0].metrics
     for (const metric of metrics) {
       expect(expectedDescriptorNames).toContain(metric.descriptor.name)
@@ -130,6 +132,7 @@ describe('should export expected metrics', () => {
       value: dataPoint.value
     }))
 
+    expect(dataPoints).toHaveLength(workflowRunJobs.length)
     for (const job of workflowRunJobs) {
       expect(dataPoints).toContainEqual({
         taskName: job.name,
@@ -139,7 +142,6 @@ describe('should export expected metrics', () => {
         )
       })
     }
-    expect(dataPoints).toHaveLength(workflowRunJobs.length)
   })
 
   test('should verify cicd.pipeline.task.queued_duration', async () => {
@@ -155,13 +157,13 @@ describe('should export expected metrics', () => {
       value: dataPoint.value
     }))
 
+    expect(dataPoints).toHaveLength(workflowRunJobs.length)
     for (const job of workflowRunJobs) {
       expect(dataPoints).toContainEqual({
         taskName: job.name,
         value: calcDiffSec(new Date(job.created_at), new Date(job.started_at))
       })
     }
-    expect(dataPoints).toHaveLength(workflowRunJobs.length)
   })
 
   test('should verify cicd.pipeline.duration', async () => {
@@ -203,6 +205,8 @@ const findMetricByDescriptorName = (
   exporter: InMemoryMetricExporter,
   name: string
 ): MetricData => {
+  expect(exporter.getMetrics()).toHaveLength(1)
+  expect(exporter.getMetrics()[0].scopeMetrics).toHaveLength(1)
   const metric = exporter
     .getMetrics()[0]
     .scopeMetrics[0].metrics.find(v => v.descriptor.name === name)
