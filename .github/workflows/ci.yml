@@ -40,7 +40,7 @@ jobs:
         id: npm-lint
         run: npm run lint
 
-      - name: Start Continer for Test
+      - name: Start Container for Test
         id: start-container-for-test
         working-directory: .devcontainer
         run: docker compose up -d prometheus jaeger
