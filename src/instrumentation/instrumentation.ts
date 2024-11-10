@@ -25,6 +25,7 @@ export const initialize = (
 }
 
 const initializeMeter = (exporter?: PushMetricExporter): void => {
+  // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
   meterProvider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
@@ -45,6 +46,8 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 }
 
 const initializeTracer = (exporter?: SpanExporter): void => {
+  // TODO: trace feature offならNoOp登録して終わりにする
+
   traceProvider = new BasicTracerProvider({
     resource: detectResourcesSync({ detectors: [envDetector] })
   })

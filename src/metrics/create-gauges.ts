@@ -34,7 +34,12 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowRunJobs
 ): void => {
   if (workflow.status !== 'completed') {
-    throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
+    // A workflow sometime has not completed here in spite of trigger of workflow completed event.
+    // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+    // GitHub Actions may be eventual consistency.
+    throw new Error(
+      `Workflow(id: ${workflow.id}) is not completed. Please retry this action.`
+    )
   }
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
 
