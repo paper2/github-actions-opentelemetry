@@ -70911,10 +70911,10 @@ const settings = {
         : false,
     // Always set to true when GitHub Actions is running the workflow.
     isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
-    logeLevel: process.env.ACTIONS_RUNNER_DEBUG === 'true' ||
-        process.env.ACTIONS_STEP_DEBUG === 'true'
-        ? 'debug' // https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging
-        : process.env.OTEL_LOG_LEVEL // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+    logeLevel: process.env.RUNNER_DEBUG === '1'
+        ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
+        : process.env.OTEL_LOG_LEVEL || // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+            'info'
 };
 /* harmony default export */ const src_settings = (settings);
 
