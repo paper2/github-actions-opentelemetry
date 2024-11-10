@@ -69,11 +69,5 @@ jobs:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
           FEATURE_TRACE: true
 
-          # If this job is removed, update it.
-          # https://github.com/paper2/github-actions-opentelemetry/actions/runs/10856659171
-          OWNER: paper2
-          REPOSITORY: github-actions-opentelemetry
-          WORKFLOW_RUN_ID: 10856659171
-
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
