@@ -59,6 +59,7 @@ jobs:
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          VALIDATE_MARKDOWN_PRETTIER: false
           FIX_SHELL_SHFMT: true
           FIX_MARKDOWN: true
           FIX_ENV: true
