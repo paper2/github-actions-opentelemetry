@@ -70910,7 +70910,11 @@ const settings = {
         ? process.env.FEATURE_TRACE.toLowerCase() === 'true'
         : false,
     // Always set to true when GitHub Actions is running the workflow.
-    isGitHubActions: process.env.GITHUB_ACTIONS === 'true'
+    isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
+    logeLevel: process.env.RUNNER_DEBUG === '1'
+        ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
+        : process.env.OTEL_LOG_LEVEL || // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+            'info'
 };
 /* harmony default export */ const src_settings = (settings);
 
@@ -70990,7 +70994,24 @@ const calcDiffSec = (startDate, endDate) => {
     return Math.floor(diffMs / 1000);
 };
 
+;// CONCATENATED MODULE: ./src/metrics/constants.ts
+// TODO: ユーザ独自定義のものはそのまま同じもの使わないようにする(breaking change)
+// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+const descriptorNames = {
+    TASK_DURATION: 'cicd.pipeline.task.duration',
+    TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
+    DURATION: 'cicd.pipeline.duration',
+    QUEUED_DURATION: 'cicd.pipeline.queued_duration'
+};
+// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+const attributeKeys = {
+    REPOSITORY: 'cicd.pipeline.repository',
+    NAME: 'cicd.pipeline.name',
+    TASK_NAME: 'cicd.pipeline.task.name'
+};
+
 ;// CONCATENATED MODULE: ./src/metrics/create-gauges.ts
+
 
 
 
@@ -70999,32 +71020,33 @@ const createGauge = (name, value, attributes, option) => {
     const gauge = meter.createGauge(name, option);
     gauge.record(value, attributes);
 };
+const createMetricsAttributes = (workflow, job) => ({
+    [attributeKeys.NAME]: workflow.name || '',
+    [attributeKeys.REPOSITORY]: workflow.repository.full_name,
+    ...(job && { [attributeKeys.TASK_NAME]: job.name })
+});
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
-        throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
+        // A workflow sometime has not completed here in spite of trigger of workflow completed event.
+        // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+        // GitHub Actions may be eventual consistency.
+        throw new Error(`Workflow(id: ${workflow.id}) is not completed. Please retry this action.`);
     }
     const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs));
     // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
     const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
     const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
-    const workflowMetricsAttributes = {
-        'cicd.pipeline.name': workflow.name || '',
-        'cicd.pipeline.repository': `${workflow.repository.full_name}`
-    };
-    createGauge('cicd.pipeline.queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
-    createGauge('cicd.pipeline.duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
+    const workflowMetricsAttributes = createMetricsAttributes(workflow);
+    createGauge(descriptorNames.QUEUED_DURATION, calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
+    createGauge(descriptorNames.DURATION, calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
         if (!job.completed_at) {
             continue;
         }
-        const jobMetricsAttributes = {
-            'cicd.pipeline.name': job.workflow_name || '',
-            'cicd.pipeline.repository': `${workflow.repository.full_name}`,
-            'cicd.pipeline.task.name': job.name
-        };
-        createGauge('cicd.pipeline.task.duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
+        const jobMetricsAttributes = createMetricsAttributes(workflow, job);
+        createGauge(descriptorNames.TASK_DURATION, calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
         // TODO: 計算ロジックをトレース側と合わせる
         const jobQueuedDuration = calcDiffSec(new Date(job.created_at), new Date(job.started_at));
         if (jobQueuedDuration < 0) {
@@ -71032,7 +71054,7 @@ const createJobGauges = (workflow, workflowRunJobs) => {
             // Not creating metric because it is noise of Statistics.
             continue;
         }
-        createGauge('cicd.pipeline.task.queued_duration', jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
+        createGauge(descriptorNames.TASK_QUEUED_DURATION, jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
     }
 };
 
@@ -71040,6 +71062,7 @@ const createJobGauges = (workflow, workflowRunJobs) => {
 
 const createMetrics = async (results) => {
     const { workflowRun, workflowRunJobs } = results;
+    // TODO: metricsもoffにできるようにする
     try {
         createWorkflowGauges(workflowRun, workflowRunJobs);
         createJobGauges(workflowRun, workflowRunJobs);
@@ -71165,13 +71188,18 @@ var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7859);
 
 
 
+
 let traceProvider;
 let meterProvider;
 const initialize = (meterExporter, spanExporter) => {
+    if (src_settings.logeLevel === 'debug')
+        src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
+    // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
     initializeMeter(meterExporter);
     initializeTracer(spanExporter);
 };
 const initializeMeter = (exporter) => {
+    // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
     meterProvider = new sdk_metrics_build_src.MeterProvider({
         readers: [
             new sdk_metrics_build_src.PeriodicExportingMetricReader({
@@ -71189,6 +71217,7 @@ const initializeMeter = (exporter) => {
     }
 };
 const initializeTracer = (exporter) => {
+    // TODO: trace feature offならNoOp登録して終わりにする
     traceProvider = new sdk_trace_base_build_src.BasicTracerProvider({
         resource: (0,build_src.detectResourcesSync)({ detectors: [build_src.envDetector] })
     });
@@ -71217,6 +71246,9 @@ const shutdown = async () => {
     }
 };
 
+;// CONCATENATED MODULE: ./src/instrumentation/index.ts
+
+
 ;// CONCATENATED MODULE: ./src/main.ts
 
 
@@ -71240,7 +71272,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     try {
@@ -71251,7 +71284,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     process.exit(exitCode);

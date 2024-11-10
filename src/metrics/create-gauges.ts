@@ -2,9 +2,11 @@ import * as opentelemetry from '@opentelemetry/api'
 import {
   getLatestCompletedAt,
   WorkflowRun,
+  WorkflowRunJob,
   WorkflowRunJobs
 } from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
+import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
 
 export const createGauge = (
   name: string,
@@ -18,48 +20,46 @@ export const createGauge = (
   gauge.record(value, attributes)
 }
 
-interface WorkflowMetricsAttributes extends opentelemetry.Attributes {
-  // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
-  readonly 'cicd.pipeline.name': string
-  readonly 'cicd.pipeline.repository': string
-}
+const createMetricsAttributes = (
+  workflow: WorkflowRun,
+  job?: WorkflowRunJob
+): opentelemetry.Attributes => ({
+  [ak.NAME]: workflow.name || '',
+  [ak.REPOSITORY]: workflow.repository.full_name,
+  ...(job && { [ak.TASK_NAME]: job.name })
+})
 
 export const createWorkflowGauges = (
   workflow: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): void => {
   if (workflow.status !== 'completed') {
-    throw new Error(`Workflow(id: ${workflow.id}) is not completed.`)
+    // A workflow sometime has not completed here in spite of trigger of workflow completed event.
+    // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+    // GitHub Actions may be eventual consistency.
+    throw new Error(
+      `Workflow(id: ${workflow.id}) is not completed. Please retry this action.`
+    )
   }
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
 
   // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
   const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
-  const workflowMetricsAttributes: WorkflowMetricsAttributes = {
-    'cicd.pipeline.name': workflow.name || '',
-    'cicd.pipeline.repository': `${workflow.repository.full_name}`
-  }
+  const workflowMetricsAttributes = createMetricsAttributes(workflow)
 
   createGauge(
-    'cicd.pipeline.queued_duration',
+    dn.QUEUED_DURATION,
     calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
     workflowMetricsAttributes,
     { unit: 's' }
   )
   createGauge(
-    'cicd.pipeline.duration',
+    dn.DURATION,
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
     workflowMetricsAttributes,
     { unit: 's' }
   )
-}
-
-interface JobMetricsAttributes extends opentelemetry.Attributes {
-  // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
-  readonly 'cicd.pipeline.name': string
-  readonly 'cicd.pipeline.repository': string
-  readonly 'cicd.pipeline.task.name': string
 }
 
 export const createJobGauges = (
@@ -71,14 +71,9 @@ export const createJobGauges = (
       continue
     }
 
-    const jobMetricsAttributes: JobMetricsAttributes = {
-      'cicd.pipeline.name': job.workflow_name || '',
-      'cicd.pipeline.repository': `${workflow.repository.full_name}`,
-      'cicd.pipeline.task.name': job.name
-    }
-
+    const jobMetricsAttributes = createMetricsAttributes(workflow, job)
     createGauge(
-      'cicd.pipeline.task.duration',
+      dn.TASK_DURATION,
       calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
       jobMetricsAttributes,
       { unit: 's' }
@@ -95,7 +90,7 @@ export const createJobGauges = (
       continue
     }
     createGauge(
-      'cicd.pipeline.task.queued_duration',
+      dn.TASK_QUEUED_DURATION,
       jobQueuedDuration,
       jobMetricsAttributes,
       { unit: 's' }

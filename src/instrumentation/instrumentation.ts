@@ -12,6 +12,7 @@ import {
   BatchSpanProcessor
 } from '@opentelemetry/sdk-trace-base'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto'
+import settings from '../settings.js'
 
 let traceProvider: BasicTracerProvider
 let meterProvider: MeterProvider
@@ -20,11 +21,18 @@ export const initialize = (
   meterExporter?: PushMetricExporter,
   spanExporter?: SpanExporter
 ): void => {
+  if (settings.logeLevel === 'debug')
+    opentelemetry.diag.setLogger(
+      new opentelemetry.DiagConsoleLogger(),
+      opentelemetry.DiagLogLevel.DEBUG
+    )
+  // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
   initializeMeter(meterExporter)
   initializeTracer(spanExporter)
 }
 
 const initializeMeter = (exporter?: PushMetricExporter): void => {
+  // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
   meterProvider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
@@ -45,6 +53,8 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 }
 
 const initializeTracer = (exporter?: SpanExporter): void => {
+  // TODO: trace feature offならNoOp登録して終わりにする
+
   traceProvider = new BasicTracerProvider({
     resource: detectResourcesSync({ detectors: [envDetector] })
   })

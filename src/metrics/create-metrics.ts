@@ -5,6 +5,7 @@ export const createMetrics = async (
   results: WorkflowResults
 ): Promise<void> => {
   const { workflowRun, workflowRunJobs } = results
+  // TODO: metricsもoffにできるようにする
 
   try {
     createWorkflowGauges(workflowRun, workflowRunJobs)

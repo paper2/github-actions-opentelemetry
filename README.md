@@ -1,4 +1,4 @@
-# GitHub Actions OpenTelemetry (Dogfooding Release)
+# GitHub Actions OpenTelemetry (Experimental)
 
 [![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
@@ -6,23 +6,45 @@
 [![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-This open-source tool allows you to send GitHub Actions workflow and job
-execution times to an OpenTelemetry (OTLP) endpoint. It helps you monitor and
-analyze GitHub Actions telemetry data using the OpenTelemetry protocol.
+This action sends metrics and traces of GitHub Actions to an OpenTelemetry
+endpoint (OTLP). It helps you monitor and analyze GitHub Actions.
 
-## Features
+## Features Summary
 
-- 📊 Collects GitHub Actions workflow and job execution times
+- 📊 Collects Metrics of GitHub Actions workflows and job execution times
+- 🔍 Collects Traces of GitHub Actions workflow, jobs, steps.
 - 📦 Sends data to any OTLP-compatible backend for monitoring and observability
 - 🚀 Easy integration with GitHub workflows
-- 🔧 Simple configuration via environment variables
 
-## Installation
+## Limitations
 
-To get started, add the action to your existing GitHub Actions workflow or
-create a new workflow to send telemetry data after other workflows have
-completed. You can install this action by referencing it directly in your
-workflow.
+- OTLP authentication is not supported yet.
+- Metric and attribute names may undergo breaking changes due to the
+  experimental status.
+
+## Metrics
+
+| Descriptor Name               | Description          |
+| ----------------------------- | -------------------- |
+| `cicd.pipeline.duration`      | Duration of workflow |
+| `cicd.pipeline.task.duration` | Duration of job      |
+
+Each metric has associated attributes.
+
+![Prometheus Example Screen Shot](./img/metrics-prom.png)
+
+## Traces
+
+![Jaeger Example Screen Shot](./img/traces-jager.png)
+
+## Setup Instructions
+
+1. **Create OTLP Endpoint**: Set up an OTLP backend to receive telemetry data
+   (e.g., Jaeger, Prometheus, or other monitoring tools).
+1. **Add a Workflow**: Create a new workflow file and use this action triggered
+   by
+   [workflow_run](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run)
+   because this action collects telemetry of completed workflows.
 
 ### GitHub Actions Example
 
@@ -42,7 +64,7 @@ on:
       - completed
 
 permissions:
-  # Need for private repository
+  # Required for private repositories
   actions: read
 
 jobs:
@@ -52,37 +74,40 @@ jobs:
     steps:
       - name: Run
         id: run
-        uses: paper2/github-actions-opentelemetry@v0.0.2
+        uses: paper2/github-actions-opentelemetry@v0.0.7
         env:
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
           OTEL_EXPORTER_OTLP_ENDPOINT: https://collector-example.com
+          FEATURE_TRACE: true
         with:
+          # Required for collecting workflow data
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Configuration
+### Configuration
 
 To configure the action, you need to set the following environment variables:
 
-- `OTEL_EXPORTER_OTLP_ENDPOINT`: The OTLP endpoint where telemetry data will be
-  sent.
-  - able to use `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and
-    `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` too.
-- `OTEL_SERVICE_NAME`: service.name attribute.
-
-## Setup Instructions
-
-1. **Create OTLP Endpoint**: Set up an OpenTelemetry-compatible backend to
-   receive telemetry data (e.g., Jaeger, Prometheus, or other monitoring tools).
-1. **Add Workflow**: Integrate the GitHub Actions OpenTelemetry tool into your
-   workflows as shown in the examples above.
+| Environment Variable                  | Required | Default Value | Description                                                                 |
+| ------------------------------------- | -------- | ------------- | --------------------------------------------------------------------------- |
+| `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                               |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`         | No       | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com> |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.           |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.            |
+| `FEATURE_TRACE`                       | No       | `false`       | Enable trace feature.                                                       |
+| `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                  |
 
 ## Development
 
 ### Dev Container
 
-- Dev Container runs Jaeger and Prometheus for local testing.
+- Jaeger and Prometheus run for local testing.
   - Jaeger: <http://localhost:16686>
   - Prometheus: <http://localhost:9090>
+
+### Set default Environment Variables
+
+`.env.local` is automatically set to environment variables for testing.
 
 ### Local test
 
