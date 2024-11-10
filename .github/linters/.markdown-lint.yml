@@ -2,6 +2,9 @@
 MD004:
   style: dash
 
+# Line length (disable for tables and other long lines)
+MD013: false
+
 # Ordered list item prefix
 MD029:
   style: one
