@@ -88,14 +88,14 @@ jobs:
 
 To configure the action, you need to set the following environment variables:
 
-| Environment Variable                  | Required | Default Value | Description                                                               |
-| ------------------------------------- | -------- | ------------- | ------------------------------------------------------------------------- |
-| `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                             |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`         | No       | -             | OTLP Endpoint for Traces and Metrics. e.g., https://collector-example.com |
-| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.         |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.          |
-| `FEATURE_TRACE`                       | No       | `false`       | Enable trace feature.                                                     |
-| `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                |
+| Environment Variable                  | Required | Default Value | Description                                                                 |
+| ------------------------------------- | -------- | ------------- | --------------------------------------------------------------------------- |
+| `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                               |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`         | No       | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com> |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.           |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.            |
+| `FEATURE_TRACE`                       | No       | `false`       | Enable trace feature.                                                       |
+| `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                  |
 
 ## Development
 
