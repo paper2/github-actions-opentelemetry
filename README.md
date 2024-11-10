@@ -101,7 +101,7 @@ To configure the action, you need to set the following environment variables:
 
 ### Dev Container
 
-- The Dev Container runs Jaeger and Prometheus for local testing.
+- Jaeger and Prometheus run for local testing.
   - Jaeger: <http://localhost:16686>
   - Prometheus: <http://localhost:9090>
 
