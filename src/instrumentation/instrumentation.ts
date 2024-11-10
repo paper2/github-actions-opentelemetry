@@ -12,6 +12,7 @@ import {
   BatchSpanProcessor
 } from '@opentelemetry/sdk-trace-base'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto'
+import settings from '../settings.js'
 
 let traceProvider: BasicTracerProvider
 let meterProvider: MeterProvider
@@ -20,6 +21,11 @@ export const initialize = (
   meterExporter?: PushMetricExporter,
   spanExporter?: SpanExporter
 ): void => {
+  if (settings.logeLevel === 'debug')
+    opentelemetry.diag.setLogger(
+      new opentelemetry.DiagConsoleLogger(),
+      opentelemetry.DiagLogLevel.DEBUG
+    )
   initializeMeter(meterExporter)
   initializeTracer(spanExporter)
 }

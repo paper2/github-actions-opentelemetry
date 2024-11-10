@@ -11,7 +11,7 @@ export const settings = {
   isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
   logeLevel:
     process.env.ACTIONS_RUNNER_DEBUG === 'true' ||
-      process.env.ACTIONS_STEP_DEBUG === 'true'
+    process.env.ACTIONS_STEP_DEBUG === 'true'
       ? 'debug' // https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging
       : process.env.OTEL_LOG_LEVEL // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
 }
