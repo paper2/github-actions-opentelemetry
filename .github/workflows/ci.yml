@@ -65,6 +65,7 @@ jobs:
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          # TODO: implement additional header for auth
           OTEL_EXPORTER_OTLP_HEADERS: ''
           OTEL_SERVICE_NAME: github-actions-opentelemetry
           FEATURE_TRACE: true
