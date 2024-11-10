@@ -71194,6 +71194,7 @@ let meterProvider;
 const initialize = (meterExporter, spanExporter) => {
     if (src_settings.logeLevel === 'debug')
         src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
+    // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
     initializeMeter(meterExporter);
     initializeTracer(spanExporter);
 };

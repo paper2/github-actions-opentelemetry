@@ -26,6 +26,7 @@ export const initialize = (
       new opentelemetry.DiagConsoleLogger(),
       opentelemetry.DiagLogLevel.DEBUG
     )
+  // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
   initializeMeter(meterExporter)
   initializeTracer(spanExporter)
 }
