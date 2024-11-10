@@ -70912,6 +70912,9 @@ const settings = {
     // Always set to true when GitHub Actions is running the workflow.
     isGitHubActions: process.env.GITHUB_ACTIONS === 'true'
 };
+// TODO: nodesdk利用していないので、dialogでデバックログ出せるように戻す
+// TODO: ACTIONS_RUNNER_DEBUGとACTIONS_STEP_DEBUGがTrueの時にdebug有効化するのも良いかも
+// https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging
 /* harmony default export */ const src_settings = (settings);
 
 ;// CONCATENATED MODULE: ./src/github/github.ts
@@ -71023,7 +71026,10 @@ const createMetricsAttributes = (workflow, job) => ({
 });
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     if (workflow.status !== 'completed') {
-        throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
+        // A workflow sometime has not completed here in spite of trigger of workflow completed event.
+        // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+        // GitHub Actions may be eventual consistency.
+        throw new Error(`Workflow(id: ${workflow.id}) is not completed. Please retry this action.`);
     }
     const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs));
     // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
@@ -71055,6 +71061,7 @@ const createJobGauges = (workflow, workflowRunJobs) => {
 
 const createMetrics = async (results) => {
     const { workflowRun, workflowRunJobs } = results;
+    // TODO: metricsもoffにできるようにする
     try {
         createWorkflowGauges(workflowRun, workflowRunJobs);
         createJobGauges(workflowRun, workflowRunJobs);
@@ -71187,6 +71194,7 @@ const initialize = (meterExporter, spanExporter) => {
     initializeTracer(spanExporter);
 };
 const initializeMeter = (exporter) => {
+    // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
     meterProvider = new sdk_metrics_build_src.MeterProvider({
         readers: [
             new sdk_metrics_build_src.PeriodicExportingMetricReader({
@@ -71204,6 +71212,7 @@ const initializeMeter = (exporter) => {
     }
 };
 const initializeTracer = (exporter) => {
+    // TODO: trace feature offならNoOp登録して終わりにする
     traceProvider = new sdk_trace_base_build_src.BasicTracerProvider({
         resource: (0,build_src.detectResourcesSync)({ detectors: [build_src.envDetector] })
     });
@@ -71255,7 +71264,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     try {
@@ -71266,7 +71276,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     process.exit(exitCode);
