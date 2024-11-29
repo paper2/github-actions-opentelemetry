@@ -41,19 +41,19 @@ export const createWorkflowGauges = (
       `Workflow(id: ${workflow.id}) is not completed. Please retry this action.`
     )
   }
-  const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
+  const workflowMetricsAttributes = createMetricsAttributes(workflow)
 
   // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
   const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
   const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
-  const workflowMetricsAttributes = createMetricsAttributes(workflow)
-
   createGauge(
     dn.QUEUED_DURATION,
     calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
     workflowMetricsAttributes,
     { unit: 's' }
   )
+
+  const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
     dn.DURATION,
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
