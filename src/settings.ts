@@ -12,8 +12,7 @@ export const settings = {
   logeLevel:
     process.env.RUNNER_DEBUG === '1'
       ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-      : process.env.OTEL_LOG_LEVEL || // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
-        'info'
+      : process.env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
 }
 
 export default settings

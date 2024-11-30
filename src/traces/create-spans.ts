@@ -6,6 +6,7 @@ import {
   getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
+import { fail } from 'assert'
 
 export const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
@@ -26,15 +27,8 @@ export const createWorkflowRunTrace = (
 export const createWorkflowRunJobSpan = (
   ctx: Context,
   job: WorkflowRunJob
-): Context | null => {
-  if (job.status !== 'completed' || job.completed_at === null) {
-    console.warn(`job is not completed. (${job.name})`)
-    return null
-  }
-  if (job.steps === undefined || job.steps.length === 0) {
-    console.warn(`job (${job.name}) has no steps.`)
-    return null
-  }
+): Context => {
+  if (!job.completed_at || job.steps === undefined) fail()
 
   const spanWithWaiting = createSpan(
     ctx,
@@ -72,20 +66,9 @@ export const createWorkflowRunStepSpan = (
   ctx: Context,
   job: WorkflowRunJob
 ): void => {
-  if (job.steps === undefined || job.steps.length === 0) {
-    console.warn(`job (${job.name}) has no steps.`)
-    return
-  }
-
-  // NOTE: GitHub Action's first step (Set up job) is flaky. :(
-  // Sometimes it starts before job.started.
+  if (job.steps === undefined) fail()
   job.steps.map(step => {
-    if (step.started_at == null || step.completed_at == null) {
-      console.warn(
-        `step (${step.name}) time is null|undifined. (started_at:${step.started_at}, complated_at:${step.completed_at})`
-      )
-      return
-    }
+    if (step.started_at == null || step.completed_at == null) fail()
 
     createSpan(
       ctx,

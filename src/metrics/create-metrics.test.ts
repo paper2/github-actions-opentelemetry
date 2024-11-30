@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, test, expect, afterEach, beforeEach } from 'vitest'
 import { WorkflowResults } from '../github/index.js'
 import {
@@ -11,6 +10,7 @@ import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { createMetrics } from './create-metrics.js'
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
+import { fail } from 'assert'
 
 const workflowRunResults = {
   workflowRun: {
@@ -111,12 +111,10 @@ describe('should export expected metrics', () => {
 
     expect(dataPoints).toHaveLength(workflowRunJobs.length)
     for (const job of workflowRunJobs) {
+      if (!job.completed_at) fail()
       expect(dataPoints).toContainEqual({
         taskName: job.name,
-        value: calcDiffSec(
-          new Date(job.started_at),
-          new Date(job.completed_at!)
-        )
+        value: calcDiffSec(new Date(job.started_at), new Date(job.completed_at))
       })
     }
   })
@@ -146,10 +144,11 @@ describe('should export expected metrics', () => {
     const metric = findMetricByDescriptorName(exporter, dn.DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
+    if (!workflowRunJobs[1].completed_at) fail()
     expect(metric.dataPoints[0].value).toEqual(
       calcDiffSec(
         new Date(workflowRun.created_at),
-        new Date(workflowRunJobs[1].completed_at!) // last job's complete_at
+        new Date(workflowRunJobs[1].completed_at) // last job's complete_at
       )
     )
   })

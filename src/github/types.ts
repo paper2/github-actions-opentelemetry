@@ -11,6 +11,7 @@ export interface WorkflowRunContext {
   readonly owner: string
   readonly repo: string
   readonly runId: number
+  readonly attempt_number: number
 }
 export interface WorkflowResults {
   workflowRun: WorkflowRun
