@@ -7,7 +7,7 @@
 # If this workflow is run from a feature branch, it will act as an additional CI
 # check and fail if the checked-in `dist/` directory does not match what is
 # expected from the build.
-name: Check Transpiled JavaScript and Update
+name: Check Transpiled JavaScript
 
 on:
   pull_request:
@@ -29,8 +29,6 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Setup Node.js
         id: setup-node
@@ -47,12 +45,6 @@ jobs:
         id: build
         run: npm run bundle
 
-      # If `dist/` has change, commit it.
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'Automated Change: dist after build [skip ci]'
-          file_pattern: 'dist/'
-
       # This will fail the workflow if the `dist/` directory is different than
       # expected.
       - name: Compare Directories
@@ -68,3 +60,14 @@ jobs:
             git diff --ignore-space-at-eol --text dist/
             exit 1
           fi
+
+      - name: Commit and Push Updated dist/
+        if: ${{ failure() && steps.diff.outcome == 'failure' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          git commit -m "Fix: Update dist/ after failed check [skip ci]"
+          git push
