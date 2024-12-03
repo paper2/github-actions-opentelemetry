@@ -18,7 +18,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   check-dist:
@@ -61,13 +61,12 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and Push Updated dist/
-        if: ${{ failure() && steps.diff.outcome == 'failure' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add dist/
-          git commit -m "Fix: Update dist/ after failed check [skip ci]"
-          git push
+      # If `dist/` was different than expected, upload the expected version as a
+      # workflow artifact.
+      - if: ${{ failure() && steps.diff.outcome == 'failure' }}
+        name: Upload Artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
