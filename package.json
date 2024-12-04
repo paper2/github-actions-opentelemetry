@@ -41,7 +41,7 @@
     "extends": ".github/linters/.eslintrc.yml"
   },
   "dependencies": {
-    "@actions/core": "^1.10.1",
+    "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
     "@octokit/rest": "^21.0.2",
     "@octokit/webhooks-types": "^7.6.1",
