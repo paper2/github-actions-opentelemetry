@@ -6,6 +6,8 @@ set -eu
 
 git switch $1
 git pull origin main
+npm ci
 npm run all
 git add -A
-git commit -m 'npm run all for update lib"
+git commit -m 'npm run all for update lib'
+git push
