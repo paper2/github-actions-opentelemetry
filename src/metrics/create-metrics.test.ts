@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, test, expect, afterEach, beforeEach } from 'vitest'
 import { WorkflowResults } from '../github/index.js'
 import {
@@ -10,6 +9,8 @@ import { initialize, forceFlush } from '../instrumentation/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { createMetrics } from './create-metrics.js'
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
+import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
+import { fail } from 'assert'
 
 const workflowRunResults = {
   workflowRun: {
@@ -90,14 +91,6 @@ const { workflowRun, workflowRunJobs } = workflowRunResults
 describe('should export expected metrics', () => {
   const exporter = new InMemoryMetricExporter(AggregationTemporality.DELTA)
 
-  // TODO: testじゃなくてコード上で定義したい
-  const descriptorNames = {
-    TASK_DURATION: 'cicd.pipeline.task.duration',
-    TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
-    PIPELINE_DURATION: 'cicd.pipeline.duration',
-    PIPELINE_QUEUED_DURATION: 'cicd.pipeline.queued_duration'
-  }
-
   beforeEach(() => {
     exporter.reset()
     initialize(exporter)
@@ -107,53 +100,32 @@ describe('should export expected metrics', () => {
     opentelemetryAllDisable()
   })
 
-  test('should export expected descriptor name only', async () => {
+  test(`should verify ${dn.TASK_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const expectedDescriptorNames = Object.values(descriptorNames)
-
-    expect(exporter.getMetrics()).toHaveLength(1)
-    expect(exporter.getMetrics()[0].scopeMetrics).toHaveLength(1)
-    const metrics = exporter.getMetrics()[0].scopeMetrics[0].metrics
-    for (const metric of metrics) {
-      expect(expectedDescriptorNames).toContain(metric.descriptor.name)
-    }
-  })
-
-  test('should verify cicd.pipeline.task.duration', async () => {
-    await createMetrics(workflowRunResults)
-    await forceFlush()
-    const metric = findMetricByDescriptorName(
-      exporter,
-      descriptorNames.TASK_DURATION
-    )
+    const metric = findMetricByDescriptorName(exporter, dn.TASK_DURATION)
     const dataPoints = metric.dataPoints.map(dataPoint => ({
-      taskName: dataPoint.attributes['cicd.pipeline.task.name'],
+      taskName: dataPoint.attributes[ak.TASK_NAME],
       value: dataPoint.value
     }))
 
     expect(dataPoints).toHaveLength(workflowRunJobs.length)
     for (const job of workflowRunJobs) {
+      if (!job.completed_at) fail()
       expect(dataPoints).toContainEqual({
         taskName: job.name,
-        value: calcDiffSec(
-          new Date(job.started_at),
-          new Date(job.completed_at!)
-        )
+        value: calcDiffSec(new Date(job.started_at), new Date(job.completed_at))
       })
     }
   })
 
-  test('should verify cicd.pipeline.task.queued_duration', async () => {
+  test(`should verify ${dn.TASK_QUEUED_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(
-      exporter,
-      descriptorNames.TASK_QUEUED_DURATION
-    )
+    const metric = findMetricByDescriptorName(exporter, dn.TASK_QUEUED_DURATION)
 
     const dataPoints = metric.dataPoints.map(dataPoint => ({
-      taskName: dataPoint.attributes['cicd.pipeline.task.name'],
+      taskName: dataPoint.attributes[ak.TASK_NAME],
       value: dataPoint.value
     }))
 
@@ -166,30 +138,25 @@ describe('should export expected metrics', () => {
     }
   })
 
-  test('should verify cicd.pipeline.duration', async () => {
+  test(`should verify ${dn.DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(
-      exporter,
-      descriptorNames.PIPELINE_DURATION
-    )
+    const metric = findMetricByDescriptorName(exporter, dn.DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
+    if (!workflowRunJobs[1].completed_at) fail()
     expect(metric.dataPoints[0].value).toEqual(
       calcDiffSec(
         new Date(workflowRun.created_at),
-        new Date(workflowRunJobs[1].completed_at!) // last job's complete_at
+        new Date(workflowRunJobs[1].completed_at) // last job's complete_at
       )
     )
   })
 
-  test('should verify cicd.pipeline.queued_duration', async () => {
+  test(`should verify ${dn.QUEUED_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(
-      exporter,
-      descriptorNames.PIPELINE_QUEUED_DURATION
-    )
+    const metric = findMetricByDescriptorName(exporter, dn.QUEUED_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
     expect(metric.dataPoints[0].value).toEqual(

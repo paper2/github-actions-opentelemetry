@@ -28557,7 +28557,7 @@ exports.DropAggregator = DropAggregator;
 
 /***/ }),
 
-/***/ 9405:
+/***/ 6001:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -30165,7 +30165,7 @@ Object.defineProperty(exports, "DropAggregator", ({ enumerable: true, get: funct
 var Histogram_1 = __nccwpck_require__(5389);
 Object.defineProperty(exports, "HistogramAccumulation", ({ enumerable: true, get: function () { return Histogram_1.HistogramAccumulation; } }));
 Object.defineProperty(exports, "HistogramAggregator", ({ enumerable: true, get: function () { return Histogram_1.HistogramAggregator; } }));
-var ExponentialHistogram_1 = __nccwpck_require__(9405);
+var ExponentialHistogram_1 = __nccwpck_require__(6001);
 Object.defineProperty(exports, "ExponentialHistogramAccumulation", ({ enumerable: true, get: function () { return ExponentialHistogram_1.ExponentialHistogramAccumulation; } }));
 Object.defineProperty(exports, "ExponentialHistogramAggregator", ({ enumerable: true, get: function () { return ExponentialHistogram_1.ExponentialHistogramAggregator; } }));
 var LastValue_1 = __nccwpck_require__(5209);
@@ -42408,6 +42408,724 @@ BufferWriter.prototype.string = function write_string_buffer(value) {
  */
 
 BufferWriter._configure();
+
+
+/***/ }),
+
+/***/ 2172:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+var __webpack_unused_export__;
+
+__webpack_unused_export__ = ({ value: true });
+__webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = exports.xK = __webpack_unused_export__ = exports.WW = __webpack_unused_export__ = void 0;
+var retry_1 = __nccwpck_require__(9028);
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.getDefaultRetryOptions; } });
+Object.defineProperty(exports, "WW", ({ enumerable: true, get: function () { return retry_1.isTooManyTries; } }));
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retry; } });
+Object.defineProperty(exports, "xK", ({ enumerable: true, get: function () { return retry_1.retryAsync; } }));
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryUntilDefined; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilDefined; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilDefinedDecorator; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilResponse; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilResponseDecorator; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilTruthy; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilTruthyDecorator; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryUntilTruthy; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryUntilTruthyDecorator; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.setDefaultRetryOptions; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.createExponetialDelay; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.createMutiplicableDelay; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.createRandomDelay; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryAsyncDecorator; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryDecorator; } });
+var wait_1 = __nccwpck_require__(4744);
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.getDefaultDuration; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.isTimeoutError; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.setDefaultDuration; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.wait; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.waitUntil; } });
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return wait_1.waitUntilAsync; } });
+
+
+/***/ }),
+
+/***/ 2467:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.assertDefined = exports.asyncDecorator = void 0;
+const asyncDecorator = (fn) => () => new Promise((resolve, reject) => {
+    try {
+        resolve(fn());
+    }
+    catch (err) {
+        reject(err);
+    }
+});
+exports.asyncDecorator = asyncDecorator;
+const assertDefined = (value, errMsg) => {
+    if (value === undefined || value == null) {
+        throw new Error(errMsg);
+    }
+    return true;
+};
+exports.assertDefined = assertDefined;
+
+
+/***/ }),
+
+/***/ 9028:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryDecorator = exports.retryAsyncDecorator = exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = exports.retryAsyncUntilResponseDecorator = exports.retryAsyncUntilResponse = exports.retryUntilTruthyDecorator = exports.retryUntilTruthy = exports.retryUntilDefinedDecorator = exports.retryUntilDefined = exports.retryAsyncUntilTruthyDecorator = exports.retryAsyncUntilTruthy = exports.retryAsyncUntilDefinedDecorator = exports.retryAsyncUntilDefined = exports.isTooManyTries = exports.retryAsync = exports.retry = exports.setDefaultRetryOptions = exports.getDefaultRetryOptions = void 0;
+var options_1 = __nccwpck_require__(3126);
+Object.defineProperty(exports, "getDefaultRetryOptions", ({ enumerable: true, get: function () { return options_1.getDefaultRetryOptions; } }));
+Object.defineProperty(exports, "setDefaultRetryOptions", ({ enumerable: true, get: function () { return options_1.setDefaultRetryOptions; } }));
+var retry_1 = __nccwpck_require__(5109);
+Object.defineProperty(exports, "retry", ({ enumerable: true, get: function () { return retry_1.retry; } }));
+Object.defineProperty(exports, "retryAsync", ({ enumerable: true, get: function () { return retry_1.retryAsync; } }));
+var tooManyTries_1 = __nccwpck_require__(897);
+Object.defineProperty(exports, "isTooManyTries", ({ enumerable: true, get: function () { return tooManyTries_1.isTooManyTries; } }));
+var utils_1 = __nccwpck_require__(2828);
+Object.defineProperty(exports, "retryAsyncUntilDefined", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilDefined; } }));
+Object.defineProperty(exports, "retryAsyncUntilDefinedDecorator", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilDefinedDecorator; } }));
+Object.defineProperty(exports, "retryAsyncUntilTruthy", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilTruthy; } }));
+Object.defineProperty(exports, "retryAsyncUntilTruthyDecorator", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilTruthyDecorator; } }));
+Object.defineProperty(exports, "retryUntilDefined", ({ enumerable: true, get: function () { return utils_1.retryUntilDefined; } }));
+Object.defineProperty(exports, "retryUntilDefinedDecorator", ({ enumerable: true, get: function () { return utils_1.retryUntilDefinedDecorator; } }));
+Object.defineProperty(exports, "retryUntilTruthy", ({ enumerable: true, get: function () { return utils_1.retryUntilTruthy; } }));
+Object.defineProperty(exports, "retryUntilTruthyDecorator", ({ enumerable: true, get: function () { return utils_1.retryUntilTruthyDecorator; } }));
+Object.defineProperty(exports, "retryAsyncUntilResponse", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilResponse; } }));
+Object.defineProperty(exports, "retryAsyncUntilResponseDecorator", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilResponseDecorator; } }));
+Object.defineProperty(exports, "createExponetialDelay", ({ enumerable: true, get: function () { return utils_1.createExponetialDelay; } }));
+Object.defineProperty(exports, "createMutiplicableDelay", ({ enumerable: true, get: function () { return utils_1.createMutiplicableDelay; } }));
+Object.defineProperty(exports, "createRandomDelay", ({ enumerable: true, get: function () { return utils_1.createRandomDelay; } }));
+Object.defineProperty(exports, "retryAsyncDecorator", ({ enumerable: true, get: function () { return utils_1.retryAsyncDecorator; } }));
+Object.defineProperty(exports, "retryDecorator", ({ enumerable: true, get: function () { return utils_1.retryDecorator; } }));
+
+
+/***/ }),
+
+/***/ 3126:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDefaultRetryOptions = exports.setDefaultRetryOptions = exports.defaultRetryOptions = exports.defaultMaxTry = exports.defaultDelay = void 0;
+exports.defaultDelay = 250;
+exports.defaultMaxTry = 4 * 60;
+exports.defaultRetryOptions = {
+    delay: exports.defaultDelay,
+    maxTry: exports.defaultMaxTry,
+    until: null,
+};
+function setDefaultRetryOptions(retryOptions) {
+    exports.defaultRetryOptions = Object.assign(Object.assign({}, exports.defaultRetryOptions), retryOptions);
+    return getDefaultRetryOptions();
+}
+exports.setDefaultRetryOptions = setDefaultRetryOptions;
+function getDefaultRetryOptions() {
+    return Object.assign({}, exports.defaultRetryOptions);
+}
+exports.getDefaultRetryOptions = getDefaultRetryOptions;
+
+
+/***/ }),
+
+/***/ 2862:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRetryParameters = void 0;
+const options_1 = __nccwpck_require__(3126);
+function getRetryParameters(currentTry, retryOptions) {
+    const fullOptions = Object.assign(Object.assign({}, (0, options_1.getDefaultRetryOptions)()), retryOptions);
+    return Object.assign(Object.assign({}, fullOptions), { currentTry, maxTry: fullOptions.maxTry || options_1.defaultMaxTry, delay: getDelay(fullOptions.delay), until: fullOptions.until ? fullOptions.until : () => true });
+}
+exports.getRetryParameters = getRetryParameters;
+function getDelay(delay) {
+    if (delay === undefined) {
+        return () => options_1.defaultDelay;
+    }
+    if (typeof delay === 'function') {
+        return delay;
+    }
+    return () => delay;
+}
+
+
+/***/ }),
+
+/***/ 5109:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsync = exports.retry = void 0;
+const misc_1 = __nccwpck_require__(2467);
+const wait_1 = __nccwpck_require__(1864);
+const parameters_1 = __nccwpck_require__(2862);
+const tooManyTries_1 = __nccwpck_require__(897);
+function retry(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fnAsync = (0, misc_1.asyncDecorator)(fn);
+        return yield retryAsync(fnAsync, retryOptions);
+    });
+}
+exports.retry = retry;
+function retryAsync(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const retryParameters = (0, parameters_1.getRetryParameters)(1, retryOptions);
+        return yield actualRetry(fn, retryParameters);
+    });
+}
+exports.retryAsync = retryAsync;
+function actualRetry(fn, retryParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const canRecall = retryParameters.currentTry < retryParameters.maxTry;
+        try {
+            const result = yield fn();
+            if (retryParameters.until(result)) {
+                if (retryParameters.onSuccessFunc) {
+                    retryParameters.onSuccessFunc(result, retryParameters.currentTry);
+                }
+                return result;
+            }
+            else if (canRecall) {
+                // i.e. throw so that we log via retryParameters.onError below 
+                // as !isTooManyTries && canRecall
+                throw new Error("function result failed to meet until() requirements");
+            }
+            else {
+                throw new tooManyTries_1.TooManyTries(result);
+            }
+        }
+        catch (err) {
+            if (!(0, tooManyTries_1.isTooManyTries)(err) && canRecall) {
+                if (retryParameters.onError) {
+                    retryParameters.onError(err, retryParameters.currentTry);
+                }
+                return yield recall(fn, retryParameters);
+            }
+            else {
+                if (retryParameters.onMaxRetryFunc) {
+                    retryParameters.onMaxRetryFunc(err, retryParameters.currentTry);
+                }
+                throw err;
+            }
+        }
+    });
+}
+function recall(fn, retryParameters, lastResult) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const delay = retryParameters.delay({
+            currentTry: retryParameters.currentTry,
+            maxTry: retryParameters.maxTry,
+            lastDelay: retryParameters.lastDelay,
+            lastResult
+        });
+        yield (0, wait_1.wait)(delay);
+        const newRetryParameters = Object.assign(Object.assign({}, retryParameters), { currentTry: retryParameters.currentTry + 1 });
+        return yield actualRetry(fn, newRetryParameters);
+    });
+}
+;
+
+
+/***/ }),
+
+/***/ 897:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isTooManyTries = exports.TooManyTries = void 0;
+class TooManyTries extends Error {
+    constructor(lastResult = undefined) {
+        super("function did not complete within allowed number of attempts");
+        this.lastResult = lastResult;
+        this.tooManyTries = true;
+    }
+    getLastResult() {
+        return this.lastResult;
+    }
+}
+exports.TooManyTries = TooManyTries;
+function isTooManyTries(error) {
+    return error.tooManyTries === true;
+}
+exports.isTooManyTries = isTooManyTries;
+
+
+/***/ }),
+
+/***/ 8276:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryDecorator = exports.retryAsyncDecorator = void 0;
+const retry_1 = __nccwpck_require__(5109);
+function retryAsyncDecorator(fn, retryOptions) {
+    return (...args) => {
+        const wrappedFn = () => fn(...args);
+        return (0, retry_1.retryAsync)(wrappedFn, retryOptions);
+    };
+}
+exports.retryAsyncDecorator = retryAsyncDecorator;
+function retryDecorator(fn, retryOptions) {
+    return (...args) => {
+        const wrappedFn = () => fn(...args);
+        return (0, retry_1.retry)(wrappedFn, retryOptions);
+    };
+}
+exports.retryDecorator = retryDecorator;
+
+
+/***/ }),
+
+/***/ 469:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncDecorator = exports.retryDecorator = void 0;
+var decorators_1 = __nccwpck_require__(8276);
+Object.defineProperty(exports, "retryDecorator", ({ enumerable: true, get: function () { return decorators_1.retryDecorator; } }));
+Object.defineProperty(exports, "retryAsyncDecorator", ({ enumerable: true, get: function () { return decorators_1.retryAsyncDecorator; } }));
+
+
+/***/ }),
+
+/***/ 7151:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = void 0;
+function createExponetialDelay(initialDelay) {
+    const delay = ({ lastDelay }) => lastDelay !== undefined ? lastDelay * initialDelay : initialDelay;
+    return delay;
+}
+exports.createExponetialDelay = createExponetialDelay;
+function createMutiplicableDelay(initialDelay, multiplicator) {
+    const delay = ({ currentTry }) => {
+        if (currentTry === 1) {
+            return initialDelay;
+        }
+        const actualMultiplicator = (currentTry - 1) * multiplicator;
+        return initialDelay * actualMultiplicator;
+    };
+    return delay;
+}
+exports.createMutiplicableDelay = createMutiplicableDelay;
+function createRandomDelay(min, max) {
+    const multiplicator = max - min + 1;
+    return () => Math.floor(Math.random() * multiplicator + min);
+}
+exports.createRandomDelay = createRandomDelay;
+
+
+/***/ }),
+
+/***/ 2828:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = exports.retryDecorator = exports.retryAsyncDecorator = exports.retryAsyncUntilResponseDecorator = exports.retryAsyncUntilResponse = exports.retryUntilTruthyDecorator = exports.retryUntilTruthy = exports.retryAsyncUntilTruthyDecorator = exports.retryAsyncUntilTruthy = exports.retryUntilDefinedDecorator = exports.retryUntilDefined = exports.retryAsyncUntilDefinedDecorator = exports.retryAsyncUntilDefined = void 0;
+var untilDefined_1 = __nccwpck_require__(6339);
+Object.defineProperty(exports, "retryAsyncUntilDefined", ({ enumerable: true, get: function () { return untilDefined_1.retryAsyncUntilDefined; } }));
+Object.defineProperty(exports, "retryAsyncUntilDefinedDecorator", ({ enumerable: true, get: function () { return untilDefined_1.retryAsyncUntilDefinedDecorator; } }));
+Object.defineProperty(exports, "retryUntilDefined", ({ enumerable: true, get: function () { return untilDefined_1.retryUntilDefined; } }));
+Object.defineProperty(exports, "retryUntilDefinedDecorator", ({ enumerable: true, get: function () { return untilDefined_1.retryUntilDefinedDecorator; } }));
+var untilTruthy_1 = __nccwpck_require__(8357);
+Object.defineProperty(exports, "retryAsyncUntilTruthy", ({ enumerable: true, get: function () { return untilTruthy_1.retryAsyncUntilTruthy; } }));
+Object.defineProperty(exports, "retryAsyncUntilTruthyDecorator", ({ enumerable: true, get: function () { return untilTruthy_1.retryAsyncUntilTruthyDecorator; } }));
+Object.defineProperty(exports, "retryUntilTruthy", ({ enumerable: true, get: function () { return untilTruthy_1.retryUntilTruthy; } }));
+Object.defineProperty(exports, "retryUntilTruthyDecorator", ({ enumerable: true, get: function () { return untilTruthy_1.retryUntilTruthyDecorator; } }));
+var untilResponse_1 = __nccwpck_require__(1981);
+Object.defineProperty(exports, "retryAsyncUntilResponse", ({ enumerable: true, get: function () { return untilResponse_1.retryAsyncUntilResponse; } }));
+Object.defineProperty(exports, "retryAsyncUntilResponseDecorator", ({ enumerable: true, get: function () { return untilResponse_1.retryAsyncUntilResponseDecorator; } }));
+var decorators_1 = __nccwpck_require__(469);
+Object.defineProperty(exports, "retryAsyncDecorator", ({ enumerable: true, get: function () { return decorators_1.retryAsyncDecorator; } }));
+Object.defineProperty(exports, "retryDecorator", ({ enumerable: true, get: function () { return decorators_1.retryDecorator; } }));
+var delay_1 = __nccwpck_require__(7151);
+Object.defineProperty(exports, "createExponetialDelay", ({ enumerable: true, get: function () { return delay_1.createExponetialDelay; } }));
+Object.defineProperty(exports, "createMutiplicableDelay", ({ enumerable: true, get: function () { return delay_1.createMutiplicableDelay; } }));
+Object.defineProperty(exports, "createRandomDelay", ({ enumerable: true, get: function () { return delay_1.createRandomDelay; } }));
+
+
+/***/ }),
+
+/***/ 4900:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryUntilOptionsToRetryOptionsHof = void 0;
+const retryUntilOptionsToRetryOptionsHof = (until) => (retryOptions) => (Object.assign(Object.assign({}, retryOptions), { until }));
+exports.retryUntilOptionsToRetryOptionsHof = retryUntilOptionsToRetryOptionsHof;
+
+
+/***/ }),
+
+/***/ 1513:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilDefinedDecorator = exports.retryUntilDefinedDecorator = void 0;
+const retry_1 = __nccwpck_require__(7229);
+function retryUntilDefinedDecorator(fn, retryOptions) {
+    return (...args) => __awaiter(this, void 0, void 0, function* () {
+        const wrappedFn = () => fn(...args);
+        return yield (0, retry_1.retryUntilDefined)(wrappedFn, retryOptions);
+    });
+}
+exports.retryUntilDefinedDecorator = retryUntilDefinedDecorator;
+function retryAsyncUntilDefinedDecorator(fn, retryOptions) {
+    return (...args) => __awaiter(this, void 0, void 0, function* () {
+        const wrappedFn = () => __awaiter(this, void 0, void 0, function* () { return yield fn(...args); });
+        return yield (0, retry_1.retryAsyncUntilDefined)(wrappedFn, retryOptions);
+    });
+}
+exports.retryAsyncUntilDefinedDecorator = retryAsyncUntilDefinedDecorator;
+
+
+/***/ }),
+
+/***/ 6339:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryUntilDefinedDecorator = exports.retryAsyncUntilDefinedDecorator = exports.retryUntilDefined = exports.retryAsyncUntilDefined = void 0;
+var retry_1 = __nccwpck_require__(7229);
+Object.defineProperty(exports, "retryAsyncUntilDefined", ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilDefined; } }));
+Object.defineProperty(exports, "retryUntilDefined", ({ enumerable: true, get: function () { return retry_1.retryUntilDefined; } }));
+var decorator_1 = __nccwpck_require__(1513);
+Object.defineProperty(exports, "retryAsyncUntilDefinedDecorator", ({ enumerable: true, get: function () { return decorator_1.retryAsyncUntilDefinedDecorator; } }));
+Object.defineProperty(exports, "retryUntilDefinedDecorator", ({ enumerable: true, get: function () { return decorator_1.retryUntilDefinedDecorator; } }));
+
+
+/***/ }),
+
+/***/ 7229:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilDefined = exports.retryUntilDefined = void 0;
+const retry_1 = __nccwpck_require__(5109);
+const options_1 = __nccwpck_require__(4900);
+const until = (lastResult) => lastResult !== undefined && lastResult !== null;
+const getOptions = (0, options_1.retryUntilOptionsToRetryOptionsHof)(until);
+function retryUntilDefined(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = getOptions(retryOptions);
+        return (yield (0, retry_1.retry)(fn, options));
+    });
+}
+exports.retryUntilDefined = retryUntilDefined;
+function retryAsyncUntilDefined(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = getOptions(retryOptions);
+        return (yield (0, retry_1.retryAsync)(fn, options));
+    });
+}
+exports.retryAsyncUntilDefined = retryAsyncUntilDefined;
+
+
+/***/ }),
+
+/***/ 7647:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilResponseDecorator = void 0;
+const retry_1 = __nccwpck_require__(1644);
+function retryAsyncUntilResponseDecorator(fn, retryOptions) {
+    return (...args) => __awaiter(this, void 0, void 0, function* () {
+        const wrappedFn = () => __awaiter(this, void 0, void 0, function* () { return yield fn(...args); });
+        return yield (0, retry_1.retryAsyncUntilResponse)(wrappedFn, retryOptions);
+    });
+}
+exports.retryAsyncUntilResponseDecorator = retryAsyncUntilResponseDecorator;
+
+
+/***/ }),
+
+/***/ 1981:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilResponseDecorator = exports.retryAsyncUntilResponse = void 0;
+var retry_1 = __nccwpck_require__(1644);
+Object.defineProperty(exports, "retryAsyncUntilResponse", ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilResponse; } }));
+var decorators_1 = __nccwpck_require__(7647);
+Object.defineProperty(exports, "retryAsyncUntilResponseDecorator", ({ enumerable: true, get: function () { return decorators_1.retryAsyncUntilResponseDecorator; } }));
+
+
+/***/ }),
+
+/***/ 1644:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilResponse = void 0;
+const retry_1 = __nccwpck_require__(5109);
+const options_1 = __nccwpck_require__(4900);
+const until = (lastResult) => lastResult.ok;
+const getOptions = (0, options_1.retryUntilOptionsToRetryOptionsHof)(until);
+function retryAsyncUntilResponse(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = getOptions(retryOptions);
+        return yield (0, retry_1.retryAsync)(fn, options);
+    });
+}
+exports.retryAsyncUntilResponse = retryAsyncUntilResponse;
+
+
+/***/ }),
+
+/***/ 8650:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilTruthyDecorator = exports.retryUntilTruthyDecorator = void 0;
+const retry_1 = __nccwpck_require__(9405);
+function retryUntilTruthyDecorator(fn, retryOptions) {
+    return (...args) => __awaiter(this, void 0, void 0, function* () {
+        const wrappedFn = () => fn(...args);
+        return yield (0, retry_1.retryUntilTruthy)(wrappedFn, retryOptions);
+    });
+}
+exports.retryUntilTruthyDecorator = retryUntilTruthyDecorator;
+function retryAsyncUntilTruthyDecorator(fn, retryOptions) {
+    return (...args) => __awaiter(this, void 0, void 0, function* () {
+        const wrappedFn = () => __awaiter(this, void 0, void 0, function* () { return yield fn(...args); });
+        return yield (0, retry_1.retryAsyncUntilTruthy)(wrappedFn, retryOptions);
+    });
+}
+exports.retryAsyncUntilTruthyDecorator = retryAsyncUntilTruthyDecorator;
+
+
+/***/ }),
+
+/***/ 8357:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryUntilTruthyDecorator = exports.retryAsyncUntilTruthyDecorator = exports.retryUntilTruthy = exports.retryAsyncUntilTruthy = void 0;
+var retry_1 = __nccwpck_require__(9405);
+Object.defineProperty(exports, "retryAsyncUntilTruthy", ({ enumerable: true, get: function () { return retry_1.retryAsyncUntilTruthy; } }));
+Object.defineProperty(exports, "retryUntilTruthy", ({ enumerable: true, get: function () { return retry_1.retryUntilTruthy; } }));
+var decorator_1 = __nccwpck_require__(8650);
+Object.defineProperty(exports, "retryAsyncUntilTruthyDecorator", ({ enumerable: true, get: function () { return decorator_1.retryAsyncUntilTruthyDecorator; } }));
+Object.defineProperty(exports, "retryUntilTruthyDecorator", ({ enumerable: true, get: function () { return decorator_1.retryUntilTruthyDecorator; } }));
+
+
+/***/ }),
+
+/***/ 9405:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAsyncUntilTruthy = exports.retryUntilTruthy = void 0;
+const __1 = __nccwpck_require__(9028);
+const options_1 = __nccwpck_require__(4900);
+const until = (lastResult) => 
+// deno-lint-ignore no-explicit-any
+lastResult == true;
+const getOptions = (0, options_1.retryUntilOptionsToRetryOptionsHof)(until);
+function retryUntilTruthy(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = getOptions(retryOptions);
+        return yield (0, __1.retry)(fn, options);
+    });
+}
+exports.retryUntilTruthy = retryUntilTruthy;
+function retryAsyncUntilTruthy(fn, retryOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = getOptions(retryOptions);
+        return yield (0, __1.retryAsync)(fn, options);
+    });
+}
+exports.retryAsyncUntilTruthy = retryAsyncUntilTruthy;
+
+
+/***/ }),
+
+/***/ 4744:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.setDefaultDuration = exports.getDefaultDuration = exports.waitUntilAsync = exports.waitUntil = exports.wait = exports.TimeoutError = exports.isTimeoutError = void 0;
+var wait_1 = __nccwpck_require__(1864);
+Object.defineProperty(exports, "isTimeoutError", ({ enumerable: true, get: function () { return wait_1.isTimeoutError; } }));
+Object.defineProperty(exports, "TimeoutError", ({ enumerable: true, get: function () { return wait_1.TimeoutError; } }));
+Object.defineProperty(exports, "wait", ({ enumerable: true, get: function () { return wait_1.wait; } }));
+Object.defineProperty(exports, "waitUntil", ({ enumerable: true, get: function () { return wait_1.waitUntil; } }));
+Object.defineProperty(exports, "waitUntilAsync", ({ enumerable: true, get: function () { return wait_1.waitUntilAsync; } }));
+var options_1 = __nccwpck_require__(1783);
+Object.defineProperty(exports, "getDefaultDuration", ({ enumerable: true, get: function () { return options_1.getDefaultDuration; } }));
+Object.defineProperty(exports, "setDefaultDuration", ({ enumerable: true, get: function () { return options_1.setDefaultDuration; } }));
+
+
+/***/ }),
+
+/***/ 1783:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDefaultDuration = exports.setDefaultDuration = exports.defaultDuration = void 0;
+exports.defaultDuration = 60 * 1000;
+function setDefaultDuration(duration) {
+    exports.defaultDuration = duration;
+}
+exports.setDefaultDuration = setDefaultDuration;
+function getDefaultDuration() {
+    return exports.defaultDuration;
+}
+exports.getDefaultDuration = getDefaultDuration;
+
+
+/***/ }),
+
+/***/ 1864:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isTimeoutError = exports.TimeoutError = exports.waitUntilAsync = exports.waitUntil = exports.wait = void 0;
+const misc_1 = __nccwpck_require__(2467);
+const options_1 = __nccwpck_require__(1783);
+function wait(duration = options_1.defaultDuration) {
+    return new Promise((resolve) => setTimeout(resolve, duration));
+}
+exports.wait = wait;
+function waitUntil(fn, duration, error) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fnAsync = (0, misc_1.asyncDecorator)(fn);
+        return yield waitUntilAsync(fnAsync, duration, error);
+    });
+}
+exports.waitUntil = waitUntil;
+function waitUntilAsync(fn, duration = options_1.defaultDuration, error = new TimeoutError("function did not complete within allowed time")) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const canary = Symbol("DELAY_EXPIRED");
+        const result = yield Promise.race([
+            fn(),
+            timeout(duration, canary),
+        ]);
+        if (result === canary) {
+            throw error;
+        }
+        return result;
+    });
+}
+exports.waitUntilAsync = waitUntilAsync;
+const timeout = (duration, result) => __awaiter(void 0, void 0, void 0, function* () {
+    yield wait(duration);
+    return result;
+});
+class TimeoutError extends Error {
+    constructor() {
+        super(...arguments);
+        this.isTimeout = true;
+    }
+}
+exports.TimeoutError = TimeoutError;
+function isTimeoutError(error) {
+    return error.isTimeout === true;
+}
+exports.isTimeoutError = isTimeoutError;
 
 
 /***/ }),
@@ -70910,40 +71628,117 @@ const settings = {
         ? process.env.FEATURE_TRACE.toLowerCase() === 'true'
         : false,
     // Always set to true when GitHub Actions is running the workflow.
-    isGitHubActions: process.env.GITHUB_ACTIONS === 'true'
+    isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
+    logeLevel: process.env.RUNNER_DEBUG === '1'
+        ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
+        : process.env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
 };
 /* harmony default export */ const src_settings = (settings);
+
+// EXTERNAL MODULE: external "assert"
+var external_assert_ = __nccwpck_require__(9491);
+// EXTERNAL MODULE: ./node_modules/ts-retry/lib/cjs/index.js
+var cjs = __nccwpck_require__(2172);
+;// CONCATENATED MODULE: ./src/github/check-completed.ts
+
+// GitHub Actions may be eventual consistency.
+const checkCompleted = (workflowResult) => {
+    const { workflowRun, workflowRunJobs } = workflowResult;
+    let status = true;
+    // check workflow
+    if (workflowRun.status !== 'completed') {
+        core.warning(`This workflow is not completed. id: ${workflowRun.id}`);
+        status = false;
+    }
+    if (!workflowRun.name) {
+        core.warning('workflowRun.name should be defined.');
+        status = false;
+    }
+    // check jobs
+    for (const job of workflowRunJobs) {
+        if (job.status !== 'completed') {
+            core.warning(`A job is not completed. workflowRun.id: ${workflowRun.id}, job.id: ${job.id} `);
+            status = false;
+        }
+        if (!job.completed_at) {
+            // TODO: change warning message when I complete to check the problem. This property sometimes not be filed.
+            core.warning('job.completed_at should be defined.');
+            status = false;
+        }
+    }
+    // check steps
+    for (const job of workflowRunJobs) {
+        if (!job.steps) {
+            core.warning(`A job has no steps. workflowRun.id: ${workflowRun.id}, job.id: ${job.id}`);
+            status = false;
+            continue;
+        }
+        for (const step of job.steps) {
+            const stepLoggedProperties = `workflowRun.id: ${workflowRun.id}, job.id: ${job.id}, step.name: ${step.name}`;
+            if (step.status !== 'completed') {
+                core.warning(`A step is not completed. ${stepLoggedProperties}`);
+                status = false;
+            }
+            if (!step.started_at) {
+                core.warning(`step.started_at should be defined. ${stepLoggedProperties}`);
+                status = false;
+            }
+            if (!step.completed_at) {
+                core.warning(`step.completed_at should be defined. ${stepLoggedProperties}`);
+                status = false;
+            }
+        }
+    }
+    return status;
+};
 
 ;// CONCATENATED MODULE: ./src/github/github.ts
 
 
 
 
-const fetchWorkflowResults = async () => {
+
+
+
+const fetchWorkflowResults = async (delayMs = 1000, maxTry = 10) => {
     const token = core.getInput('GITHUB_TOKEN');
     const octokit = new dist_src_Octokit({ auth: token });
     const workflowRunContext = getWorkflowRunContext(github.context);
     try {
-        const workflowRun = await fetchWorkflowRun(octokit, workflowRunContext);
-        const workflowRunJobs = await fetchWorkflowRunJobs(octokit, workflowRunContext);
-        return { workflowRun, workflowRunJobs };
+        // A workflow sometime has not completed in spite of trigger of workflow completed event.
+        // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+        const results = await (0,cjs/* retryAsync */.xK)(async () => ({
+            workflowRun: await fetchWorkflowRun(octokit, workflowRunContext),
+            workflowRunJobs: await fetchWorkflowRunJobs(octokit, workflowRunContext)
+        }), {
+            delay: delayMs,
+            maxTry,
+            onError: (err, currentTry) => console.error(`current try: ${currentTry}`, err),
+            until: lastResult => checkCompleted(lastResult)
+        });
+        core.debug(`WorkflowResults: ${JSON.stringify(results)}`);
+        return results;
     }
-    catch (error) {
+    catch (err) {
         core.error('failed to get results of workflow run');
-        throw error;
+        if ((0,cjs/* isTooManyTries */.WW)(err)) {
+            console.error('retry count exceeded maxTry');
+        }
+        console.error(err);
+        throw err;
     }
 };
 const fetchWorkflowRun = async (octokit, workflowContext) => {
-    const res = await octokit.rest.actions.getWorkflowRun({
+    const res = await octokit.rest.actions.getWorkflowRunAttempt({
         owner: workflowContext.owner,
         repo: workflowContext.repo,
-        run_id: workflowContext.runId
+        run_id: workflowContext.runId,
+        attempt_number: workflowContext.attempt_number
     });
     return {
         ...res.data
     };
 };
-// TODO: attemptを取得して指定しないと、連続で実行されると値取れない場合ありそう
 const fetchWorkflowRunJobs = async (octokit, workflowContext) => {
     const res = await octokit.rest.actions.listJobsForWorkflowRun({
         owner: workflowContext.owner,
@@ -70958,24 +71753,23 @@ const getWorkflowRunContext = (context) => {
     // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
     const workflowRunEvent = context.payload;
     const runId = src_settings.workflowRunId ?? workflowRunEvent?.workflow_run?.id;
-    if (runId === undefined) {
-        throw new Error('Workflow run id is undefined.');
-    }
+    if (!runId)
+        (0,external_assert_.fail)('Workflow run id should be defined.');
     return {
         owner: src_settings.owner ?? context.repo.owner,
         repo: src_settings.repository ?? context.repo.repo,
+        attempt_number: workflowRunEvent?.workflow_run?.run_attempt || 1,
         runId
     };
 };
 const getLatestCompletedAt = (jobs) => {
-    const jobCompletedAtDates = jobs
-        .map(job => {
+    const jobCompletedAtDates = jobs.map(job => {
         if (job.completed_at === null)
-            return null;
+            (0,external_assert_.fail)('Jobs should be completed.');
         return new Date(job.completed_at);
-    })
-        .filter(v => v !== null);
-    return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString();
+    });
+    const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number));
+    return new Date(maxDateNumber).toISOString();
 };
 
 ;// CONCATENATED MODULE: ./src/github/index.ts
@@ -70990,7 +71784,24 @@ const calcDiffSec = (startDate, endDate) => {
     return Math.floor(diffMs / 1000);
 };
 
+;// CONCATENATED MODULE: ./src/metrics/constants.ts
+// TODO: ユーザ独自定義のものはそのまま同じもの使わないようにする(breaking change)
+// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+const descriptorNames = {
+    TASK_DURATION: 'cicd.pipeline.task.duration',
+    TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
+    DURATION: 'cicd.pipeline.duration',
+    QUEUED_DURATION: 'cicd.pipeline.queued_duration'
+};
+// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
+const attributeKeys = {
+    REPOSITORY: 'cicd.pipeline.repository',
+    NAME: 'cicd.pipeline.name',
+    TASK_NAME: 'cicd.pipeline.task.name'
+};
+
 ;// CONCATENATED MODULE: ./src/metrics/create-gauges.ts
+
 
 
 
@@ -70999,32 +71810,27 @@ const createGauge = (name, value, attributes, option) => {
     const gauge = meter.createGauge(name, option);
     gauge.record(value, attributes);
 };
+const createMetricsAttributes = (workflow, job) => ({
+    [attributeKeys.NAME]: workflow.name || '',
+    [attributeKeys.REPOSITORY]: workflow.repository.full_name,
+    ...(job && { [attributeKeys.TASK_NAME]: job.name })
+});
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
-    if (workflow.status !== 'completed') {
-        throw new Error(`Workflow(id: ${workflow.id}) is not completed.`);
-    }
-    const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs));
+    const workflowMetricsAttributes = createMetricsAttributes(workflow);
     // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
     const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at));
     const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)));
-    const workflowMetricsAttributes = {
-        'cicd.pipeline.name': workflow.name || '',
-        'cicd.pipeline.repository': `${workflow.repository.full_name}`
-    };
-    createGauge('cicd.pipeline.queued_duration', calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
-    createGauge('cicd.pipeline.duration', calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
+    createGauge(descriptorNames.QUEUED_DURATION, calcDiffSec(new Date(workflow.created_at), jobStartedAtMin), workflowMetricsAttributes, { unit: 's' });
+    const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs));
+    createGauge(descriptorNames.DURATION, calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
         if (!job.completed_at) {
             continue;
         }
-        const jobMetricsAttributes = {
-            'cicd.pipeline.name': job.workflow_name || '',
-            'cicd.pipeline.repository': `${workflow.repository.full_name}`,
-            'cicd.pipeline.task.name': job.name
-        };
-        createGauge('cicd.pipeline.task.duration', calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
+        const jobMetricsAttributes = createMetricsAttributes(workflow, job);
+        createGauge(descriptorNames.TASK_DURATION, calcDiffSec(new Date(job.started_at), new Date(job.completed_at)), jobMetricsAttributes, { unit: 's' });
         // TODO: 計算ロジックをトレース側と合わせる
         const jobQueuedDuration = calcDiffSec(new Date(job.created_at), new Date(job.started_at));
         if (jobQueuedDuration < 0) {
@@ -71032,7 +71838,7 @@ const createJobGauges = (workflow, workflowRunJobs) => {
             // Not creating metric because it is noise of Statistics.
             continue;
         }
-        createGauge('cicd.pipeline.task.queued_duration', jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
+        createGauge(descriptorNames.TASK_QUEUED_DURATION, jobQueuedDuration, jobMetricsAttributes, { unit: 's' });
     }
 };
 
@@ -71040,6 +71846,7 @@ const createJobGauges = (workflow, workflowRunJobs) => {
 
 const createMetrics = async (results) => {
     const { workflowRun, workflowRunJobs } = results;
+    // TODO: metricsもoffにできるようにする
     try {
         createWorkflowGauges(workflowRun, workflowRunJobs);
         createJobGauges(workflowRun, workflowRunJobs);
@@ -71057,6 +71864,7 @@ const createMetrics = async (results) => {
 
 
 
+
 const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
     const span = createSpan(src.ROOT_CONTEXT, workflowRun.name || `${workflowRun.workflow_id}`, workflowRun.run_started_at || workflowRun.created_at, getLatestCompletedAt(workflowRunJobs), 
     // TODO: Set Attributes
@@ -71064,14 +71872,8 @@ const createWorkflowRunTrace = (workflowRun, workflowRunJobs) => {
     return src.trace.setSpan(src.ROOT_CONTEXT, span);
 };
 const createWorkflowRunJobSpan = (ctx, job) => {
-    if (job.status !== 'completed' || job.completed_at === null) {
-        console.warn(`job is not completed. (${job.name})`);
-        return null;
-    }
-    if (job.steps === undefined || job.steps.length === 0) {
-        console.warn(`job (${job.name}) has no steps.`);
-        return null;
-    }
+    if (!job.completed_at || job.steps === undefined)
+        (0,external_assert_.fail)();
     const spanWithWaiting = createSpan(ctx, `${job.name} with time of waiting runner`, job.created_at, job.completed_at, 
     // TODO: Set Attributes
     {});
@@ -71086,17 +71888,11 @@ const createWorkflowRunJobSpan = (ctx, job) => {
     return src.trace.setSpan(ctxWithWaiting, jobSpan);
 };
 const createWorkflowRunStepSpan = (ctx, job) => {
-    if (job.steps === undefined || job.steps.length === 0) {
-        console.warn(`job (${job.name}) has no steps.`);
-        return;
-    }
-    // NOTE: GitHub Action's first step (Set up job) is flaky. :(
-    // Sometimes it starts before job.started.
+    if (job.steps === undefined)
+        (0,external_assert_.fail)();
     job.steps.map(step => {
-        if (step.started_at == null || step.completed_at == null) {
-            console.warn(`step (${step.name}) time is null|undifined. (started_at:${step.started_at}, complated_at:${step.completed_at})`);
-            return;
-        }
+        if (step.started_at == null || step.completed_at == null)
+            (0,external_assert_.fail)();
         createSpan(ctx, step.name, step.started_at, step.completed_at, 
         // TODO: Set Attributes
         {});
@@ -71115,7 +71911,6 @@ const createSpan = (ctx, name, startedAt, endAt, attributes) => {
 
 
 
-
 const createTrace = async (results) => {
     if (src_settings.FeatureFlagTrace) {
         console.log('trace feature is enabled.');
@@ -71127,22 +71922,12 @@ const createTrace = async (results) => {
     const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs);
     for (const job of workflowRunJobs) {
         const jobCtx = createWorkflowRunJobSpan(rootCtx, job);
-        if (jobCtx === null)
-            continue;
         createWorkflowRunStepSpan(jobCtx, job);
     }
     const traceId = src.trace.getSpanContext(rootCtx)?.traceId;
+    // TODO: actions output traceID.
     console.log(`TraceID: ${traceId}`);
-    // TODO: actions output traceID and Delete this feature.
-    await createSummary(traceId);
     return traceId;
-};
-const createSummary = async (traceId) => {
-    if (src_settings.isGitHubActions)
-        await core.summary.addHeading('GitHub Actions OpenTelemetry')
-            .addRaw(`TraceID: ${traceId}\n`)
-            .addLink('Google Cloud Trace Helper', `https://console.cloud.google.com/traces/list?tid=${traceId}`)
-            .write();
 };
 
 ;// CONCATENATED MODULE: ./src/traces/index.ts
@@ -71165,13 +71950,18 @@ var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7859);
 
 
 
+
 let traceProvider;
 let meterProvider;
 const initialize = (meterExporter, spanExporter) => {
+    if (src_settings.logeLevel === 'debug')
+        src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
+    // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
     initializeMeter(meterExporter);
     initializeTracer(spanExporter);
 };
 const initializeMeter = (exporter) => {
+    // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
     meterProvider = new sdk_metrics_build_src.MeterProvider({
         readers: [
             new sdk_metrics_build_src.PeriodicExportingMetricReader({
@@ -71189,6 +71979,7 @@ const initializeMeter = (exporter) => {
     }
 };
 const initializeTracer = (exporter) => {
+    // TODO: trace feature offならNoOp登録して終わりにする
     traceProvider = new sdk_trace_base_build_src.BasicTracerProvider({
         resource: (0,build_src.detectResourcesSync)({ detectors: [build_src.envDetector] })
     });
@@ -71217,6 +72008,9 @@ const shutdown = async () => {
     }
 };
 
+;// CONCATENATED MODULE: ./src/instrumentation/index.ts
+
+
 ;// CONCATENATED MODULE: ./src/main.ts
 
 
@@ -71240,7 +72034,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     try {
@@ -71251,7 +72046,8 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error)
-            core.setFailed(error.message);
+            core.error(error);
+        console.error(error);
         exitCode = 1;
     }
     process.exit(exitCode);

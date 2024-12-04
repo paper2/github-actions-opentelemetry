@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, test, expect, afterEach, beforeEach } from 'vitest'
 import { WorkflowResults } from '../github/index.js'
 import {
@@ -8,6 +7,7 @@ import {
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 import { initialize, forceFlush } from '../instrumentation/index.js'
 import { createTrace } from './create-trace.js'
+import { fail } from 'assert'
 
 const workflowRunResults = {
   workflowRun: {
@@ -108,12 +108,13 @@ describe('should export expected spans', () => {
 
     let testedSpanCount = 0
 
+    if (!workflowRunJobs[1].completed_at) fail()
     // workflow span
     expect(spans).toContainEqual({
       name: workflowRun.name,
       startTime: [toEpochSec(workflowRun.created_at), 0],
       endTime: [
-        toEpochSec(workflowRunJobs[1].completed_at!), // last job's completed_at
+        toEpochSec(workflowRunJobs[1].completed_at), // last job's completed_at
         0
       ]
     })
@@ -121,20 +122,22 @@ describe('should export expected spans', () => {
 
     // jobs span
     for (const job of workflowRunJobs) {
+      if (!job.completed_at) fail()
       expect(spans).toContainEqual({
         name: job.name,
         startTime: [toEpochSec(job.started_at), 0],
-        endTime: [toEpochSec(job.completed_at!), 0]
+        endTime: [toEpochSec(job.completed_at), 0]
       })
       testedSpanCount++
     }
 
     // with waiting for a job span
     for (const job of workflowRunJobs) {
+      if (!job.completed_at) fail()
       expect(spans).toContainEqual({
         name: `${job.name} with time of waiting runner`,
         startTime: [toEpochSec(job.created_at), 0],
-        endTime: [toEpochSec(job.completed_at!), 0]
+        endTime: [toEpochSec(job.completed_at), 0]
       })
       testedSpanCount++
     }
@@ -152,10 +155,11 @@ describe('should export expected spans', () => {
     // steps span
     for (const job of workflowRunJobs) {
       job.steps?.map(step => {
+        if (!step.started_at || !step.completed_at) fail()
         expect(spans).toContainEqual({
           name: step.name,
-          startTime: [toEpochSec(step.started_at!), 0],
-          endTime: [toEpochSec(step.completed_at!), 0]
+          startTime: [toEpochSec(step.started_at), 0],
+          endTime: [toEpochSec(step.completed_at), 0]
         })
         testedSpanCount++
       })
@@ -200,7 +204,8 @@ describe('should export expected spans', () => {
 
     const spans = exporter.getFinishedSpans()
 
-    const rootSpan = findSpanByName(spans, workflowRun.name!)
+    if (!workflowRun.name) fail()
+    const rootSpan = findSpanByName(spans, workflowRun.name)
     const child1 = findSpanByName(
       spans,
       `${workflowRunJobs[0].name} with time of waiting runner`

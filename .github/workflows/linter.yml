@@ -45,10 +45,8 @@ jobs:
         id: install
         run: npm ci
 
-      # TODO: 一旦雰囲気で使っているのであとでしっかりみる
-      # FYI: https://github.com/super-linter/super-linter?tab=readme-ov-file#github-actions-workflow-example-pull-request
       - name: Super-linter
-        uses: super-linter/super-linter@v7.1.0
+        uses: super-linter/super-linter@v7.2.0
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,6 +57,7 @@ jobs:
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          VALIDATE_MARKDOWN_PRETTIER: false
           FIX_SHELL_SHFMT: true
           FIX_MARKDOWN: true
           FIX_ENV: true

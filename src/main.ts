@@ -21,7 +21,8 @@ export async function run(): Promise<void> {
     await createMetrics(results)
     await createTrace(results)
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) core.error(error)
+    console.error(error)
     exitCode = 1
   }
 
@@ -31,7 +32,8 @@ export async function run(): Promise<void> {
     await shutdown()
     console.log('Providers shutdown successfully.')
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) core.error(error)
+    console.error(error)
     exitCode = 1
   }
 
