@@ -73,13 +73,12 @@ jobs:
     steps:
       - name: Run
         id: run
-        uses: paper2/github-actions-opentelemetry@v0.0.7
+        uses: paper2/github-actions-opentelemetry
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
           OTEL_EXPORTER_OTLP_ENDPOINT: https://collector-example.com
           # Additional OTLP headers. Useful for OTLP authentication.
           # e.g.
-          # Splunk:
           # New Relic: api-key=YOUR_NEWRELIC_API_KEY
           OTEL_EXPORTER_OTLP_HEADERS: 'api-key=key,other-config-value=value'
           FEATURE_TRACE: true
