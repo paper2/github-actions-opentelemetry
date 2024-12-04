@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Exit early
+# See: https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Set-Builtin
+set -eu
+
+git switch "$1"
+git pull origin main
+npm ci
+npm run all
+git add -A
+git commit -m 'npm run all for update lib'
+git push
