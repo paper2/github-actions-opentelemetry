@@ -71640,51 +71640,51 @@ var external_assert_ = __nccwpck_require__(9491);
 // EXTERNAL MODULE: ./node_modules/ts-retry/lib/cjs/index.js
 var cjs = __nccwpck_require__(2172);
 ;// CONCATENATED MODULE: ./src/github/check-completed.ts
-// A workflow sometime has not completed in spite of trigger of workflow completed event.
-// FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+
 // GitHub Actions may be eventual consistency.
 const checkCompleted = (workflowResult) => {
     const { workflowRun, workflowRunJobs } = workflowResult;
     let status = true;
     // check workflow
     if (workflowRun.status !== 'completed') {
-        console.warn(`This workflow is not completed. id: ${workflowRun.id}`);
+        core.warning(`This workflow is not completed. id: ${workflowRun.id}`);
         status = false;
     }
     if (!workflowRun.name) {
-        console.warn('workflowRun.name should be defined.');
+        core.warning('workflowRun.name should be defined.');
         status = false;
     }
     // check jobs
     for (const job of workflowRunJobs) {
         if (job.status !== 'completed') {
-            console.warn(`A job is not completed. workflowRun.id: ${workflowRun.id}, job.id: ${job.id} `);
+            core.warning(`A job is not completed. workflowRun.id: ${workflowRun.id}, job.id: ${job.id} `);
             status = false;
         }
         if (!job.completed_at) {
-            console.warn('job.completed_at should be defined.');
+            // TODO: change warning message when I complete to check the problem. This property sometimes not be filed.
+            core.warning('job.completed_at should be defined.');
             status = false;
         }
     }
     // check steps
     for (const job of workflowRunJobs) {
         if (!job.steps) {
-            console.warn(`A job has no steps. workflowRun.id: ${workflowRun.id}, job.id: ${job.id}`);
+            core.warning(`A job has no steps. workflowRun.id: ${workflowRun.id}, job.id: ${job.id}`);
             status = false;
             continue;
         }
         for (const step of job.steps) {
             const stepLoggedProperties = `workflowRun.id: ${workflowRun.id}, job.id: ${job.id}, step.name: ${step.name}`;
             if (step.status !== 'completed') {
-                console.warn(`A step is not completed. ${stepLoggedProperties}`);
+                core.warning(`A step is not completed. ${stepLoggedProperties}`);
                 status = false;
             }
             if (!step.started_at) {
-                console.warn(`step.started_at should be defined. ${stepLoggedProperties}`);
+                core.warning(`step.started_at should be defined. ${stepLoggedProperties}`);
                 status = false;
             }
             if (!step.completed_at) {
-                console.warn(`step.completed_at should be defined. ${stepLoggedProperties}`);
+                core.warning(`step.completed_at should be defined. ${stepLoggedProperties}`);
                 status = false;
             }
         }
@@ -71705,7 +71705,9 @@ const fetchWorkflowResults = async (delayMs = 1000, maxTry = 10) => {
     const octokit = new dist_src_Octokit({ auth: token });
     const workflowRunContext = getWorkflowRunContext(github.context);
     try {
-        return await (0,cjs/* retryAsync */.xK)(async () => ({
+        // A workflow sometime has not completed in spite of trigger of workflow completed event.
+        // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+        const results = await (0,cjs/* retryAsync */.xK)(async () => ({
             workflowRun: await fetchWorkflowRun(octokit, workflowRunContext),
             workflowRunJobs: await fetchWorkflowRunJobs(octokit, workflowRunContext)
         }), {
@@ -71714,6 +71716,8 @@ const fetchWorkflowResults = async (delayMs = 1000, maxTry = 10) => {
             onError: (err, currentTry) => console.error(`current try: ${currentTry}`, err),
             until: lastResult => checkCompleted(lastResult)
         });
+        core.debug(`WorkflowResults: ${JSON.stringify(results)}`);
+        return results;
     }
     catch (err) {
         core.error('failed to get results of workflow run');
@@ -71759,14 +71763,13 @@ const getWorkflowRunContext = (context) => {
     };
 };
 const getLatestCompletedAt = (jobs) => {
-    const jobCompletedAtDates = jobs
-        .map(job => {
+    const jobCompletedAtDates = jobs.map(job => {
         if (job.completed_at === null)
             (0,external_assert_.fail)('Jobs should be completed.');
         return new Date(job.completed_at);
-    })
-        .filter(v => v !== null);
-    return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString();
+    });
+    const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number));
+    return new Date(maxDateNumber).toISOString();
 };
 
 ;// CONCATENATED MODULE: ./src/github/index.ts
