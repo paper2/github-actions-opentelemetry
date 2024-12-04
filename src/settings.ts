@@ -6,7 +6,10 @@ export const settings = {
   repository: process.env.REPOSITORY,
   FeatureFlagTrace: process.env.FEATURE_TRACE
     ? process.env.FEATURE_TRACE.toLowerCase() === 'true'
-    : false,
+    : true,
+  FeatureFlagMetrics: process.env.FEATURE_METRICS
+    ? process.env.FEATURE_METRICS.toLowerCase() === 'true'
+    : true,
   // Always set to true when GitHub Actions is running the workflow.
   isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
   logeLevel:

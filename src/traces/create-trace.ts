@@ -10,12 +10,10 @@ import * as opentelemetry from '@opentelemetry/api'
 export const createTrace = async (
   results: WorkflowResults
 ): Promise<string | undefined> => {
-  if (settings.FeatureFlagTrace) {
+  if (!settings.FeatureFlagTrace) {
     console.log('trace feature is enabled.')
-  } else {
-    return undefined
+    return
   }
-
   const { workflowRun, workflowRunJobs } = results
   const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
   for (const job of workflowRunJobs) {
