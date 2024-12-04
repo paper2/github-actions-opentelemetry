@@ -22,7 +22,9 @@ export const fetchWorkflowResults = async (
   const octokit = new Octokit({ auth: token })
   const workflowRunContext = getWorkflowRunContext(github.context)
   try {
-    return await retryAsync(
+    // A workflow sometime has not completed in spite of trigger of workflow completed event.
+    // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
+    const results = await retryAsync(
       async () => ({
         workflowRun: await fetchWorkflowRun(octokit, workflowRunContext),
         workflowRunJobs: await fetchWorkflowRunJobs(octokit, workflowRunContext)
@@ -35,9 +37,10 @@ export const fetchWorkflowResults = async (
         until: lastResult => checkCompleted(lastResult)
       }
     )
+    core.debug(`WorkflowResults: ${JSON.stringify(results)}`)
+    return results
   } catch (err) {
     core.error('failed to get results of workflow run')
-
     if (isTooManyTries(err)) {
       console.error('retry count exceeded maxTry')
     }
@@ -95,11 +98,10 @@ export const getWorkflowRunContext = (
 }
 
 export const getLatestCompletedAt = (jobs: WorkflowRunJobs): string => {
-  const jobCompletedAtDates = jobs
-    .map(job => {
-      if (job.completed_at === null) fail('Jobs should be completed.')
-      return new Date(job.completed_at)
-    })
-    .filter(v => v !== null)
-  return new Date(Math.max(...jobCompletedAtDates.map(Number))).toISOString()
+  const jobCompletedAtDates = jobs.map(job => {
+    if (job.completed_at === null) fail('Jobs should be completed.')
+    return new Date(job.completed_at)
+  })
+  const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
+  return new Date(maxDateNumber).toISOString()
 }
