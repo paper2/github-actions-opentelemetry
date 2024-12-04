@@ -59,6 +59,7 @@ on:
       - Continuous Integration
       - CodeQL
       - Lint Codebase
+    # This action uses completed workflow for making traces and metrics.
     types:
       - completed
 
@@ -80,8 +81,8 @@ jobs:
           # Additional OTLP headers. Useful for OTLP authentication.
           # e.g.
           # New Relic: api-key=YOUR_NEWRELIC_API_KEY
-          OTEL_EXPORTER_OTLP_HEADERS: 'api-key=key,other-config-value=value'
-          FEATURE_TRACE: true
+          OTEL_EXPORTER_OTLP_HEADERS:
+            api-key=${ secrets.API_KEY },other-config-value=value
         with:
           # Required for collecting workflow data
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,7 +99,8 @@ To configure the action, you need to set the following environment variables:
 | `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                 |
-| `FEATURE_TRACE`                       | No       | `false`       | Enable trace feature.                                                                            |
+| `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
+| `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
 
 ## Development

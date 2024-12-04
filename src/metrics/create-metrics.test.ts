@@ -11,6 +11,7 @@ import { createMetrics } from './create-metrics.js'
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
 import { fail } from 'assert'
+import settings from '../settings.js'
 
 const workflowRunResults = {
   workflowRun: {
@@ -165,6 +166,20 @@ describe('should export expected metrics', () => {
         new Date(workflowRunJobs[0].started_at)
       )
     )
+  })
+
+  test(`should not export metrics when disable FeatureFlagMetrics`, async () => {
+    settings.FeatureFlagMetrics = false
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    expect(exporter.getMetrics()).toHaveLength(1)
+    expect(exporter.getMetrics()[0].scopeMetrics).toHaveLength(0)
+    settings.FeatureFlagMetrics = true
+  })
+
+  test(`should throw error when createMetrics fails`, async () => {
+    const brokenResults = {} as WorkflowResults
+    await expect(createMetrics(brokenResults)).rejects.toThrow()
   })
 })
 

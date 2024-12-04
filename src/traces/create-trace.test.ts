@@ -8,6 +8,7 @@ import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 import { initialize, forceFlush } from '../instrumentation/index.js'
 import { createTrace } from './create-trace.js'
 import { fail } from 'assert'
+import settings from '../settings.js'
 
 const workflowRunResults = {
   workflowRun: {
@@ -196,6 +197,19 @@ describe('should export expected spans', () => {
         'service.name': 'github-actions-opentelemetry'
       })
     })
+  })
+
+  test('should not export when disable FeatureFlagTrace', async () => {
+    settings.FeatureFlagTrace = false
+    await createTrace(workflowRunResults)
+    await forceFlush()
+
+    const spans = exporter.getFinishedSpans().map(span => ({
+      parentSpanId: span.parentSpanId
+    }))
+
+    expect(spans).toHaveLength(0)
+    settings.FeatureFlagTrace = true
   })
 
   test('should verify span hierarchy', async () => {

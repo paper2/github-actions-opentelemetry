@@ -1,4 +1,4 @@
-import settings from 'src/settings.js'
+import settings from '../settings.js'
 import { createWorkflowGauges, createJobGauges } from './create-gauges.js'
 import { WorkflowResults } from 'src/github/types.js'
 

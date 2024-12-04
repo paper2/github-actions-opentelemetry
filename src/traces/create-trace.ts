@@ -11,7 +11,7 @@ export const createTrace = async (
   results: WorkflowResults
 ): Promise<string | undefined> => {
   if (!settings.FeatureFlagTrace) {
-    console.log('trace feature is enabled.')
+    console.log('trace feature is disabled.')
     return
   }
   const { workflowRun, workflowRunJobs } = results
