@@ -37,7 +37,6 @@ export const fetchWorkflowResults = async (
         until: lastResult => checkCompleted(lastResult)
       }
     )
-    core.debug(`WorkflowResults: ${JSON.stringify(results)}`)
     return results
   } catch (err) {
     core.error('failed to get results of workflow run')

@@ -85,6 +85,7 @@ describe('shutdown', () => {
     opentelemetryAllDisable()
   })
   test('forceFlush and shutdown should be success', async () => {
+    initialize()
     await expect(forceFlush()).resolves.not.toThrow()
     await expect(shutdown()).resolves.not.toThrow()
   })
