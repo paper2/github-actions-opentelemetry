@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Run
         id: run
-        uses: paper2/github-actions-opentelemetry
+        uses: paper2/github-actions-opentelemetry@main
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
           OTEL_EXPORTER_OTLP_ENDPOINT: https://collector-example.com

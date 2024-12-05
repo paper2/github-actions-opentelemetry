@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Run
         id: run
-        uses: paper2/github-actions-opentelemetry
+        uses: paper2/github-actions-opentelemetry@main
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
