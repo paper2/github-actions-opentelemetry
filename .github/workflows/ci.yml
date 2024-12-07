@@ -19,7 +19,6 @@ jobs:
       collector:
         image: otel/opentelemetry-collector-contrib:0.115.1
         ports:
-          - 4317:4317
           - 4318:4318
 
     steps:
@@ -48,8 +47,6 @@ jobs:
 
       - name: Test
         id: npm-test
-        env:
-          OTEL_EXPORTER_OTLP: http://collector:4318
         run: npm run test
 
   test-action:

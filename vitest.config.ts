@@ -1,6 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import { execSync } from 'child_process'
 
+const isCI = process.env.CI === 'true'
+
+if (!isCI) {
+  // Set up GitHub token on local.
+  setGitHubTokenEnv()
+}
+
 const defaultEnv = {
   FEATURE_METRICS: 'true',
   FEATURE_TRACE: 'true',
@@ -13,9 +20,10 @@ const defaultEnv = {
   WORKFLOW_RUN_ID: '10640837411'
 }
 
-// Set up GitHub token on local.
-if (!process.env.CI) {
-  setGitHubTokenEnv()
+const CIEnv = {
+  ...defaultEnv,
+  OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: undefined,
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: undefined
 }
 
 export default defineConfig({
@@ -25,7 +33,7 @@ export default defineConfig({
       reporter: ['json-summary', 'text', 'lcov'],
       include: ['src']
     },
-    env: defaultEnv
+    env: isCI ? CIEnv : defaultEnv
   }
 })
 
