@@ -18,7 +18,7 @@ export const fetchWorkflowResults = async (
   delayMs = 1000,
   maxTry = 10
 ): Promise<WorkflowResults> => {
-  const token = core.getInput('GITHUB_TOKEN')
+  const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN // read environment variable for testing
   const octokit = new Octokit({ auth: token })
   const workflowRunContext = getWorkflowRunContext(github.context)
   try {

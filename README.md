@@ -107,19 +107,49 @@ To configure the action, you need to set the following environment variables:
 
 ### Dev Container
 
+You can run containers by
+[devcontainer](https://code.visualstudio.com/docs/devcontainers/containers).
+
 - Jaeger and Prometheus run for local testing.
   - Jaeger: <http://localhost:16686>
   - Prometheus: <http://localhost:9090>
 
-### Set default Environment Variables
-
-`.env.local` is automatically set to environment variables for testing.
-
 ### Local test
+
+You can run all tests below command.
+
+```sh
+npm run test
+```
+
+If you want to run an integration test only, run below command.
 
 ```sh
 npm run test-local
 ```
+
+### Recommend to install GitHub CLI (gh)
+
+Tests invoke real GitHub API. Unauthenticated users are subject to strict API
+rate limits. If `gh` command is installed and login is finished, token is set
+for tests in `vitest.config.ts`.
+
+the login command is below.
+
+```sh
+gh auth login
+```
+
+If you face below error, recommend to install GitHub CLI and login.
+
+```text
+message: "API rate limit exceeded for xx.xx.xx.xx. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)",
+documentation_url: 'https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting'
+```
+
+### Default Environment Variables for Testing
+
+Some environment variables are set on `vitest.config.ts`.
 
 ## License
 

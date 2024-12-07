@@ -33,7 +33,7 @@
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
-    "test-local": "npx tsx --env-file=.env.local ./src/index.ts",
+    "test-local": "vitest src/mian.test.ts -t 'should run successfully' --hideSkippedTests --reporter=dot",
     "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
@@ -61,7 +61,6 @@
     "@typescript-eslint/parser": "^7.18.0",
     "@vercel/ncc": "^0.38.1",
     "@vitest/coverage-v8": "^2.0.5",
-    "dotenv": "^16.4.5",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.3",
