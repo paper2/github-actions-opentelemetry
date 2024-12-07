@@ -26,7 +26,7 @@ export const checkCompleted = (workflowResult: WorkflowResults): boolean => {
       status = false
     }
     if (!job.completed_at) {
-      // TODO: change warning message when I complete to check the problem. This property sometimes not be filed.
+      // TODO: should exit immediately and not failed because it is not recoverable empirically.
       core.warning('job.completed_at should be defined.')
       status = false
     }

@@ -15,6 +15,12 @@ jobs:
   test-typescript:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    services:
+      # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
+      collector:
+        image: otel/opentelemetry-collector-contrib:0.115.1
+        ports:
+          - 4318:4318
 
     steps:
       - name: Checkout
@@ -39,11 +45,6 @@ jobs:
       - name: Lint
         id: npm-lint
         run: npm run lint
-
-      - name: Start Container for Test
-        id: start-container-for-test
-        working-directory: .devcontainer
-        run: docker compose up -d prometheus jaeger
 
       - name: Test
         id: npm-test

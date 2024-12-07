@@ -1,3 +1,4 @@
+import settings from '../settings.js'
 import { createWorkflowGauges, createJobGauges } from './create-gauges.js'
 import { WorkflowResults } from 'src/github/types.js'
 
@@ -5,8 +6,10 @@ export const createMetrics = async (
   results: WorkflowResults
 ): Promise<void> => {
   const { workflowRun, workflowRunJobs } = results
-  // TODO: metricsもoffにできるようにする
-
+  if (!settings.FeatureFlagMetrics) {
+    console.log('metrics feature is disabled.')
+    return
+  }
   try {
     createWorkflowGauges(workflowRun, workflowRunJobs)
     createJobGauges(workflowRun, workflowRunJobs)

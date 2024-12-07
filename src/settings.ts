@@ -1,18 +1,22 @@
-export const settings = {
-  workflowRunId: process.env.WORKFLOW_RUN_ID
-    ? parseInt(process.env.WORKFLOW_RUN_ID)
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const createSettings = (env: typeof process.env) => ({
+  workflowRunId: env.WORKFLOW_RUN_ID
+    ? parseInt(env.WORKFLOW_RUN_ID)
     : undefined,
-  owner: process.env.OWNER,
-  repository: process.env.REPOSITORY,
-  FeatureFlagTrace: process.env.FEATURE_TRACE
-    ? process.env.FEATURE_TRACE.toLowerCase() === 'true'
-    : false,
-  // Always set to true when GitHub Actions is running the workflow.
-  isGitHubActions: process.env.GITHUB_ACTIONS === 'true',
+  owner: env.OWNER,
+  repository: env.REPOSITORY,
+  FeatureFlagTrace: env.FEATURE_TRACE
+    ? env.FEATURE_TRACE.toLowerCase() === 'true'
+    : true,
+  FeatureFlagMetrics: env.FEATURE_METRICS
+    ? env.FEATURE_METRICS.toLowerCase() === 'true'
+    : true,
   logeLevel:
-    process.env.RUNNER_DEBUG === '1'
+    env.RUNNER_DEBUG === '1'
       ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-      : process.env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
-}
+      : env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+})
+
+export const settings = createSettings(process.env)
 
 export default settings

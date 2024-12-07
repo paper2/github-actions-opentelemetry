@@ -26,24 +26,26 @@ export const initialize = (
       new opentelemetry.DiagConsoleLogger(),
       opentelemetry.DiagLogLevel.DEBUG
     )
-  // TODO: add OTLP auth or retry NodeSDK with mocha testing framework
   initializeMeter(meterExporter)
   initializeTracer(spanExporter)
 }
 
 const initializeMeter = (exporter?: PushMetricExporter): void => {
-  // TODO: meter feature offできるようにする。offの場合NoOpをglobalに設定する
-  meterProvider = new MeterProvider({
-    readers: [
-      new PeriodicExportingMetricReader({
-        exporter: exporter ?? new OTLPMetricExporter(),
-        // Exporter has not implemented the manual flush method yet.
-        // High interval prevents from generating duplicate metrics.
-        exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
-      })
-    ],
-    resource: detectResourcesSync({ detectors: [envDetector] })
-  })
+  if (settings.FeatureFlagMetrics) {
+    meterProvider = new MeterProvider({
+      readers: [
+        new PeriodicExportingMetricReader({
+          exporter: exporter ?? new OTLPMetricExporter(),
+          // Exporter has not implemented the manual flush method yet.
+          // High interval prevents from generating duplicate metrics.
+          exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
+        })
+      ],
+      resource: detectResourcesSync({ detectors: [envDetector] })
+    })
+  } else {
+    meterProvider = new MeterProvider()
+  }
   const result = opentelemetry.metrics.setGlobalMeterProvider(meterProvider)
   if (!result) {
     throw new Error(
@@ -53,14 +55,16 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 }
 
 const initializeTracer = (exporter?: SpanExporter): void => {
-  // TODO: trace feature offならNoOp登録して終わりにする
-
-  traceProvider = new BasicTracerProvider({
-    resource: detectResourcesSync({ detectors: [envDetector] })
-  })
-  traceProvider.addSpanProcessor(
-    new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))
-  )
+  if (settings.FeatureFlagTrace) {
+    traceProvider = new BasicTracerProvider({
+      resource: detectResourcesSync({ detectors: [envDetector] }),
+      spanProcessors: [
+        new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))
+      ]
+    })
+  } else {
+    traceProvider = new BasicTracerProvider()
+  }
   const result = opentelemetry.trace.setGlobalTracerProvider(traceProvider)
   if (!result) {
     throw new Error(
@@ -70,19 +74,11 @@ const initializeTracer = (exporter?: SpanExporter): void => {
 }
 
 export const forceFlush = async (): Promise<void> => {
-  try {
-    await meterProvider.forceFlush()
-    await traceProvider.forceFlush()
-  } catch (error) {
-    console.log('provider failed forceFlush.', error)
-  }
+  await meterProvider.forceFlush()
+  await traceProvider.forceFlush()
 }
 
 export const shutdown = async (): Promise<void> => {
-  try {
-    await meterProvider.shutdown()
-    await traceProvider.shutdown()
-  } catch (error) {
-    console.log('provider failed shutdown.', error)
-  }
+  await meterProvider.shutdown()
+  await traceProvider.shutdown()
 }
