@@ -122,7 +122,7 @@ You can run all tests below command.
 npm run test
 ```
 
-If you want to run an integration test only, run below command.
+You can run a simple test. It is useful for checking output while developing.
 
 ```sh
 npm run test-local
@@ -131,8 +131,8 @@ npm run test-local
 ### Recommend to install GitHub CLI (gh)
 
 Tests invoke real GitHub API. Unauthenticated users are subject to strict API
-rate limits. If `gh` command is installed and login is finished, token is set
-for tests in `vitest.config.ts`.
+rate limits. If `gh` command is installed and login is finished, token is
+automatically set for tests by `vitest.config.ts`.
 
 the login command is below.
 

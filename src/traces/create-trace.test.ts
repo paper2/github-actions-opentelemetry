@@ -204,11 +204,7 @@ describe('should export expected spans', () => {
     await createTrace(workflowRunResults)
     await forceFlush()
 
-    const spans = exporter.getFinishedSpans().map(span => ({
-      parentSpanId: span.parentSpanId
-    }))
-
-    expect(spans).toHaveLength(0)
+    expect(exporter.getFinishedSpans()).toHaveLength(0)
     settings.FeatureFlagTrace = true
   })
 

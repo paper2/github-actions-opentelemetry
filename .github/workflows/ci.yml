@@ -16,6 +16,7 @@ jobs:
     name: TypeScript Tests
     runs-on: ubuntu-latest
     services:
+      # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
       collector:
         image: otel/opentelemetry-collector-contrib:0.115.1
         ports:

@@ -168,7 +168,7 @@ describe('should export expected metrics', () => {
     )
   })
 
-  test(`should not export metrics when disable FeatureFlagMetrics`, async () => {
+  test('should not export metrics when disable FeatureFlagMetrics', async () => {
     settings.FeatureFlagMetrics = false
     await createMetrics(workflowRunResults)
     await forceFlush()
