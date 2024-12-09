@@ -17,6 +17,7 @@ export const createWorkflowRunTrace = (
     workflowRun.name || `${workflowRun.workflow_id}`,
     workflowRun.run_started_at || workflowRun.created_at,
     getLatestCompletedAt(workflowRunJobs),
+    // TODO: Set Attributes
     {}
   )
 
@@ -34,6 +35,7 @@ export const createWorkflowRunJobSpan = (
     `${job.name} with time of waiting runner`,
     job.created_at,
     job.completed_at,
+    // TODO: Set Attributes
     {}
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
@@ -44,6 +46,7 @@ export const createWorkflowRunJobSpan = (
     `waiting runner for ${job.name}`,
     job.created_at,
     job.started_at,
+    // TODO: Set Attributes
     {}
   )
 
@@ -52,6 +55,7 @@ export const createWorkflowRunJobSpan = (
     job.name,
     job.started_at,
     job.completed_at,
+    // TODO: Set Attributes
     {}
   )
 
@@ -66,7 +70,14 @@ export const createWorkflowRunStepSpan = (
   job.steps.map(step => {
     if (step.started_at == null || step.completed_at == null) fail()
 
-    createSpan(ctx, step.name, step.started_at, step.completed_at, {})
+    createSpan(
+      ctx,
+      step.name,
+      step.started_at,
+      step.completed_at,
+      // TODO: Set Attributes
+      {}
+    )
   })
 }
 
