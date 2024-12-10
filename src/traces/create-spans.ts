@@ -12,11 +12,13 @@ export const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
   workflowRunJobs: WorkflowRunJobs
 ): Context => {
+  if (!workflowRun.name) fail()
   const span = createSpan(
     ROOT_CONTEXT,
-    workflowRun.name || `${workflowRun.workflow_id}`,
-    workflowRun.run_started_at || workflowRun.created_at,
+    workflowRun.name,
+    workflowRun.created_at,
     getLatestCompletedAt(workflowRunJobs),
+    // TODO: add workflowRun.id into tags or URL
     {}
   )
 
@@ -38,7 +40,6 @@ export const createWorkflowRunJobSpan = (
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
-  // create wait runner span
   createSpan(
     ctxWithWaiting,
     `waiting runner for ${job.name}`,
