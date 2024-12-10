@@ -128,6 +128,18 @@ You can run a simple test. It is useful for checking output while developing.
 npm run test-local
 ```
 
+### Compile
+
+TypeScript codes must be compiled by ncc. You have changed code, run bellow the
+command.
+
+```sh
+npm run all
+```
+
+This command creates index.js and more on dist. You must includes these
+artifacts on a commit.
+
 ### Recommend to install GitHub CLI (gh)
 
 Tests invoke real GitHub API. Unauthenticated users are subject to strict API
