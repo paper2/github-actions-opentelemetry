@@ -34,17 +34,6 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowRunJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
-
-  // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
-  const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
-  const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
-  createGauge(
-    dn.QUEUED_DURATION,
-    calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
-    workflowMetricsAttributes,
-    { unit: 's' }
-  )
-
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
     dn.DURATION,
@@ -72,6 +61,9 @@ export const createJobGauges = (
     )
 
     // TODO: 計算ロジックをトレース側と合わせる
+    // memo ロジックは合っているかも。
+    // GitHubで仕様は明らかになっていない。Jobの欄として表示されるのでこの計算ロジックで一旦行く。
+    // See. https://docs.github.com/en/actions/administering-github-actions/viewing-github-actions-metrics
     const jobQueuedDuration = calcDiffSec(
       new Date(job.created_at),
       new Date(job.started_at)
@@ -79,6 +71,7 @@ export const createJobGauges = (
     if (jobQueuedDuration < 0) {
       // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
       // Not creating metric because it is noise of Statistics.
+      console.warn('Job xxx')
       continue
     }
     createGauge(

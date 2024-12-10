@@ -74,12 +74,12 @@ export const createWorkflowRunStepSpan = (
 const createSpan = (
   ctx: Context,
   name: string,
-  startedAt: string,
+  startAt: string,
   endAt: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
   const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
-  const startTime = new Date(startedAt)
+  const startTime = new Date(startAt)
   const endTime = new Date(endAt)
 
   const span = tracer.startSpan(name, { startTime, attributes }, ctx)

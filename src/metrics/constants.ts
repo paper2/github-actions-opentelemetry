@@ -3,8 +3,7 @@
 export const descriptorNames: Record<string, string> = {
   TASK_DURATION: 'cicd.pipeline.task.duration',
   TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
-  DURATION: 'cicd.pipeline.duration',
-  QUEUED_DURATION: 'cicd.pipeline.queued_duration'
+  DURATION: 'cicd.pipeline.duration'
 } as const
 
 // FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
