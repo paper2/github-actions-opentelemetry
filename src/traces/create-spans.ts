@@ -7,6 +7,8 @@ import {
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
 import { fail } from 'assert'
+import { calcDiffSec } from '../utils/calc-diff-sec.js'
+import * as core from '@actions/core'
 
 export const createWorkflowRunTrace = (
   workflowRun: WorkflowRun,
@@ -40,13 +42,24 @@ export const createWorkflowRunJobSpan = (
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
-  createSpan(
-    ctxWithWaiting,
-    `waiting runner for ${job.name}`,
-    job.created_at,
-    job.started_at,
-    {}
+  const waitingSpanName = `waiting runner for ${job.name}`
+  const jobQueuedDuration = calcDiffSec(
+    new Date(job.created_at),
+    new Date(job.started_at)
   )
+  if (jobQueuedDuration >= 0) {
+    createSpan(
+      ctxWithWaiting,
+      waitingSpanName,
+      job.created_at,
+      job.started_at,
+      {}
+    )
+  } else {
+    core.notice(
+      `${job.name}: Skip to create "${waitingSpanName}" span. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
+    )
+  }
 
   const jobSpan = createSpan(
     ctxWithWaiting,

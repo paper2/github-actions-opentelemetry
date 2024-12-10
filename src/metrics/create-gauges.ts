@@ -7,6 +7,7 @@ import {
 } from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
+import * as core from '@actions/core'
 
 export const createGauge = (
   name: string,
@@ -60,18 +61,17 @@ export const createJobGauges = (
       { unit: 's' }
     )
 
-    // TODO: 計算ロジックをトレース側と合わせる
-    // memo ロジックは合っているかも。
-    // GitHubで仕様は明らかになっていない。Jobの欄として表示されるのでこの計算ロジックで一旦行く。
+    // The calculation method for GitHub's queue times has not been disclosed.
+    // Since it is displayed in the job column, it is assumed to be calculated based on job information.
     // See. https://docs.github.com/en/actions/administering-github-actions/viewing-github-actions-metrics
     const jobQueuedDuration = calcDiffSec(
       new Date(job.created_at),
       new Date(job.started_at)
     )
     if (jobQueuedDuration < 0) {
-      // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
-      // Not creating metric because it is noise of Statistics.
-      console.warn('Job xxx')
+      core.notice(
+        `${job.name}: Skip to create ${dn.TASK_QUEUED_DURATION} metrics. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
+      )
       continue
     }
     createGauge(
