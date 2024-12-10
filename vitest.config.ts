@@ -17,7 +17,7 @@ const defaultEnv = {
   OTEL_SERVICE_NAME: 'github-actions-opentelemetry',
   OWNER: 'paper2',
   REPOSITORY: 'github-actions-opentelemetry',
-  WORKFLOW_RUN_ID: '10640837411'
+  WORKFLOW_RUN_ID: '12246387114'
 }
 
 const CIEnv = {
