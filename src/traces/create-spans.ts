@@ -20,8 +20,7 @@ export const createWorkflowRunTrace = (
     workflowRun.name,
     workflowRun.created_at,
     getLatestCompletedAt(workflowRunJobs),
-    // TODO: add workflowRun.id into tags or URL
-    {}
+    { ...buildWorkflowRunAttributes(workflowRun) }
   )
 
   return opentelemetry.trace.setSpan(ROOT_CONTEXT, span)
@@ -38,7 +37,7 @@ export const createWorkflowRunJobSpan = (
     `${job.name} with time of waiting runner`,
     job.created_at,
     job.completed_at,
-    {}
+    { ...buildWorkflowRunJobAttributes(job) }
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
@@ -53,7 +52,7 @@ export const createWorkflowRunJobSpan = (
       waitingSpanName,
       job.created_at,
       job.started_at,
-      {}
+      { ...buildWorkflowRunJobAttributes(job) }
     )
   } else {
     core.notice(
@@ -66,7 +65,7 @@ export const createWorkflowRunJobSpan = (
     job.name,
     job.started_at,
     job.completed_at,
-    {}
+    { ...buildWorkflowRunJobAttributes(job) }
   )
 
   return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
@@ -99,3 +98,20 @@ const createSpan = (
   span.end(endTime)
   return span
 }
+
+const buildWorkflowRunAttributes = (
+  workflowRun: WorkflowRun
+): opentelemetry.Attributes => ({
+  'github.repository': workflowRun.repository.full_name,
+  'github.run_id': workflowRun.id,
+  'github.run_attempt': workflowRun.run_attempt,
+  'github.url': workflowRun.html_url
+})
+
+const buildWorkflowRunJobAttributes = (
+  job: WorkflowRunJob
+): opentelemetry.Attributes => ({
+  'job.conclusion': job.conclusion || undefined,
+  'runner.name': job.runner_name || undefined,
+  'runner.group': job.runner_group_name || undefined
+})
