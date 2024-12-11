@@ -101,12 +101,12 @@ describe('should export expected metrics', () => {
     opentelemetryAllDisable()
   })
 
-  test(`should verify ${dn.TASK_DURATION}`, async () => {
+  test(`should verify ${dn.JOB_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.TASK_DURATION)
+    const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
     const dataPoints = metric.dataPoints.map(dataPoint => ({
-      taskName: dataPoint.attributes[ak.TASK_NAME],
+      taskName: dataPoint.attributes[ak.JOB_NAME],
       value: dataPoint.value
     }))
 
@@ -120,10 +120,10 @@ describe('should export expected metrics', () => {
     }
   })
 
-  test(`should verify ${dn.DURATION}`, async () => {
+  test(`should verify ${dn.WORKFLOW_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.DURATION)
+    const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
     if (!workflowRunJobs[1].completed_at) fail()

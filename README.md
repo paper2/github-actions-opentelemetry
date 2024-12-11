@@ -23,10 +23,11 @@ endpoint (OTLP). It helps you monitor and analyze GitHub Actions.
 
 ## Metrics
 
-| Descriptor Name               | Description          |
-| ----------------------------- | -------------------- |
-| `cicd.pipeline.duration`      | Duration of workflow |
-| `cicd.pipeline.task.duration` | Duration of job      |
+| Descriptor Name              | Description            |
+| ---------------------------- | ---------------------- |
+| `github.workflow.duration`   | Duration of workflow   |
+| `github.job.duration`        | Duration of job        |
+| `github.job.queued_duration` | Duration of queued job |
 
 Each metric has associated attributes.
 
@@ -95,10 +96,10 @@ To configure the action, you need to set the following environment variables:
 | Environment Variable                  | Required | Default Value | Description                                                                                      |
 | ------------------------------------- | -------- | ------------- | ------------------------------------------------------------------------------------------------ |
 | `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                                                    |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`         | No       | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                      |
-| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`         | Yes      | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                      |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                 |
+| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
 | `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
