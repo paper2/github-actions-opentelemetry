@@ -1,4 +1,4 @@
-# GitHub Actions OpenTelemetry (Experimental)
+# GitHub Actions OpenTelemetry
 
 [![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
@@ -15,11 +15,6 @@ endpoint (OTLP). It helps you monitor and analyze GitHub Actions.
 - 🔍 Collects Traces of GitHub Actions workflow, jobs, steps.
 - 📦 Sends data to any OTLP-compatible backend for monitoring and observability
 - 🚀 Easy integration with GitHub workflows
-
-## Limitations
-
-- Metric and attribute names may undergo breaking changes due to the
-  experimental status.
 
 ## Metrics
 
