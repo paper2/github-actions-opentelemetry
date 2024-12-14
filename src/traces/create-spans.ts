@@ -102,10 +102,10 @@ const createSpan = (
 const buildWorkflowRunAttributes = (
   workflowRun: WorkflowRun
 ): opentelemetry.Attributes => ({
-  'github.repository': workflowRun.repository.full_name,
-  'github.run_id': workflowRun.id,
-  'github.run_attempt': workflowRun.run_attempt,
-  'github.url': workflowRun.html_url
+  repository: workflowRun.repository.full_name,
+  run_id: workflowRun.id,
+  run_attempt: workflowRun.run_attempt,
+  url: workflowRun.html_url
 })
 
 const buildWorkflowRunJobAttributes = (
