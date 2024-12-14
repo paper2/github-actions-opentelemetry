@@ -1,4 +1,4 @@
-# GitHub Actions OpenTelemetry (Experimental)
+# GitHub Actions OpenTelemetry
 
 [![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
@@ -16,17 +16,13 @@ endpoint (OTLP). It helps you monitor and analyze GitHub Actions.
 - 📦 Sends data to any OTLP-compatible backend for monitoring and observability
 - 🚀 Easy integration with GitHub workflows
 
-## Limitations
-
-- Metric and attribute names may undergo breaking changes due to the
-  experimental status.
-
 ## Metrics
 
-| Descriptor Name               | Description          |
-| ----------------------------- | -------------------- |
-| `cicd.pipeline.duration`      | Duration of workflow |
-| `cicd.pipeline.task.duration` | Duration of job      |
+| Descriptor Name              | Description            |
+| ---------------------------- | ---------------------- |
+| `github.workflow.duration`   | Duration of workflow   |
+| `github.job.duration`        | Duration of job        |
+| `github.job.queued_duration` | Duration of queued job |
 
 Each metric has associated attributes.
 
@@ -35,6 +31,8 @@ Each metric has associated attributes.
 ## Traces
 
 ![Jaeger Example Screen Shot](./img/traces-jager.png)
+
+![Attributes Sample](./img/trace-attributes.png)
 
 ## Setup Instructions
 
@@ -95,10 +93,10 @@ To configure the action, you need to set the following environment variables:
 | Environment Variable                  | Required | Default Value | Description                                                                                      |
 | ------------------------------------- | -------- | ------------- | ------------------------------------------------------------------------------------------------ |
 | `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                                                    |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`         | No       | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                      |
-| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`         | Yes      | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                      |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                 |
+| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
 | `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
@@ -127,6 +125,18 @@ You can run a simple test. It is useful for checking output while developing.
 ```sh
 npm run test-local
 ```
+
+### Compile
+
+TypeScript codes must be compiled by ncc. You have changed code, run bellow the
+command.
+
+```sh
+npm run all
+```
+
+This command creates index.js and more on dist. You must includes these
+artifacts on a commit.
 
 ### Recommend to install GitHub CLI (gh)
 

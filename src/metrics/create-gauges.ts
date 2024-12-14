@@ -7,6 +7,7 @@ import {
 } from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
+import * as core from '@actions/core'
 
 export const createGauge = (
   name: string,
@@ -24,9 +25,9 @@ const createMetricsAttributes = (
   workflow: WorkflowRun,
   job?: WorkflowRunJob
 ): opentelemetry.Attributes => ({
-  [ak.NAME]: workflow.name || '',
+  [ak.WORKFLOW_NAME]: workflow.name || undefined,
   [ak.REPOSITORY]: workflow.repository.full_name,
-  ...(job && { [ak.TASK_NAME]: job.name })
+  ...(job && { [ak.JOB_NAME]: job.name })
 })
 
 export const createWorkflowGauges = (
@@ -34,20 +35,9 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowRunJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
-
-  // TODO: トレースの仕様と合わせる。（正確にはgithubの仕様に合わせる）
-  const jobStartedAtDates = workflowRunJobs.map(job => new Date(job.started_at))
-  const jobStartedAtMin = new Date(Math.min(...jobStartedAtDates.map(Number)))
-  createGauge(
-    dn.QUEUED_DURATION,
-    calcDiffSec(new Date(workflow.created_at), jobStartedAtMin),
-    workflowMetricsAttributes,
-    { unit: 's' }
-  )
-
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
-    dn.DURATION,
+    dn.WORKFLOW_DURATION,
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
     workflowMetricsAttributes,
     { unit: 's' }
@@ -65,24 +55,27 @@ export const createJobGauges = (
 
     const jobMetricsAttributes = createMetricsAttributes(workflow, job)
     createGauge(
-      dn.TASK_DURATION,
+      dn.JOB_DURATION,
       calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
       jobMetricsAttributes,
       { unit: 's' }
     )
 
-    // TODO: 計算ロジックをトレース側と合わせる
+    // The calculation method for GitHub's queue times has not been disclosed.
+    // Since it is displayed in the job column, it is assumed to be calculated based on job information.
+    // See. https://docs.github.com/en/actions/administering-github-actions/viewing-github-actions-metrics
     const jobQueuedDuration = calcDiffSec(
       new Date(job.created_at),
       new Date(job.started_at)
     )
     if (jobQueuedDuration < 0) {
-      // Sometime jobQueuedDuration is negative value because specification of GitHub. (I have inquired it to supports.)
-      // Not creating metric because it is noise of Statistics.
+      core.notice(
+        `${job.name}: Skip to create ${dn.JOB_QUEUED_DURATION} metrics. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
+      )
       continue
     }
     createGauge(
-      dn.TASK_QUEUED_DURATION,
+      dn.JOB_QUEUED_DURATION,
       jobQueuedDuration,
       jobMetricsAttributes,
       { unit: 's' }

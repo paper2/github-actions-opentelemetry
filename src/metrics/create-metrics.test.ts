@@ -101,12 +101,12 @@ describe('should export expected metrics', () => {
     opentelemetryAllDisable()
   })
 
-  test(`should verify ${dn.TASK_DURATION}`, async () => {
+  test(`should verify ${dn.JOB_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.TASK_DURATION)
+    const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
     const dataPoints = metric.dataPoints.map(dataPoint => ({
-      taskName: dataPoint.attributes[ak.TASK_NAME],
+      taskName: dataPoint.attributes[ak.JOB_NAME],
       value: dataPoint.value
     }))
 
@@ -120,29 +120,10 @@ describe('should export expected metrics', () => {
     }
   })
 
-  test(`should verify ${dn.TASK_QUEUED_DURATION}`, async () => {
+  test(`should verify ${dn.WORKFLOW_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
     await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.TASK_QUEUED_DURATION)
-
-    const dataPoints = metric.dataPoints.map(dataPoint => ({
-      taskName: dataPoint.attributes[ak.TASK_NAME],
-      value: dataPoint.value
-    }))
-
-    expect(dataPoints).toHaveLength(workflowRunJobs.length)
-    for (const job of workflowRunJobs) {
-      expect(dataPoints).toContainEqual({
-        taskName: job.name,
-        value: calcDiffSec(new Date(job.created_at), new Date(job.started_at))
-      })
-    }
-  })
-
-  test(`should verify ${dn.DURATION}`, async () => {
-    await createMetrics(workflowRunResults)
-    await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.DURATION)
+    const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
     if (!workflowRunJobs[1].completed_at) fail()
@@ -150,20 +131,6 @@ describe('should export expected metrics', () => {
       calcDiffSec(
         new Date(workflowRun.created_at),
         new Date(workflowRunJobs[1].completed_at) // last job's complete_at
-      )
-    )
-  })
-
-  test(`should verify ${dn.QUEUED_DURATION}`, async () => {
-    await createMetrics(workflowRunResults)
-    await forceFlush()
-    const metric = findMetricByDescriptorName(exporter, dn.QUEUED_DURATION)
-
-    expect(metric.dataPoints).toHaveLength(1)
-    expect(metric.dataPoints[0].value).toEqual(
-      calcDiffSec(
-        new Date(workflowRun.created_at),
-        new Date(workflowRunJobs[0].started_at)
       )
     )
   })

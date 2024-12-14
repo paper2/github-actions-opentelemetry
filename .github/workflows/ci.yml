@@ -2,11 +2,7 @@ name: Continuous Integration
 
 on:
   pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -48,6 +44,8 @@ jobs:
 
       - name: Test
         id: npm-test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run test
 
   test-action:
