@@ -25,9 +25,9 @@ const createMetricsAttributes = (
   workflow: WorkflowRun,
   job?: WorkflowRunJob
 ): opentelemetry.Attributes => ({
-  [ak.NAME]: workflow.name || '',
+  [ak.WORKFLOW_NAME]: workflow.name || undefined,
   [ak.REPOSITORY]: workflow.repository.full_name,
-  ...(job && { [ak.TASK_NAME]: job.name })
+  ...(job && { [ak.JOB_NAME]: job.name })
 })
 
 export const createWorkflowGauges = (
@@ -37,7 +37,7 @@ export const createWorkflowGauges = (
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
-    dn.DURATION,
+    dn.WORKFLOW_DURATION,
     calcDiffSec(new Date(workflow.created_at), jobCompletedAtMax),
     workflowMetricsAttributes,
     { unit: 's' }
@@ -55,7 +55,7 @@ export const createJobGauges = (
 
     const jobMetricsAttributes = createMetricsAttributes(workflow, job)
     createGauge(
-      dn.TASK_DURATION,
+      dn.JOB_DURATION,
       calcDiffSec(new Date(job.started_at), new Date(job.completed_at)),
       jobMetricsAttributes,
       { unit: 's' }
@@ -70,12 +70,12 @@ export const createJobGauges = (
     )
     if (jobQueuedDuration < 0) {
       core.notice(
-        `${job.name}: Skip to create ${dn.TASK_QUEUED_DURATION} metrics. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
+        `${job.name}: Skip to create ${dn.JOB_QUEUED_DURATION} metrics. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
       )
       continue
     }
     createGauge(
-      dn.TASK_QUEUED_DURATION,
+      dn.JOB_QUEUED_DURATION,
       jobQueuedDuration,
       jobMetricsAttributes,
       { unit: 's' }

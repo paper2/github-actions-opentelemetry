@@ -1,14 +1,11 @@
-// TODO: ユーザ独自定義のものはそのまま同じもの使わないようにする(breaking change)
-// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
-export const descriptorNames: Record<string, string> = {
-  TASK_DURATION: 'cicd.pipeline.task.duration',
-  TASK_QUEUED_DURATION: 'cicd.pipeline.task.queued_duration',
-  DURATION: 'cicd.pipeline.duration'
-} as const
+export const descriptorNames = {
+  JOB_DURATION: 'github.job.duration',
+  JOB_QUEUED_DURATION: 'github.job.queued_duration',
+  WORKFLOW_DURATION: 'github.workflow.duration'
+} as const satisfies Record<string, string>
 
-// FYI: [CICD Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/attributes-registry/cicd/)
-export const attributeKeys: Record<string, string> = {
-  REPOSITORY: 'cicd.pipeline.repository',
-  NAME: 'cicd.pipeline.name',
-  TASK_NAME: 'cicd.pipeline.task.name'
-} as const
+export const attributeKeys = {
+  REPOSITORY: 'repository',
+  WORKFLOW_NAME: 'workflow.name',
+  JOB_NAME: 'job.name'
+} as const satisfies Record<string, string>
