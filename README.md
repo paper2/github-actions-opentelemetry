@@ -37,6 +37,8 @@ Each metric has associated attributes.
 
 ![Jaeger Example Screen Shot](./img/traces-jager.png)
 
+![Attributes Sample](./img/trace-attributes.png)
+
 ## Setup Instructions
 
 1. **Create OTLP Endpoint**: Set up an OTLP backend to receive telemetry data
