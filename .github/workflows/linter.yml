@@ -3,7 +3,6 @@ name: Lint Codebase
 on:
   pull_request:
   push:
-    branches: '**' # Super-linter bug workaround. Ignore push tags. : https://github.com/super-linter/super-linter/pull/6204
 
 permissions:
   contents: read
