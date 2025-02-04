@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.3.1",
+  "version": "v0.3.2",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -29,7 +29,7 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+    "lint": "npx eslint . -c .github/linters/eslint.config.mjs",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
@@ -38,7 +38,7 @@
   },
   "license": "MIT",
   "eslintConfig": {
-    "extends": ".github/linters/.eslintrc.yml"
+    "extends": ".github/linters/eslint.config.mjs"
   },
   "dependencies": {
     "@actions/core": "^1.11.1",
@@ -53,6 +53,8 @@
     "ts-retry": "^5.0.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
     "@octokit/types": "^13.5.0",
     "@opentelemetry/sdk-node": "^0.57.1",
     "@opentelemetry/semantic-conventions": "^1.27.0",
@@ -61,6 +63,7 @@
     "@typescript-eslint/parser": "^8.23.0",
     "@vercel/ncc": "^0.38.3",
     "@vitest/coverage-v8": "^3.0.5",
+    "@vitest/eslint-plugin": "^1.1.25",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^3.7.0",
@@ -69,6 +72,7 @@
     "eslint-plugin-jsonc": "^2.19.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-vitest": "^0.5.4",
+    "globals": "^15.14.0",
     "make-coverage-badge": "^1.2.0",
     "prettier": "^3.4.2",
     "prettier-eslint": "^16.3.0",
