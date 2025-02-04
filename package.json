@@ -33,7 +33,7 @@
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
-    "test-local": "vitest src/mian.test.ts -t 'should run successfully' --hideSkippedTests --reporter=dot",
+    "test-local": "vitest src/main.test.ts -t 'should run successfully' --hideSkippedTests --reporter=dot",
     "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
