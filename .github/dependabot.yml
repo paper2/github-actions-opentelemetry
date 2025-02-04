@@ -3,24 +3,21 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
       actions-minor:
         update-types:
           - minor
           - patch
+          - major
 
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: monthly
     groups:
-      npm-development:
-        dependency-type: development
+      npm:
         update-types:
           - minor
           - patch
-      npm-production:
-        dependency-type: production
-        update-types:
-          - patch
+          - major
