@@ -9,6 +9,7 @@ import { initialize, forceFlush } from '../instrumentation/index.js'
 import { createTrace } from './create-trace.js'
 import { fail } from 'assert'
 import settings from '../settings.js'
+import { SpanStatusCode } from '@opentelemetry/api'
 
 const workflowRunResults = {
   workflowRun: {
@@ -19,7 +20,8 @@ const workflowRunResults = {
     run_number: 14,
     repository: {
       full_name: 'paper2/github-actions-opentelemetry'
-    }
+    },
+    conclusion: 'failure'
   },
   workflowRunJobs: [
     {
@@ -31,6 +33,7 @@ const workflowRunResults = {
       run_id: 10000000000,
       workflow_name: 'Test Run',
       status: 'completed',
+      conclusion: 'success',
       steps: [
         {
           name: 'step1_1',
@@ -61,6 +64,7 @@ const workflowRunResults = {
       run_id: 10000000000,
       workflow_name: 'Test Run',
       status: 'completed',
+      conclusion: 'failure',
       steps: [
         {
           name: 'step2_1',
@@ -78,7 +82,7 @@ const workflowRunResults = {
           name: 'step2_3',
           started_at: '2024-09-01T00:15:40',
           completed_at: '2024-09-01T00:15:50',
-          conclusion: 'success'
+          conclusion: 'failure'
         }
       ]
     }
@@ -206,6 +210,33 @@ describe('should export expected spans', () => {
 
     expect(exporter.getFinishedSpans()).toHaveLength(0)
     settings.FeatureFlagTrace = true
+  })
+
+  test('should verify span status', async () => {
+    await createTrace(workflowRunResults)
+    await forceFlush()
+
+    const spans = exporter.getFinishedSpans()
+    if (!workflowRun.name) fail()
+    const rootSpan = findSpanByName(spans, workflowRun.name)
+    const job1 = findSpanByName(spans, 'job1')
+    const job2 = findSpanByName(spans, 'job2')
+    const job2WithWaitingTime = findSpanByName(
+      spans,
+      'job2 with time of waiting runner'
+    )
+    const job2WaitingTime = findSpanByName(spans, 'waiting runner for job2')
+    const step2_1 = findSpanByName(spans, 'step2_1')
+    const step2_2 = findSpanByName(spans, 'step2_2')
+    const step2_3 = findSpanByName(spans, 'step2_3')
+    expect(rootSpan.status.code).toBe(SpanStatusCode.ERROR)
+    expect(job1.status.code).toBe(SpanStatusCode.OK)
+    expect(job2.status.code).toBe(SpanStatusCode.ERROR)
+    expect(job2WithWaitingTime.status.code).toBe(SpanStatusCode.ERROR)
+    expect(job2WaitingTime.status.code).toBe(SpanStatusCode.OK)
+    expect(step2_1.status.code).toBe(SpanStatusCode.OK)
+    expect(step2_2.status.code).toBe(SpanStatusCode.OK)
+    expect(step2_3.status.code).toBe(SpanStatusCode.ERROR)
   })
 
   test('should verify span hierarchy', async () => {
