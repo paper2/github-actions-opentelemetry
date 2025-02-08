@@ -104,4 +104,3 @@ __tests__/runner/*
 
 # Super Linter Output
 github_conf/
-super-linter-output/

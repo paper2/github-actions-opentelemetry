@@ -2,8 +2,6 @@ name: Lint Codebase
 
 on:
   pull_request:
-  push:
-    branches: '**' # Super-linter bug workaround. Ignore push tags. : https://github.com/super-linter/super-linter/pull/6204
 
 permissions:
   contents: read
@@ -19,17 +17,10 @@ jobs:
       # To write linting fixes
       contents: write
       packages: read
-      # To report GitHub Actions status checks
-      # To write Super-linter status checks
-      statuses: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          # super-linter needs the full git history to get the
-          # list of files that changed across commits
-          fetch-depth: 0
 
       - name: Setup Node.js
         id: setup-node
@@ -42,31 +33,6 @@ jobs:
         id: install
         run: npm ci
 
-      - name: Super-linter
-        uses: super-linter/super-linter@v7.2.0
-        env:
-          # To report GitHub Actions status checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JAVASCRIPT_ES_CONFIG_FILE:
-          DEFAULT_BRANCH: main
-          FILTER_REGEX_EXCLUDE: dist/**/*
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_JAVASCRIPT_STANDARD: false
-          VALIDATE_JSCPD: false
-          VALIDATE_TYPESCRIPT_STANDARD: false
-          VALIDATE_MARKDOWN_PRETTIER: false
-          FIX_SHELL_SHFMT: true
-          FIX_MARKDOWN: true
-          FIX_ENV: true
-      - name: Commit and push linting fixes
-        if: >
-          github.event_name == 'pull_request' && github.ref_name !=
-          github.event.repository.default_branch
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch:
-            ${{ github.event.pull_request.head.ref || github.head_ref ||
-            github.ref }}
-          commit_message: 'chore: fix linting issues'
-          commit_user_name: super-linter
-          commit_user_email: super-linter@super-linter.dev
+      - name: lint
+        id: lint
+        run: npm run lint
