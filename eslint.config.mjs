@@ -23,7 +23,8 @@ export default [
       '**/dist/**',
       '**/coverage/**',
       '**/*.json',
-      '.github/linters/**'
+      'vitest.config.ts',
+      'eslint.config.mjs'
     ]
   },
   ...compat.extends(
@@ -50,7 +51,7 @@ export default [
       sourceType: 'module',
 
       parserOptions: {
-        project: ['./tsconfig.json', './.github/linters/tsconfig.json']
+        project: ['./tsconfig.json']
       }
     },
 

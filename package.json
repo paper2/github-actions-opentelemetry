@@ -29,7 +29,7 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "lint": "npx eslint . -c .github/linters/eslint.config.mjs",
+    "lint": "npx eslint . -c eslint.config.mjs",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",
@@ -37,9 +37,6 @@
     "all": "npm run format:write && npm run lint && npm run test -- --run && npm run coverage && npm run package"
   },
   "license": "MIT",
-  "eslintConfig": {
-    "extends": ".github/linters/eslint.config.mjs"
-  },
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
