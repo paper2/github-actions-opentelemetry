@@ -1,9 +1,12 @@
-name: Example Workflow
+name: Example Workflow 02
 
 on:
   push:
     branches:
       - main
+env:
+  FIXED_SLEEP: 2
+  RANDOM_SLEEP: 3
 
 jobs:
   test:
@@ -25,7 +28,8 @@ jobs:
       - name: Test
         id: test
         # add a random delay for changing metrics and traces
-        run: sleep $(($RANDOM % 5 + 2))
+        run:
+          sleep $(($RANDOM % ${{ env.RANDOM_SLEEP }} + ${{ env.FIXED_SLEEP }}))
   build:
     name: Build Application
     runs-on: ubuntu-latest
@@ -42,7 +46,8 @@ jobs:
       - name: Build
         id: build
         # add a random delay for changing metrics and traces
-        run: sleep $(($RANDOM % 5 + 2))
+        run:
+          sleep $(($RANDOM % ${{ env.RANDOM_SLEEP }} + ${{ env.FIXED_SLEEP }}))
   deploy:
     name: Deploy Application
     needs: [test, build]

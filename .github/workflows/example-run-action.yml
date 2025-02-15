@@ -3,7 +3,9 @@ name: Send Telemetry after Other Workflow Example
 on:
   workflow_run:
     workflows:
-      - Example Workflow
+      - Example Workflow 01
+      - Example Workflow 02
+      - Example Workflow 03
     types:
       - completed
 
