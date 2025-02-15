@@ -1,10 +1,14 @@
-# 骨子
+このGetting Startedでは、Google CloudのCloud Run上でOpenTelemetry
+Collectorをデプロイし、github-actions-opentelemetryを使ってGitHub
+ActionsのワークフローからOTLPでトレースとメトリクスGoogle
+Cloudに送信する方法を説明します。
 
-- how to work
+# 前提条件
 
-  - これはgetting startedじゃないな。別で書くか
+- Google Cloudプロジェクト
+  - APIの有効化（Cloud Run, Cloud Trace, Cloud Monitoring）
+- gcloud cli
 
-- 概要
 - required
   - google cloud project
   - apiの有効化までやる？
@@ -40,6 +44,11 @@
   - example workflowとsend metricsが動く
 - Metrics Exploerで確認
 - clean up
+
   - cloud runの削除
   - デフォルト設定のunset
   - https://cloud.google.com/run/docs/tutorials/custom-metrics-opentelemetry-sidecar?hl=ja#review-code
+
+- how to work
+
+  - これはgetting startedじゃないな。別で書くか
