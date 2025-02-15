@@ -1,0 +1,58 @@
+name: Example Workflow 02
+
+on:
+  push:
+    branches:
+      - main
+env:
+  FIXED_SLEEP: 2
+  RANDOM_SLEEP: 3
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        run: sleep 2
+      - name: Setup
+        id: setup
+        run: sleep 2
+      - name: Install Dependencies
+        id: install
+        run: sleep 3
+      - name: Lint
+        id: lint
+        run: sleep 2
+      - name: Test
+        id: test
+        # add a random delay for changing metrics and traces
+        run:
+          sleep $(($RANDOM % ${{ env.RANDOM_SLEEP }} + ${{ env.FIXED_SLEEP }}))
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        run: sleep 2
+      - name: Setup
+        id: setup
+        run: sleep 2
+      - name: Install Dependencies
+        id: install
+        run: sleep 3
+      - name: Build
+        id: build
+        # add a random delay for changing metrics and traces
+        run:
+          sleep $(($RANDOM % ${{ env.RANDOM_SLEEP }} + ${{ env.FIXED_SLEEP }}))
+  deploy:
+    name: Deploy Application
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        id: deploy
+        run: sleep 2

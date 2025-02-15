@@ -1,0 +1,30 @@
+name: Send Telemetry after Other Workflow Example
+
+on:
+  workflow_run:
+    workflows:
+      - Example Workflow 01
+      - Example Workflow 02
+      - Example Workflow 03
+    types:
+      - completed
+
+permissions:
+  # Need for private repository
+  actions: read
+
+jobs:
+  send-telemetry:
+    name: Send CI Telemetry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run
+        id: run
+        uses: paper2/github-actions-opentelemetry@main
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+          OTEL_EXPORTER_OTLP_HEADERS: ''
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

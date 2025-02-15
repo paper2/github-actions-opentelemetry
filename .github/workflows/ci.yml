@@ -51,7 +51,12 @@ jobs:
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
-
+    services:
+      # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
+      collector:
+        image: otel/opentelemetry-collector-contrib:0.115.1
+        ports:
+          - 4318:4318
     steps:
       - name: Checkout
         id: checkout
@@ -61,12 +66,7 @@ jobs:
         id: test-action
         uses: ./
         env:
-          OTEL_EXPORTER_OTLP_ENDPOINT:
-            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
-          OTEL_EXPORTER_OTLP_HEADERS: ''
           OTEL_SERVICE_NAME: github-actions-opentelemetry
-          FEATURE_TRACE: true
-
           # If this job is removed, update it.
           # https://github.com/paper2/github-actions-opentelemetry/actions/runs/10856659171
           OWNER: paper2

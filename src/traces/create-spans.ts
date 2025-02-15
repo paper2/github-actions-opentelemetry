@@ -20,6 +20,7 @@ export const createWorkflowRunTrace = (
     workflowRun.name,
     workflowRun.created_at,
     getLatestCompletedAt(workflowRunJobs),
+    workflowRun.conclusion,
     { ...buildWorkflowRunAttributes(workflowRun) }
   )
 
@@ -31,12 +32,12 @@ export const createWorkflowRunJobSpan = (
   job: WorkflowRunJob
 ): Context => {
   if (!job.completed_at || job.steps === undefined) fail()
-
   const spanWithWaiting = createSpan(
     ctx,
     `${job.name} with time of waiting runner`,
     job.created_at,
     job.completed_at,
+    job.conclusion,
     { ...buildWorkflowRunJobAttributes(job) }
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
@@ -52,6 +53,7 @@ export const createWorkflowRunJobSpan = (
       waitingSpanName,
       job.created_at,
       job.started_at,
+      'success', // waiting runner is not a error.
       { ...buildWorkflowRunJobAttributes(job) }
     )
   } else {
@@ -65,6 +67,7 @@ export const createWorkflowRunJobSpan = (
     job.name,
     job.started_at,
     job.completed_at,
+    job.conclusion,
     { ...buildWorkflowRunJobAttributes(job) }
   )
 
@@ -78,8 +81,14 @@ export const createWorkflowRunStepSpan = (
   if (job.steps === undefined) fail()
   job.steps.map(step => {
     if (step.started_at == null || step.completed_at == null) fail()
-
-    createSpan(ctx, step.name, step.started_at, step.completed_at, {})
+    createSpan(
+      ctx,
+      step.name,
+      step.started_at,
+      step.completed_at,
+      step.conclusion,
+      {}
+    )
   })
 }
 
@@ -88,15 +97,35 @@ const createSpan = (
   name: string,
   startAt: string,
   endAt: string,
+  conclusion: string | null,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
   const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
   const startTime = new Date(startAt)
   const endTime = new Date(endAt)
-
   const span = tracer.startSpan(name, { startTime, attributes }, ctx)
+  span.setStatus(getSpanStatusFromConclusion(conclusion))
   span.end(endTime)
   return span
+}
+
+// In reality, the values of `conclusion` for step, job, and workflow might differ.
+// However, I couldn't find a complete definition in the official documentation.
+// The type of `conclusion` for a job is defined, but for step and workflow, it is just a string.
+// At the very least, we know that `conclusion` for step, job, and workflow can take the values `success` and `failure`,
+// so I have summarized the definitions accordingly.
+const getSpanStatusFromConclusion = (
+  status: string | null
+): opentelemetry.SpanStatus => {
+  switch (status) {
+    case 'success':
+      return { code: opentelemetry.SpanStatusCode.OK }
+    case 'failure':
+    case 'timed_out':
+      return { code: opentelemetry.SpanStatusCode.ERROR }
+    default:
+      return { code: opentelemetry.SpanStatusCode.UNSET }
+  }
 }
 
 const buildWorkflowRunAttributes = (
