@@ -1,12 +1,9 @@
-name: Send Telemetry after Other Workflow
+name: Send Telemetry after Other Workflow Example
 
 on:
   workflow_run:
     workflows:
-      - Check Transpiled JavaScript
-      - Continuous Integration
-      - CodeQL
-      - Lint Codebase
+      - Example Workflow
     types:
       - completed
 
@@ -25,6 +22,7 @@ jobs:
         env:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
           OTEL_EXPORTER_OTLP_HEADERS: ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
