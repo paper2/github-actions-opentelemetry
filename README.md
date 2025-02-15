@@ -51,6 +51,7 @@ name: Send Telemetry after Other Workflow
 
 on:
   workflow_run:
+    # Specify the workflows you want to collect telemetry.
     workflows:
       - Check Transpiled JavaScript
       - Continuous Integration
@@ -78,6 +79,7 @@ jobs:
           # Additional OTLP headers. Useful for OTLP authentication.
           # e.g.
           # New Relic: api-key=YOUR_NEWRELIC_API_KEY
+          # Google Cloud Run: Authorization=Bearer <value of $(gcloud auth print-identity-token)>
           OTEL_EXPORTER_OTLP_HEADERS:
             api-key=${ secrets.API_KEY },other-config-value=value
         with:
@@ -99,6 +101,12 @@ To configure the action, you need to set the following environment variables:
 | `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
+
+## Limitations
+
+There are some limitations that come from GitHub Actions Specification. See
+[Specification](https://github.com/paper2/github-actions-opentelemetry/wiki/Specification)
+page for details.
 
 ## Development
 
