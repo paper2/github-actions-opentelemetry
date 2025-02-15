@@ -51,6 +51,7 @@ name: Send Telemetry after Other Workflow
 
 on:
   workflow_run:
+    # Specify the workflows you want to collect telemetry.
     workflows:
       - Check Transpiled JavaScript
       - Continuous Integration
@@ -78,6 +79,7 @@ jobs:
           # Additional OTLP headers. Useful for OTLP authentication.
           # e.g.
           # New Relic: api-key=YOUR_NEWRELIC_API_KEY
+          # Google Cloud Run: Authorization=Bearer <value of $(gcloud auth print-identity-token)>
           OTEL_EXPORTER_OTLP_HEADERS:
             api-key=${ secrets.API_KEY },other-config-value=value
         with:
