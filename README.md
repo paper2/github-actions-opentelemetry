@@ -102,7 +102,7 @@ To configure the action, you need to set the following environment variables:
 
 ## Limitations
 
-There are some limitations comes from GitHub Actions Specification. See
+There are some limitations that come from GitHub Actions Specification. See
 [Specification](https://github.com/paper2/github-actions-opentelemetry/wiki/Specification)
 page for details.
 
