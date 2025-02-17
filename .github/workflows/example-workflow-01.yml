@@ -3,7 +3,8 @@ name: Example Workflow 01
 on:
   push:
     branches:
-      - main
+      - getting-started
+
 env:
   FIXED_SLEEP: 1
   RANDOM_SLEEP: 3
