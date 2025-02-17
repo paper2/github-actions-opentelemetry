@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - getting-started
+
 env:
   FIXED_SLEEP: 2
   RANDOM_SLEEP: 3

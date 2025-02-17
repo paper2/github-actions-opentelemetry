@@ -91,7 +91,7 @@ getting-startedブランチにコミットし、リモートリポジトリに�
 
 ```sh
 git commit --allow-empty -m "empty commit"
-git push origin getting-started
+git push --set-upstream origin getting-started
 ```
 
 - empty commitをしてpush
