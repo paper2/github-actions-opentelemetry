@@ -2,6 +2,7 @@ name: Send Telemetry after Other Workflow Example
 
 on:
   workflow_run:
+    # Specify the workflows you want to collect telemetry.
     workflows:
       - Example Workflow 01
       - Example Workflow 02
@@ -10,7 +11,7 @@ on:
       - completed
 
 permissions:
-  # Need for private repository
+  # Required for private repositories
   actions: read
 
 jobs:
@@ -25,6 +26,5 @@ jobs:
           OTEL_EXPORTER_OTLP_ENDPOINT:
             ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
           OTEL_SERVICE_NAME: github-actions-opentelemetry
-          OTEL_EXPORTER_OTLP_HEADERS: ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

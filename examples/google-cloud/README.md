@@ -8,8 +8,6 @@ Cloudに送信する方法を説明します。
 ## 前提条件
 
 - Google Cloudプロジェクト
-  - APIの有効化（Cloud Run, Cloud Trace, Cloud Monitoring） #
-    TODO: サービスの見直しとlink作成
 - gcloud cliのインストール
 
 ## gcloudのデフォルトを設定する
@@ -41,8 +39,6 @@ cd github-actions-opentelemetry/examples/google-cloud
 
 ## OpenTelemetryコレクターをCloud Runにデプロイする
 
-> [!NOTE] 検証以外ではCloud Runの未認証アクセスを許可しないことをお勧めします。
-
 ```sh
   gcloud run deploy collector \
   --source . \
@@ -50,6 +46,9 @@ cd github-actions-opentelemetry/examples/google-cloud
   --port=4318 \
   --max-instances=3
 ```
+
+> [!NOTE] 本番環境などではCloud
+> Runの未認証アクセスを許可しないことをお勧めします。
 
 上記コマンドでは[Dockerfile](./Dockerfile)を使ってコンテナをビルドし、OpenTelemetryコレクターをCloud
 Runにデプロイします。[Contrib repository for the OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib)をベースイメージにしており、[collector-config.yaml](./collector-config.yaml)を設定ファイルとして使用しています。
@@ -94,25 +93,100 @@ git commit --allow-empty -m "empty commit"
 git push --set-upstream origin getting-started
 ```
 
-- empty commitをしてpush
-  - example workflowとsend metricsが成功することを確認
-- 確認が終わったらempty commitをしてpush(metricsの差分を見るため)
-  - example workflowとsend metricsが動く
-- トレースの確認
-  - send metricsのトレースIDで検索
-- empty commitをしてpush(metricsの差分を見るため)
-  - example workflowとsend metricsが動く
-- Metrics Exploerで確認
-- clean up
+Actionsタブからワークフローの実行を確認します。
+[Example Workflow](../../.github/workflows/example-workflow-01.yml) が成功すると
+[Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)
+が実行されます。ワークフローによりgithub-actions-opentelemetryが動作し、トレースとメトリクスがOTLPエンドポイントに送信されます。
 
-  - cloud runの削除
-  - デフォルト設定のunset
-  - https://cloud.google.com/run/docs/tutorials/custom-metrics-opentelemetry-sidecar?hl=ja#review-code
+![Actions-tab](../../img/actions-tab.png)
 
-- how to work
+成功していることが確認できたらメトリクスの変化を確認するため再びコミットし、リモートリポジトリにプッシュしてください。
 
-  - これはgetting startedじゃないな。別で書くか
-
+```sh
+git commit --allow-empty -m "empty commit"
+git push
 ```
 
+[Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)は以下のようになっています。
+
+```yaml
+name: Send Telemetry after Other Workflow Example
+
+on:
+  workflow_run:
+    # Specify the workflows you want to collect telemetry.
+    workflows:
+      - Example Workflow 01
+      - Example Workflow 02
+      - Example Workflow 03
+    types:
+      - completed
+
+permissions:
+  # Required for private repositories
+  actions: read
+
+jobs:
+  send-telemetry:
+    name: Send CI Telemetry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run
+        id: run
+        uses: paper2/github-actions-opentelemetry@main
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+workflow_runは指定したワークフローが完了したときにトリガーされます。github-actions-opentelemetryは完了したワークフローの情報を収集し、トレースとメトリクスをOTLPエンドポイントに送信します。
+
+## Cloud Traceでトレースを確認する
+
+ワークフローの `run_id` を取得します。 `run_id`
+はワークフロー実行結果のURLに含まれています。
+
+例えば以下のURLであれば、 `run_id` は `13388380812` です。
+
+```
+https://github.com/paper2/github-actions-opentelemetry/actions/runs/13388380812
+```
+
+[Trace Explorer](https://console.cloud.google.com/traces/explorer)を開き、フィルタで
+`run_id` を指定します。
+
+![filter run id](../../img/filter-run-id.png)
+
+Span IDのリンクを押下するとトレースを確認できます。
+
+![trace detail](../../img/trace-detail.png)
+
+## Metrics Explorerでメトリクスを確認する
+
+[Metrics Explorer](https://console.cloud.google.com/monitoring/metrics-explorer)を開き、
+`prometheus/github_job_duration_seconds/gauge` メトリクスを選択します。
+
+![choose metrics](../../img/choose-metrics.png)
+
+グループに `workflow_name` と `job_name`
+を指定すると、ワークフローとジョブごとの実行時間を確認することができます。
+
+![metrics graph](../../img/metrics-graph.png)
+
+## 片付け
+
+コレクターのcloud runを削除します。
+
+```sh
+gcloud run services delete collector
+```
+
+gcloudのデフォルト設定を削除します。
+
+```sh
+gcloud config unset project
+gcloud config unset run/region
 ```
