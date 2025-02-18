@@ -8,7 +8,7 @@ Cloudに送信する方法を説明します。
 ## 前提条件
 
 - Google Cloudプロジェクト
-- gcloud cliのインストール
+- gcloud CLIのインストール
 
 ## gcloudのデフォルトを設定する
 
@@ -18,15 +18,15 @@ Cloudに送信する方法を説明します。
    gcloud config set project <PROJECT_ID>
    ```
 
-   <PROJECT_ID> は、Google CloudプロジェクトのIDです。
+   `<PROJECT_ID>` は、Google CloudプロジェクトのIDです。
 
-1. デフォルトのリージョンを設定します。
+2. デフォルトのリージョンを設定します。
 
    ```sh
    gcloud config set run/region <REGION>
    ```
 
-   <REGION> は、Cloud Runのリージョンです。 例: `asia-northeast1`
+   `<REGION>` は、Cloud Runのリージョンです。例: `asia-northeast1`
 
 ## サンプルコードをクローンする
 
@@ -40,7 +40,7 @@ cd github-actions-opentelemetry/examples/google-cloud
 ## OpenTelemetryコレクターをCloud Runにデプロイする
 
 ```sh
-  gcloud run deploy collector \
+gcloud run deploy collector \
   --source . \
   --allow-unauthenticated \
   --port=4318 \
@@ -142,7 +142,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-workflow_runは指定したワークフローが完了したときにトリガーされます。github-actions-opentelemetryは完了したワークフローの情報を収集し、トレースとメトリクスをOTLPエンドポイントに送信します。
+`workflow_run`は指定したワークフローが完了したときにトリガーされます。github-actions-opentelemetryは完了したワークフローの情報を収集し、トレースとメトリクスをOTLPエンドポイントに送信します。
 
 ## Cloud Traceでトレースを確認する
 
@@ -166,8 +166,7 @@ Span IDのリンクを押下するとトレースを確認できます。
 
 ## Metrics Explorerでメトリクスを確認する
 
-[Metrics Explorer](https://console.cloud.google.com/monitoring/metrics-explorer)を開き、
-`prometheus/github_job_duration_seconds/gauge` メトリクスを選択します。
+[Metrics Explorer](https://console.cloud.google.com/monitoring/metrics-explorer)を開き、`prometheus/github_job_duration_seconds/gauge`メトリクスを選択します。
 
 ![choose metrics](../../img/choose-metrics.png)
 
@@ -178,7 +177,7 @@ Span IDのリンクを押下するとトレースを確認できます。
 
 ## 片付け
 
-コレクターのcloud runを削除します。
+コレクターのCloud Runを削除します。
 
 ```sh
 gcloud run services delete collector
