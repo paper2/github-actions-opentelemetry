@@ -12,6 +12,7 @@ Protocol(OTLP)でトレースとメトリクスをGoogle Cloudに送信する方
 
 - Google Cloudプロジェクト
 - gcloud CLIのインストール
+- GitHubアカウント
 
 ## gcloudのデフォルトを設定する
 
