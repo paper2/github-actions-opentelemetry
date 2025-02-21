@@ -79,7 +79,11 @@ gcloud run services describe collector --format 'value(status.url)'
 
 ![repository-secret](../../img/repository-secret.png)
 
-## ワークフローの実行を許可する
+## ワークフローの実行を有効化する
+
+リポジトリのActionsタブを開くと以下のように有効化するか聞かれます。当リポジトリのワークフローをご確認いただき、有効化してください。
+
+![enable workflows](../../img/enable-workflows.png)
 
 ## ワークフローを実行する
 
