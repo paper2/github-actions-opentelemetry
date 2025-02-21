@@ -33,6 +33,26 @@ Each metric has associated attributes.
 
 ![Attributes Sample](./img/trace-attributes.png)
 
+## How it works
+
+This action creates metrics and traces of GitHub Actions workflows and sends
+them to an OTLP endpoint. It uses the GitHub API to collect data about completed
+workflows and jobs. The action then sends this data to the OTLP endpoint for
+monitoring and observability.
+
+```mermaid
+sequenceDiagram
+  participant TW as Target Workflow
+  participant GAOW as GitHub Actions OpenTelemetry Workflow
+  participant GA as GitHub API
+  participant OE as OTLP Endpoint
+
+  TW ->> TW: Complete Workflow
+  TW ->> GAOW: Trigger by workflow_run
+  GAOW ->> GA: Get Target Workflow Data
+  GAOW ->> OE: Send Metrics and Traces
+```
+
 ## Setup Instructions
 
 1. **Create OTLP Endpoint**: Set up an OTLP backend to receive telemetry data
