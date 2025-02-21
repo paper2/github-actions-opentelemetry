@@ -1,54 +1,56 @@
 # Getting Started on Google Cloud
 
-このGetting Startedでは、Google CloudのCloud Run上でOpenTelemetry
-Collectorをデプロイし、github-actions-opentelemetryを使ってGitHub
-ActionsのワークフローからOpenTelemetry
-Protocol(OTLP)でトレースとメトリクスをGoogle Cloudに送信する方法を説明します。
+This Getting Started guide explains how to deploy an OpenTelemetry Collector on
+Google Cloud’s Cloud Run and use github-actions-opentelemetry to send traces and
+metrics from GitHub Actions workflows to Google Cloud via the OpenTelemetry
+Protocol (OTLP).
 
 > [!IMPORTANT]  
-> github-actions-opentelemetryはOTLPエンドポイントがあればどこでも動作します。Google Cloud以外の環境でも利用可能です。
+> github-actions-opentelemetry works with any OTLP endpoint. It can also be used
+> outside of Google Cloud.
 
-## 前提条件
+## Prerequisites
 
-- Google Cloudプロジェクト
-- gcloud CLIのインストール
-- GitHubアカウント
+- A Google Cloud project
+- The gcloud CLI installed
+- A GitHub account
 
-## gcloudのデフォルトを設定する
+## Configure default gcloud settings
 
-1. デフォルトのプロジェクトを設定します。
+1. Set the default project:
 
    ```sh
    gcloud config set project <PROJECT_ID>
    ```
 
-   `<PROJECT_ID>` は、Google CloudプロジェクトのIDです。
+   `<PROJECT_ID>` is your Google Cloud project ID.
 
-2. デフォルトのリージョンを設定します。
+2. Set the default region:
 
    ```sh
    gcloud config set run/region <REGION>
    ```
 
-   `<REGION>` は、Cloud Runのリージョンです。例: `asia-northeast1`
+   `<REGION>` is your Cloud Run region (for example, `asia-northeast1`).
 
-## Github Actions OpenTelemetryのリポジトリをフォークする
+## Fork the GitHub Actions OpenTelemetry repository
 
-サンプルのGitHub
-Actionsワークフローを動かすために[github-actions-opentelemetry](https://github.com/paper2/github-actions-opentelemetry)をフォークします。
+To run the sample GitHub Actions workflow, fork the
+[github-actions-opentelemetry](https://github.com/paper2/github-actions-opentelemetry)
+repository.
 
 ![fork repository](../../img/fork-repository.png)
 
-## サンプルコードをクローンする
+## Clone the sample code
 
-サンプルコードをローカルにクローンし、ディレクトリに移動します。
+Clone the sample code locally and move into the directory:
 
 ```sh
 git clone https://<YOUR_FORKED_REPOSITORY>
 cd github-actions-opentelemetry/examples/google-cloud
 ```
 
-## OpenTelemetryコレクターをCloud Runにデプロイする
+## Deploy the OpenTelemetry Collector to Cloud Run
 
 ```sh
 gcloud run deploy collector \
@@ -59,36 +61,44 @@ gcloud run deploy collector \
 ```
 
 > [!NOTE]  
-> 本番環境などではCloud Runの未認証アクセスを許可しないことをお勧めします。
+> In a production environment, it is recommended not to allow unauthenticated
+> access to Cloud Run.
 
-上記コマンドでは[Dockerfile](./Dockerfile)を使ってコンテナをビルドし、OpenTelemetryコレクターをCloud
-Runにデプロイします。[Contrib repository for the OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib)をベースイメージにしており、[collector-config.yaml](./collector-config.yaml)を設定ファイルとして使用しています。
+The command above uses the [Dockerfile](./Dockerfile) to build a container and
+deploy the OpenTelemetry Collector to Cloud Run. It is based on the
+[Contrib repository for the OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib),
+using [collector-config.yaml](./collector-config.yaml) as the configuration
+file.
 
-設定ファイルではOTLPでエンドポイントに送られたテレメトリをCloud TraceとCloud
-Monitoringに送信するように設定しています。これによりOTLPを受け付けるコレクターがデプロイできました。
+The configuration file is set up to receive telemetry via OTLP, then forward it
+to Cloud Trace and Cloud Monitoring. This means you now have a collector that
+accepts OTLP.
 
-## OTLPのエンドポイントを設定する
+## Set the OTLP endpoint
 
-以下のコマンドでOpenTelemetryコレクターのCloud Runのエンドポイントを取得します。
+Run this command to retrieve the Cloud Run endpoint of the OpenTelemetry
+Collector:
 
 ```sh
 gcloud run services describe collector --format 'value(status.url)'
 ```
 
-[レポジトリシークレット](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)に
-`OTEL_EXPORTER_OTLP_ENDPOINT` というキーで取得したエンドポイントを設定します。
+Add the retrieved endpoint to your
+[repository secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
+with the key `OTEL_EXPORTER_OTLP_ENDPOINT`.
 
 ![repository-secret](../../img/repository-secret.png)
 
-## ワークフローの実行を有効化する
+## Enable workflow runs
 
-リポジトリのActionsタブを開くと以下のように有効化するか聞かれます。当リポジトリのワークフローをご確認いただき、有効化してください。
+Open the Actions tab in your repository. You should see a message asking if you
+want to enable workflows. Review them and enable.
 
 ![enable workflows](../../img/enable-workflows.png)
 
-## ワークフローを実行する
+## Run the workflow
 
-getting-startedブランチにコミットし、リモートリポジトリにプッシュします。
+Create and push a branch named `getting-started`:
 
 ```sh
 git switch -c getting-started
@@ -96,28 +106,30 @@ git commit --allow-empty -m "empty commit"
 git push --set-upstream origin getting-started
 ```
 
-Actionsタブからワークフローの実行を確認します。
-[Example Workflow](../../.github/workflows/example-workflow-01.yml) が成功すると
+Check the workflow run in the Actions tab. Once the
+[Example Workflow](../../.github/workflows/example-workflow-01.yml) completes
+successfully, the
 [Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)
-が実行され、github-actions-opentelemetryが動作し、トレースとメトリクスがOTLPエンドポイントに送信されます。
+will run, where github-actions-opentelemetry sends traces and metrics via OTLP
+to the endpoint.
 
-![Actions-tab](../../img/actions-tab.png)
-
-成功していることが確認できたらメトリクスの変化を確認するため再びコミットし、リモートリポジトリにプッシュしてください。
+After confirming success, commit again to observe changes in the metrics:
 
 ```sh
 git commit --allow-empty -m "empty commit"
 git push
 ```
 
-[Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)は以下のようになっています。
+The
+[Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)
+looks like this:
 
 ```yaml
 name: Send Telemetry after Other Workflow Example
 
 on:
   workflow_run:
-    # Specify the workflows you want to collect telemetry.
+    # Specify the workflows you want to collect telemetry from.
     workflows:
       - Example Workflow 01
       - Example Workflow 02
@@ -145,52 +157,56 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`workflow_run`は指定したワークフローが完了したときにトリガーされます。github-actions-opentelemetryは完了したワークフローの情報を収集し、トレースとメトリクスをOTLPエンドポイントに送信します。
+When any of the specified workflows complete, the `workflow_run` trigger runs
+this job. github-actions-opentelemetry gathers the completed workflow details
+and sends the traces and metrics to the OTLP endpoint.
 
-## Cloud Traceでトレースを確認する
+## Check Cloud Trace for traces
 
-Example Workflow 01の `run_id` を取得します。 `run_id`
-はワークフロー実行結果のURLに含まれています。
+Obtain the `run_id` for Example Workflow 01. This `run_id` appears in the URL of
+the workflow’s results.
 
-例えば以下のURLであれば、 `run_id` は `13388380812` です。
+For example, in the URL below, the `run_id` is `13388380812`:
 
 ```txt
 https://github.com/paper2/github-actions-opentelemetry/actions/runs/13388380812
 ```
 
-[Trace Explorer](https://console.cloud.google.com/traces/explorer)を開き、フィルタで
-`run_id` を指定します。
+Open the [Trace Explorer](https://console.cloud.google.com/traces/explorer) and
+filter by `run_id`.
 
 ![filter run id](../../img/filter-run-id.png)
 
-Span IDのリンクを押下するとトレースを確認できます。
+Select the Span ID link to view detailed trace information.
 
 ![trace detail](../../img/trace-detail.png)
 
-## Metrics Explorerでメトリクスを確認する
+## Check Cloud Monitoring for metrics
 
-[Metrics Explorer](https://console.cloud.google.com/monitoring/metrics-explorer)を開き、`prometheus/github_job_duration_seconds/gauge`メトリクスを選択します。
+Open the
+[Metrics Explorer](https://console.cloud.google.com/monitoring/metrics-explorer)
+and select the metric `prometheus/github_job_duration_seconds/gauge`.
 
 ![choose metrics](../../img/choose-metrics.png)
 
-Aggregationに `workflow_name` と `job_name`
-を指定すると、ワークフローとジョブごとの実行時間を確認することができます。
+In the Aggregation settings, choose `workflow_name` and `job_name` to view
+execution times by workflow and by job.
 
 ![metrics graph](../../img/metrics-graph.png)
 
-## 片付け
+## Clean up
 
-コレクターのCloud Runを削除します。
+Delete the Cloud Run service for the collector:
 
 ```sh
 gcloud run services delete collector
 ```
 
-gcloudのデフォルト設定を削除します。
+Unset the default gcloud configuration:
 
 ```sh
 gcloud config unset project
 gcloud config unset run/region
 ```
 
-フォークしたリポジトリを削除します。
+Finally, delete the forked repository.
