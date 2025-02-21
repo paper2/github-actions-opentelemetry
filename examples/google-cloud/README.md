@@ -2,8 +2,11 @@
 
 このGetting Startedでは、Google CloudのCloud Run上でOpenTelemetry
 Collectorをデプロイし、github-actions-opentelemetryを使ってGitHub
-ActionsのワークフローからOTLPでトレースとメトリクスをGoogle
-Cloudに送信する方法を説明します。
+ActionsのワークフローからOpenTelemetry
+Protocol(OTLP)でトレースとメトリクスをGoogle Cloudに送信する方法を説明します。
+
+> [!IMPORTANT]  
+> github-actions-opentelemetryはOTLPエンドポイントがあればどこでも動作します。Google Cloud以外の環境でも利用可能です。
 
 ## 前提条件
 
@@ -28,12 +31,19 @@ Cloudに送信する方法を説明します。
 
    `<REGION>` は、Cloud Runのリージョンです。例: `asia-northeast1`
 
+## Github Actions OpenTelemetryのリポジトリをフォークする
+
+サンプルのGitHub
+Actionsワークフローを動かすために[github-actions-opentelemetry](https://github.com/paper2/github-actions-opentelemetry)をフォークします。
+
+![fork repository](../../img/fork-repository.png)
+
 ## サンプルコードをクローンする
 
-サンプルコードをクローンし、ディレクトリに移動します。
+サンプルコードをローカルにクローンし、ディレクトリに移動します。
 
 ```sh
-git clone https://github.com/paper2/github-actions-opentelemetry.git
+git clone https://<YOUR_FORKED_REPOSITORY>
 cd github-actions-opentelemetry/examples/google-cloud
 ```
 
@@ -47,20 +57,14 @@ gcloud run deploy collector \
   --max-instances=3
 ```
 
-> [!NOTE] 本番環境などではCloud
-> Runの未認証アクセスを許可しないことをお勧めします。
+> [!NOTE]  
+> 本番環境などではCloud Runの未認証アクセスを許可しないことをお勧めします。
 
 上記コマンドでは[Dockerfile](./Dockerfile)を使ってコンテナをビルドし、OpenTelemetryコレクターをCloud
 Runにデプロイします。[Contrib repository for the OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib)をベースイメージにしており、[collector-config.yaml](./collector-config.yaml)を設定ファイルとして使用しています。
 
-設定ファイルではOTLPのエンドポイントに送られたテレメトリをCloud TraceとCloud
+設定ファイルではOTLPでエンドポイントに送られたテレメトリをCloud TraceとCloud
 Monitoringに送信するように設定しています。これによりOTLPを受け付けるコレクターがデプロイできました。
-
-## Github Actions OpenTelemetryのリポジトリをフォークする
-
-サンプルのワークフローを動かすために[github-actions-opentelemetry](https://github.com/paper2/github-actions-opentelemetry)をフォークします。
-
-![fork repository](../../img/fork-repository.png)
 
 ## OTLPのエンドポイントを設定する
 
@@ -75,20 +79,14 @@ gcloud run services describe collector --format 'value(status.url)'
 
 ![repository-secret](../../img/repository-secret.png)
 
-## getting-startedブランチを作成する
-
-ローカルにフォークしたリポジトリをクローンし、getting-startedブランチを作成します。
-
-```sh
-git clone <YOUR_FORKED_REPOSITORY>
-git switch -c getting-started
-```
+## ワークフローの実行を許可する
 
 ## ワークフローを実行する
 
 getting-startedブランチにコミットし、リモートリポジトリにプッシュします。
 
 ```sh
+git switch -c getting-started
 git commit --allow-empty -m "empty commit"
 git push --set-upstream origin getting-started
 ```
@@ -96,7 +94,7 @@ git push --set-upstream origin getting-started
 Actionsタブからワークフローの実行を確認します。
 [Example Workflow](../../.github/workflows/example-workflow-01.yml) が成功すると
 [Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)
-が実行されます。ワークフローによりgithub-actions-opentelemetryが動作し、トレースとメトリクスがOTLPエンドポイントに送信されます。
+が実行され、github-actions-opentelemetryが動作し、トレースとメトリクスがOTLPエンドポイントに送信されます。
 
 ![Actions-tab](../../img/actions-tab.png)
 
@@ -146,12 +144,12 @@ jobs:
 
 ## Cloud Traceでトレースを確認する
 
-ワークフローの `run_id` を取得します。 `run_id`
+Example Workflow 01の `run_id` を取得します。 `run_id`
 はワークフロー実行結果のURLに含まれています。
 
 例えば以下のURLであれば、 `run_id` は `13388380812` です。
 
-```
+```txt
 https://github.com/paper2/github-actions-opentelemetry/actions/runs/13388380812
 ```
 
@@ -170,7 +168,7 @@ Span IDのリンクを押下するとトレースを確認できます。
 
 ![choose metrics](../../img/choose-metrics.png)
 
-グループに `workflow_name` と `job_name`
+Aggregationに `workflow_name` と `job_name`
 を指定すると、ワークフローとジョブごとの実行時間を確認することができます。
 
 ![metrics graph](../../img/metrics-graph.png)
@@ -189,3 +187,5 @@ gcloudのデフォルト設定を削除します。
 gcloud config unset project
 gcloud config unset run/region
 ```
+
+フォークしたリポジトリを削除します。
