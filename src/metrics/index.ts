@@ -1,1 +1,1 @@
-export * from './create-metrics.js'
+export { createMetrics } from './create-metrics.js'

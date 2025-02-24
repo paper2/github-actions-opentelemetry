@@ -27,7 +27,8 @@ const createMetricsAttributes = (
 ): opentelemetry.Attributes => ({
   [ak.WORKFLOW_NAME]: workflow.name || undefined,
   [ak.REPOSITORY]: workflow.repository.full_name,
-  ...(job && { [ak.JOB_NAME]: job.name })
+  ...(job && { [ak.JOB_NAME]: job.name }),
+  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion })
 })
 
 export const createWorkflowGauges = (
