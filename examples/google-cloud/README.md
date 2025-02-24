@@ -197,6 +197,8 @@ and select the metric:
 prometheus/github_job_duration_seconds/gauge
 ```
 
+![choose metrics](../../img/choose-metrics.png)
+
 Configure the **Aggregation** settings to group by `workflow_name` and
 `job_name` to see execution times for each workflow and job.
 
