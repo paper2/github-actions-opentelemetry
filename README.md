@@ -13,7 +13,7 @@ Protocol (OTLP) endpoint. It helps you monitor and analyze GitHub Actions.
 - 📊 Collects Metrics of GitHub Actions workflows and job execution times
 - 🔍 Collects Traces of GitHub Actions workflow, jobs, steps.
 - 📦 Sends data to any OTLP-compatible backend for monitoring and observability
-- 🚀 Easy integration with GitHub workflows
+- 🚀 Collect telemetry without modifying existing workflows
 
 ## Metrics
 
