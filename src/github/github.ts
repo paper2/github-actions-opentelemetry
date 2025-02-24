@@ -19,11 +19,11 @@ export const fetchWorkflowResults = async (
   maxTry = 10
 ): Promise<WorkflowResults> => {
   const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN // read environment variable for testing
-  const serverUrl = process.env.GITHUB_API_URL || 'https://api.github.com';
+  const serverUrl = process.env.GITHUB_API_URL || 'https://api.github.com'
   const octokit = new Octokit({
-  baseUrl: serverUrl,
-  auth: token
-  });
+    baseUrl: serverUrl,
+    auth: token
+  })
   const workflowRunContext = getWorkflowRunContext(github.context)
   try {
     // A workflow sometime has not completed in spite of trigger of workflow completed event.
