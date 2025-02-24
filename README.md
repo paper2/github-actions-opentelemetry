@@ -5,8 +5,8 @@
 [![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-This action sends metrics and traces of GitHub Actions to an OpenTelemetry
-endpoint (OTLP). It helps you monitor and analyze GitHub Actions.
+This action sends metrics and traces of GitHub Actions to an OpenTelemetry Protocol (OTLP) endpoint. 
+It helps you monitor and analyze GitHub Actions.
 
 ## Features Summary
 
