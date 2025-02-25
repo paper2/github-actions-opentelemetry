@@ -30,6 +30,12 @@ export const checkCompleted = (workflowResult: WorkflowResults): boolean => {
       core.warning('job.completed_at should be defined.')
       status = false
     }
+    if (!job.conclusion) {
+      core.warning(
+        `job.conclusion should be defined. workflowRun.id: ${workflowRun.id}, job.id: ${job.id}`
+      )
+      status = false
+    }
   }
 
   // check steps

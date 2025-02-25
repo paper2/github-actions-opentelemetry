@@ -28,7 +28,7 @@ const createMetricsAttributes = (
   [ak.WORKFLOW_NAME]: workflow.name || undefined,
   [ak.REPOSITORY]: workflow.repository.full_name,
   ...(job && { [ak.JOB_NAME]: job.name }),
-  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion })
+  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }) // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
 })
 
 export const createWorkflowGauges = (

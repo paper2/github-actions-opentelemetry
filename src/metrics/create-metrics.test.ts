@@ -29,6 +29,7 @@ const workflowRunResults = {
       created_at: '2024-09-01T00:02:00Z',
       started_at: '2024-09-01T00:05:00Z',
       completed_at: '2024-09-01T00:10:00Z',
+      conclusion: 'success',
       id: 30000000000,
       name: 'job1',
       run_id: 10000000000,
@@ -59,6 +60,7 @@ const workflowRunResults = {
       created_at: '2024-09-01T00:12:00Z',
       started_at: '2024-09-01T00:15:00Z',
       completed_at: '2024-09-01T00:20:00Z',
+      conclusion: 'failure',
       id: 30000000001,
       name: 'job2',
       run_id: 10000000000,
@@ -81,7 +83,7 @@ const workflowRunResults = {
           name: 'step2_3',
           started_at: '2024-09-01T00:15:40',
           completed_at: '2024-09-01T00:15:50',
-          conclusion: 'success'
+          conclusion: 'failure'
         }
       ]
     }
@@ -147,6 +149,124 @@ describe('should export expected metrics', () => {
   test(`should throw error when createMetrics fails`, async () => {
     const brokenResults = {} as WorkflowResults
     await expect(createMetrics(brokenResults)).rejects.toThrow()
+  })
+})
+
+describe('should export expected attributes', () => {
+  const exporter = new InMemoryMetricExporter(AggregationTemporality.DELTA)
+
+  beforeEach(() => {
+    exporter.reset()
+    initialize(exporter)
+  })
+
+  afterEach(async () => {
+    opentelemetryAllDisable()
+  })
+
+  test('should export workflow name', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metricWorkflow = findMetricByDescriptorName(
+      exporter,
+      dn.WORKFLOW_DURATION
+    )
+    const metricJob = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
+
+    expect(metricWorkflow.dataPoints).toHaveLength(1)
+    expect(metricWorkflow.dataPoints[0].attributes[ak.WORKFLOW_NAME]).toEqual(
+      workflowRun.name
+    )
+    expect(metricJob.dataPoints).toHaveLength(2)
+    for (const point of metricJob.dataPoints) {
+      expect(point.attributes[ak.WORKFLOW_NAME]).toEqual(workflowRun.name)
+    }
+  })
+
+  test('should export repository name', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metricWorkflow = findMetricByDescriptorName(
+      exporter,
+      dn.WORKFLOW_DURATION
+    )
+    const metricJob = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
+
+    expect(metricWorkflow.dataPoints).toHaveLength(1)
+    expect(metricWorkflow.dataPoints[0].attributes[ak.REPOSITORY]).toEqual(
+      workflowRun.repository.full_name
+    )
+    expect(metricJob.dataPoints).toHaveLength(2)
+    for (const point of metricJob.dataPoints) {
+      expect(point.attributes[ak.REPOSITORY]).toEqual(
+        workflowRun.repository.full_name
+      )
+    }
+  })
+
+  test('should export job name in job metrics', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
+
+    expect(metric.dataPoints).toHaveLength(2)
+    for (const point of metric.dataPoints) {
+      expect(point.attributes[ak.JOB_NAME]).toMatch(/job[1-2]/)
+    }
+  })
+
+  test('should not export job name in workflow metrics', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
+
+    expect(metric.dataPoints).toHaveLength(1)
+    expect(metric.dataPoints[0].attributes[ak.JOB_NAME]).toBeUndefined()
+  })
+
+  test('should export job conclusion in job metrics', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
+
+    expect(metric.dataPoints).toHaveLength(2)
+    expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toEqual(
+      'success'
+    )
+    expect(metric.dataPoints[1].attributes[ak.JOB_CONCLUSION]).toEqual(
+      'failure'
+    )
+  })
+
+  test('should not export job conclusion in workflow metrics', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+    const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
+
+    expect(metric.dataPoints).toHaveLength(1)
+    expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toBeUndefined()
+  })
+
+  test('should not export job conclusion when job conclusion is null', async () => {
+    const modifiedWorkflowRunResults = {
+      workflowRun: workflowRunResults.workflowRun,
+      workflowRunJobs: [
+        workflowRunResults.workflowRunJobs[0],
+        {
+          ...workflowRunResults.workflowRunJobs[1],
+          conclusion: null
+        }
+      ]
+    }
+    await createMetrics(modifiedWorkflowRunResults)
+    await forceFlush()
+    const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
+
+    expect(metric.dataPoints).toHaveLength(2)
+    expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toEqual(
+      'success'
+    )
+    expect(metric.dataPoints[1].attributes[ak.JOB_CONCLUSION]).toBeUndefined()
   })
 })
 
