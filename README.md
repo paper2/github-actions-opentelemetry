@@ -33,8 +33,8 @@ Each metric has associated attributes.
 
 ![Attributes Sample](./img/trace-attributes.png)
 
-You can find trace by the `run_id` attribute is attached the root span. `run_id`
-is visible in the workflow results URL. For example, if the URL is:
+You can find a trace by the `run_id` attribute attached to the root span.
+`run_id` is visible in the workflow results URL. For example, if the URL is:
 
 ```txt
 https://github.com/paper2/github-actions-opentelemetry/actions/runs/12246387114
