@@ -33,6 +33,17 @@ Each metric has associated attributes.
 
 ![Attributes Sample](./img/trace-attributes.png)
 
+You can find trace by the `run_id` attribute is attached the root span. `run_id`
+is visible in the workflow results URL. For example, if the URL is:
+
+```txt
+https://github.com/paper2/github-actions-opentelemetry/actions/runs/12246387114
+```
+
+Then the `run_id` is `12246387114`.
+
+![search-trace-run-id](./img/search-trace-run-id.png)
+
 ## How it works
 
 This action creates metrics and traces of GitHub Actions workflows and sends
@@ -167,8 +178,9 @@ command.
 npm run all
 ```
 
-This command creates index.js and more on dist. You must includes these
-artifacts on a commit.
+> [!NOTE]  
+> This command creates `index.js` and more on the `/dist` directory. You must
+> includes these artifacts on a commit because GitHub Actions uses these files.
 
 ### Recommend to install GitHub CLI (gh)
 
