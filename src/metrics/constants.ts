@@ -8,6 +8,5 @@ export const attributeKeys = {
   REPOSITORY: 'repository',
   WORKFLOW_NAME: 'workflow.name',
   JOB_NAME: 'job.name',
-  // TODO: test追加
   JOB_CONCLUSION: 'job.conclusion'
 } as const satisfies Record<string, string>
