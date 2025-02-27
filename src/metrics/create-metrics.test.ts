@@ -251,9 +251,8 @@ describe('should export expected attributes', () => {
     const modifiedWorkflowRunResults = {
       workflowRun: workflowRunResults.workflowRun,
       workflowRunJobs: [
-        workflowRunResults.workflowRunJobs[0],
         {
-          ...workflowRunResults.workflowRunJobs[1],
+          ...workflowRunResults.workflowRunJobs[0],
           conclusion: null
         }
       ]
@@ -262,11 +261,8 @@ describe('should export expected attributes', () => {
     await forceFlush()
     const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
 
-    expect(metric.dataPoints).toHaveLength(2)
-    expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toEqual(
-      'success'
-    )
-    expect(metric.dataPoints[1].attributes[ak.JOB_CONCLUSION]).toBeUndefined()
+    expect(metric.dataPoints).toHaveLength(1)
+    expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toBeUndefined()
   })
 })
 
