@@ -18,6 +18,7 @@ describe('checkCompleted', () => {
       {
         id: 22222222,
         status: 'completed',
+        conclusion: 'success',
         completed_at: '2024-11-30T12:00:00Z',
         steps: [
           {
@@ -38,6 +39,7 @@ describe('checkCompleted', () => {
         id: 33333333,
         status: 'completed',
         completed_at: '2024-11-30T12:00:00Z',
+        conclusion: 'success',
         steps: [
           {
             name: 'step-1',
@@ -120,6 +122,13 @@ describe('checkCompleted', () => {
         step: {
           completed_at: undefined
         }
+      })
+      expect(checkCompleted(mockData)).toBe(false)
+    })
+
+    test('returns false when a conclusion is not defined', () => {
+      const mockData = createMockWorkflowResults({
+        workflowRunJob: { conclusion: null }
       })
       expect(checkCompleted(mockData)).toBe(false)
     })
