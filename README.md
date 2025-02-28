@@ -111,6 +111,7 @@ jobs:
           # e.g.
           # New Relic: api-key=YOUR_NEWRELIC_API_KEY
           # Google Cloud Run: Authorization=Bearer <value of $(gcloud auth print-identity-token)>
+          # Basic Authentication: Authorization=Basic <base64-encoded value of userid:password>
           OTEL_EXPORTER_OTLP_HEADERS:
             api-key=${ secrets.API_KEY },other-config-value=value
         with:
