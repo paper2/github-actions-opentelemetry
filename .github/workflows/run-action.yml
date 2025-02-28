@@ -1,0 +1,23 @@
+name: run actions for E2E testing
+
+on:
+  workflow_run:
+    workflows:
+      - main
+    types:
+      - completed
+
+jobs:
+  send-telemetry:
+    name: Send CI Telemetry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run
+        id: run
+        uses: paper2/github-actions-opentelemetry@main
+        env:
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
