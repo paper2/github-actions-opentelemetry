@@ -3,6 +3,7 @@ name: Example Workflow 03
 on:
   push:
     branches:
+      - main
       - getting-started
 
 env:
