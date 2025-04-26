@@ -9,7 +9,7 @@ Protocol (OTLP).
 
 > [!IMPORTANT]  
 > `github-actions-opentelemetry` works with any OTLP endpoint. It can also be
-> used outside of Google Cloud.
+> used Other than that Google Cloud.
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ Protocol (OTLP).
    ```
 
    Replace `<REGION>` with your desired Cloud Run region (for example,
-   `asia-northeast1`).
+   `us-west1`).
 
 ## Step 2: Fork the GitHub Actions OpenTelemetry Repository
 
@@ -117,6 +117,8 @@ successfully. Afterward, the
 [Send Telemetry after Other Workflow Example](../../.github/workflows/example-run-action.yml)
 runs and uses `github-actions-opentelemetry` to send traces and metrics to the
 OTLP endpoint.
+
+![verify completed job](../../img/verify-completed-job.png)
 
 Once you confirm that the workflow completes, make another commit to observe
 changes in the metrics:
