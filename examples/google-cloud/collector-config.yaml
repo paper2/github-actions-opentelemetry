@@ -9,10 +9,12 @@ processors:
     send_batch_size: 200
     timeout: 5s
 
-  resourcedetection:
-    detectors: [env, gcp]
-    timeout: 2s
-    override: false
+  resource:
+    attributes:
+      # Not using gcp detector to avoid increasing time series due to changing instance IDs in Cloud Run.
+      - key: 'location'
+        value: 'us-east1' # Set the location to your Google Cloud region
+        action: upsert
 
 exporters:
   googlecloud:
@@ -22,9 +24,9 @@ service:
   pipelines:
     metrics:
       receivers: [otlp]
-      processors: [resourcedetection, batch]
+      processors: [batch, resource]
       exporters: [googlemanagedprometheus]
     traces:
       receivers: [otlp]
-      processors: [resourcedetection, batch]
+      processors: [batch, resource]
       exporters: [googlecloud]
