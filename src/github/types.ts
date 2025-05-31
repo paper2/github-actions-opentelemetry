@@ -2,13 +2,13 @@ import { Endpoints } from '@octokit/types'
 import { context } from '@actions/github'
 
 // Define types for GitHub Actions workflow run and job responses
-export type WorkflowRunResponse =
+export type WorkflowResponse =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}']['response']['data']
-export type WorkflowRunJobsResponse =
+export type WorkflowJobsResponse =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
-export type WorkflowRunJobResponse = WorkflowRunJobsResponse[number]
+export type WorkflowJobResponse = WorkflowJobsResponse[number]
 export type WorkflowStepResponse = NonNullable<
-  WorkflowRunJobResponse['steps']
+  WorkflowJobResponse['steps']
 >[number]
 
 // Define types for the models used in the application
@@ -30,7 +30,7 @@ export type WorkflowJob = {
   readonly workflow_name: string
   readonly steps: WorkflowStep[]
 }
-export type WorkflowRun = {
+export type Workflow = {
   readonly id: number
   readonly name: string
   readonly status: string
@@ -41,14 +41,14 @@ export type WorkflowRun = {
     readonly full_name: string
   }
 }
-export type WorkflowRunContext = {
+export type WorkflowContext = {
   readonly owner: string
   readonly repo: string
   readonly runId: number
   readonly attempt_number: number
 }
 export type WorkflowResults = {
-  workflowRun: WorkflowRun
+  workflowRun: Workflow
   workflowRunJobs: WorkflowJob[]
 }
 export type GitHubContext = typeof context
@@ -66,7 +66,7 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
     completed_at: step.completed_at
   }
 }
-export const toWorkflowJob = (job: WorkflowRunJobResponse): WorkflowJob => {
+export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
   if (!job.conclusion) throw new Error('Job conclusion is required')
   if (!job.completed_at) throw new Error('Job completed_at is required')
   if (!job.workflow_name) throw new Error('Job workflow_name is required')
@@ -84,9 +84,7 @@ export const toWorkflowJob = (job: WorkflowRunJobResponse): WorkflowJob => {
     steps: job.steps?.map(toWorkflowStep) || []
   }
 }
-export const toWorkflowRun = (
-  workflowRun: WorkflowRunResponse
-): WorkflowRun => {
+export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
   if (workflowRun.status !== 'completed')
     throw new Error(`This workflow is not completed. id: ${workflowRun.id}`)
   if (!workflowRun.name) throw new Error('Workflow run name is required')
