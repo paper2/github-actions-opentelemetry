@@ -3,16 +3,18 @@ import * as github from '@actions/github'
 import { EventPayloadMap } from '@octokit/webhooks-types'
 import settings from '../settings.js'
 import {
-  WorkflowRun,
-  WorkflowRunJobs,
-  WorkflowRunContext,
+  WorkflowContext,
   WorkflowResults,
-  GitHubContext
+  GitHubContext,
+  WorkflowJob,
+  toWorkflowRun as toWorkflow,
+  toWorkflowJob,
+  WorkflowResponse,
+  WorkflowJobsResponse
 } from './types.js'
 import * as core from '@actions/core'
 import { fail } from 'assert'
 import { isTooManyTries, retryAsync } from 'ts-retry'
-import { checkCompleted } from './check-completed.js'
 
 export const fetchWorkflowResults = async (
   delayMs = 1000,
@@ -23,21 +25,27 @@ export const fetchWorkflowResults = async (
     baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
     auth: token
   })
-  const workflowRunContext = getWorkflowRunContext(github.context)
+  const workflowContext = getWorkflowContext(github.context)
   try {
     // A workflow sometime has not completed in spite of trigger of workflow completed event.
     // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
     const results = await retryAsync(
-      async () => ({
-        workflowRun: await fetchWorkflowRun(octokit, workflowRunContext),
-        workflowRunJobs: await fetchWorkflowRunJobs(octokit, workflowRunContext)
-      }),
+      async () => {
+        const workflowRes = await fetchWorkflow(octokit, workflowContext)
+        const workflowJobsRes = await fetchWorkflowJobs(
+          octokit,
+          workflowContext
+        )
+        return {
+          workflow: toWorkflow(workflowRes),
+          workflowJobs: workflowJobsRes.map(toWorkflowJob)
+        }
+      },
       {
         delay: delayMs,
         maxTry,
         onError: (err, currentTry) =>
-          console.error(`current try: ${currentTry}`, err),
-        until: lastResult => checkCompleted(lastResult)
+          console.error(`current try: ${currentTry}`, err)
       }
     )
     return results
@@ -51,10 +59,10 @@ export const fetchWorkflowResults = async (
   }
 }
 
-const fetchWorkflowRun = async (
+const fetchWorkflow = async (
   octokit: Octokit,
-  workflowContext: WorkflowRunContext
-): Promise<WorkflowRun> => {
+  workflowContext: WorkflowContext
+): Promise<WorkflowResponse> => {
   const res = await octokit.rest.actions.getWorkflowRunAttempt({
     owner: workflowContext.owner,
     repo: workflowContext.repo,
@@ -66,10 +74,10 @@ const fetchWorkflowRun = async (
   }
 }
 
-const fetchWorkflowRunJobs = async (
+const fetchWorkflowJobs = async (
   octokit: Octokit,
-  workflowContext: WorkflowRunContext
-): Promise<WorkflowRunJobs> => {
+  workflowContext: WorkflowContext
+): Promise<WorkflowJobsResponse> => {
   const res = await octokit.rest.actions.listJobsForWorkflowRun({
     owner: workflowContext.owner,
     repo: workflowContext.repo,
@@ -79,9 +87,7 @@ const fetchWorkflowRunJobs = async (
   return res.data.jobs
 }
 
-export const getWorkflowRunContext = (
-  context: GitHubContext
-): WorkflowRunContext => {
+const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
   // If this workflow is trigged on `workflow_run`, set runId it's id.
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
   const workflowRunEvent = context.payload as
@@ -99,11 +105,8 @@ export const getWorkflowRunContext = (
   }
 }
 
-export const getLatestCompletedAt = (jobs: WorkflowRunJobs): string => {
-  const jobCompletedAtDates = jobs.map(job => {
-    if (job.completed_at === null) fail('Jobs should be completed.')
-    return new Date(job.completed_at)
-  })
+export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
+  const jobCompletedAtDates = jobs.map(job => new Date(job.completed_at))
   const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
   return new Date(maxDateNumber).toISOString()
 }

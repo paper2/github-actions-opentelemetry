@@ -14,29 +14,44 @@ export type WorkflowStepResponse = NonNullable<
 // Define types for the models used in the application
 export type WorkflowStep = {
   readonly name: string
+  // TODO: use union type for conclusion
   readonly conclusion: string
+  // TODO: use Date type
   readonly started_at: string
+  // TODO: use Date type
   readonly completed_at: string
 }
 export type WorkflowJob = {
+  // TODO: use Date type
   readonly created_at: string
+  // TODO: use Date type
   readonly started_at: string
+  // TODO: use Date type
   readonly completed_at: string
   readonly id: number
   readonly name: string
   readonly run_id: number
-  readonly status: string
+  readonly status: 'completed'
+  // TODO: use union type for conclusion
   readonly conclusion: string
+  // runner_name is optional field, so we allow it to be null
+  readonly runner_name: string | null
+  // runner_group_name is optional field, so we allow it to be null
+  readonly runner_group_name: string | null
   readonly workflow_name: string
   readonly steps: WorkflowStep[]
 }
+export type WorkflowJobs = WorkflowJob[]
 export type Workflow = {
   readonly id: number
   readonly name: string
-  readonly status: string
+  readonly status: 'completed'
+  // TODO: use union type for conclusion
   readonly conclusion: string
+  // TODO: use Date type
   readonly created_at: string
   readonly run_attempt: number
+  readonly html_url: string
   readonly repository: {
     readonly full_name: string
   }
@@ -48,8 +63,8 @@ export type WorkflowContext = {
   readonly attempt_number: number
 }
 export type WorkflowResults = {
-  workflowRun: Workflow
-  workflowRunJobs: WorkflowJob[]
+  workflow: Workflow
+  workflowJobs: WorkflowJob[]
 }
 export type GitHubContext = typeof context
 
@@ -67,7 +82,10 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
   }
 }
 export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
+  if (job.status !== 'completed')
+    throw new Error(`This job is not completed. id: ${job.id}`)
   if (!job.conclusion) throw new Error('Job conclusion is required')
+  // FIXME: should exit immediately because it is not recoverable empirically.
   if (!job.completed_at) throw new Error('Job completed_at is required')
   if (!job.workflow_name) throw new Error('Job workflow_name is required')
 
@@ -81,7 +99,9 @@ export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
     completed_at: job.completed_at,
     workflow_name: job.workflow_name,
     run_id: job.run_id,
-    steps: job.steps?.map(toWorkflowStep) || []
+    steps: job.steps?.map(toWorkflowStep) || [],
+    runner_name: job.runner_name,
+    runner_group_name: job.runner_group_name
   }
 }
 export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
@@ -100,6 +120,7 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
     conclusion: workflowRun.conclusion,
     created_at: workflowRun.created_at,
     run_attempt: workflowRun.run_attempt,
+    html_url: workflowRun.html_url,
     repository: {
       full_name: workflowRun.repository.full_name
     }

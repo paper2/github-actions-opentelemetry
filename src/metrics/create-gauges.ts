@@ -2,8 +2,8 @@ import * as opentelemetry from '@opentelemetry/api'
 import {
   getLatestCompletedAt,
   WorkflowRun,
-  WorkflowRunJob,
-  WorkflowRunJobs
+  WorkflowJob,
+  WorkflowJobs
 } from '../github/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { descriptorNames as dn, attributeKeys as ak } from './constants.js'
@@ -23,7 +23,7 @@ export const createGauge = (
 
 const createMetricsAttributes = (
   workflow: WorkflowRun,
-  job?: WorkflowRunJob
+  job?: WorkflowJob
 ): opentelemetry.Attributes => ({
   [ak.WORKFLOW_NAME]: workflow.name || undefined,
   [ak.REPOSITORY]: workflow.repository.full_name,
@@ -33,7 +33,7 @@ const createMetricsAttributes = (
 
 export const createWorkflowGauges = (
   workflow: WorkflowRun,
-  workflowRunJobs: WorkflowRunJobs
+  workflowRunJobs: WorkflowJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
@@ -47,7 +47,7 @@ export const createWorkflowGauges = (
 
 export const createJobGauges = (
   workflow: WorkflowRun,
-  workflowRunJobs: WorkflowRunJobs
+  workflowRunJobs: WorkflowJobs
 ): void => {
   for (const job of workflowRunJobs) {
     if (!job.completed_at) {

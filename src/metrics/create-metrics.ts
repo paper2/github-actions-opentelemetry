@@ -5,14 +5,14 @@ import { WorkflowResults } from 'src/github/types.js'
 export const createMetrics = async (
   results: WorkflowResults
 ): Promise<void> => {
-  const { workflowRun, workflowRunJobs } = results
+  const { workflow: workflow, workflowJobs: workflowJobs } = results
   if (!settings.FeatureFlagMetrics) {
     console.log('metrics feature is disabled.')
     return
   }
   try {
-    createWorkflowGauges(workflowRun, workflowRunJobs)
-    createJobGauges(workflowRun, workflowRunJobs)
+    createWorkflowGauges(workflow, workflowJobs)
+    createJobGauges(workflow, workflowJobs)
   } catch (error) {
     console.error('failed to create metrics')
     throw error
