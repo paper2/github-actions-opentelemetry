@@ -3,7 +3,11 @@
     "allow": [
       "Bash(npm run test:*)",
       "Bash(npm install)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm run coverage:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(npm run all:*)",
+      "Bash(npm run format:write:*)"
     ],
     "deny": []
   }
