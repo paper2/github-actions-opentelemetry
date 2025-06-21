@@ -1,12 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { fetchWorkflowResults, getLatestCompletedAt } from './github.js'
-import {
-  toWorkflowStep,
-  toWorkflowJob,
-  toWorkflowRun,
-  WorkflowStep,
-  WorkflowStepResponse
-} from './types.js'
+import { toWorkflowJob, toWorkflowRun, WorkflowJob, Workflow } from './types.js'
 
 describe('fetchWorkflowResults', () => {
   // Tips: If API limit exceed, authenticate by using below command
@@ -40,67 +34,6 @@ describe('getLatestCompletedAt', () => {
 })
 
 describe('Type converters', () => {
-  describe('toWorkflowStep', () => {
-    test('should convert valid step response', () => {
-      const stepResponse: WorkflowStepResponse = {
-        name: 'test-step',
-        status: 'completed',
-        number: 1,
-        conclusion: 'success',
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: '2023-01-01T00:02:00Z'
-      }
-      const expected: WorkflowStep = {
-        name: 'test-step',
-        conclusion: 'success',
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: '2023-01-01T00:02:00Z'
-      }
-
-      const result = toWorkflowStep(stepResponse)
-      expect(result).toEqual(expected)
-    })
-
-    test('should throw error when conclusion is missing', () => {
-      const stepResponse = {
-        name: 'test-step',
-        conclusion: null,
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: '2023-01-01T00:02:00Z'
-      }
-
-      expect(() => toWorkflowStep(stepResponse as never)).toThrow(
-        'Step conclusion is required'
-      )
-    })
-
-    test('should throw error when started_at is missing', () => {
-      const stepResponse = {
-        name: 'test-step',
-        conclusion: 'success',
-        started_at: null,
-        completed_at: '2023-01-01T00:02:00Z'
-      }
-
-      expect(() => toWorkflowStep(stepResponse as never)).toThrow(
-        'Step started_at is required'
-      )
-    })
-
-    test('should throw error when completed_at is missing', () => {
-      const stepResponse = {
-        name: 'test-step',
-        conclusion: 'success',
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: null
-      }
-
-      expect(() => toWorkflowStep(stepResponse as never)).toThrow(
-        'Step completed_at is required'
-      )
-    })
-  })
-
   describe('toWorkflowJob', () => {
     const mockJobResponse = {
       id: 1,
@@ -126,11 +59,9 @@ describe('Type converters', () => {
 
     test('should convert valid job response', () => {
       const result = toWorkflowJob(mockJobResponse as never)
+      const expected: WorkflowJob = { ...mockJobResponse }
 
-      expect(result.id).toBe(1)
-      expect(result.name).toBe('test-job')
-      expect(result.status).toBe('completed')
-      expect(result.steps).toHaveLength(1)
+      expect(result).toEqual(expected)
     })
 
     test('should handle job without steps', () => {
@@ -188,10 +119,9 @@ describe('Type converters', () => {
     }
     test('should convert valid workflow response', () => {
       const result = toWorkflowRun(mockWorkflowResponse as never)
+      const expected: Workflow = { ...mockWorkflowResponse }
 
-      expect(result.id).toBe(12345)
-      expect(result.name).toBe('Test Workflow')
-      expect(result.status).toBe('completed')
+      expect(result).toEqual(expected)
     })
 
     test('should throw error when workflow is not completed', () => {
