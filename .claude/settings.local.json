@@ -6,7 +6,10 @@
       "Bash(npm run lint)",
       "Bash(npm run all)",
       "Bash(npm run format:write:*)",
-      "Bash(git *)"
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": []
   }
