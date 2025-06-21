@@ -33,6 +33,13 @@ Each metric has associated attributes.
 
 ![Attributes Sample](./img/trace-attributes.png)
 
+Traces include several attributes to help identify and analyze workflow
+execution:
+
+- **Workflow-level attributes**: `run_id`, `run_attempt`, `repository`, `url`
+- **Job-level attributes**: `job.id`, `job.conclusion`, `runner.name`,
+  `runner.group`
+
 You can find a trace by the `run_id` attribute attached to the root span.
 `run_id` is visible in the workflow results URL. For example, if the URL is:
 
