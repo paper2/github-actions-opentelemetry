@@ -203,8 +203,11 @@ describe('should export expected spans', () => {
     }))
 
     spans.map(span => {
+      // NOTE: Resource attributes are defined in vitest.config.ts
       expect(span.resourceAttributes).toMatchObject({
-        'service.name': 'github-actions-opentelemetry'
+        'service.name': 'github-actions-opentelemetry',
+        'test.attribute': 'example',
+        'test.attribute2': 'example2'
       })
     })
   })
