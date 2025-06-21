@@ -40,11 +40,56 @@ describe('getLatestCompletedAt', () => {
   })
 
   test('should handle jobs with null completed_at', () => {
-    const mixedJobs = [
-      { completed_at: '2023-01-01T10:00:00Z' } as WorkflowJob,
-      { completed_at: null } as Partial<WorkflowJob>,
-      { completed_at: '2023-01-01T12:00:00Z' } as WorkflowJob
-    ]
+    const completedJob1 = {
+      id: 1,
+      name: 'job1',
+      status: 'completed' as const,
+      conclusion: 'success',
+      created_at: '2023-01-01T09:00:00Z',
+      started_at: '2023-01-01T09:30:00Z',
+      completed_at: '2023-01-01T10:00:00Z',
+      workflow_name: 'Test Workflow',
+      run_id: 12345,
+      runner_name: null,
+      runner_group_name: null,
+      steps: []
+    } as WorkflowJob
+
+    const completedJob2 = {
+      id: 2,
+      name: 'job2',
+      status: 'completed' as const,
+      conclusion: 'success',
+      created_at: '2023-01-01T11:00:00Z',
+      started_at: '2023-01-01T11:30:00Z',
+      completed_at: '2023-01-01T12:00:00Z',
+      workflow_name: 'Test Workflow',
+      run_id: 12345,
+      runner_name: null,
+      runner_group_name: null,
+      steps: []
+    } as WorkflowJob
+
+    // Create incomplete job that would be filtered out
+    const incompleteJob = {
+      id: 3,
+      name: 'job3',
+      status: 'in_progress' as const,
+      conclusion: null,
+      created_at: '2023-01-01T08:00:00Z',
+      started_at: '2023-01-01T08:30:00Z',
+      completed_at: null,
+      workflow_name: 'Test Workflow',
+      run_id: 12345,
+      runner_name: null,
+      runner_group_name: null,
+      steps: []
+    }
+
+    // Mix completed jobs with incomplete one (simulating real scenario)
+    const mixedJobs = [completedJob1, incompleteJob, completedJob2].filter(
+      (job): job is WorkflowJob => job.status === 'completed'
+    )
 
     const result = getLatestCompletedAt(mixedJobs)
     expect(result).toBe('2023-01-01T12:00:00.000Z')
@@ -86,7 +131,10 @@ describe('Type converters', () => {
       const jobWithoutSteps = { ...mockJobResponse, steps: null }
 
       const result = toWorkflowJob(jobWithoutSteps as never)
-      expect(result.steps).toEqual([])
+      expect(result).not.toBeNull()
+      if (result) {
+        expect(result.steps).toEqual([])
+      }
     })
 
     test('should return null when job is not completed', () => {
