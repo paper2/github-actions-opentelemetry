@@ -2,8 +2,13 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { fetchWorkflowResults, getLatestCompletedAt } from './github.js'
 import * as core from '@actions/core'
 import { Octokit } from '@octokit/rest'
-import { toWorkflowStep, toWorkflowJob, toWorkflowRun } from './types.js'
-import { WorkflowStep } from '@octokit/webhooks-types'
+import {
+  toWorkflowStep,
+  toWorkflowJob,
+  toWorkflowRun,
+  WorkflowStep,
+  WorkflowStepResponse
+} from './types.js'
 
 // Mock dependencies
 vi.mock('@actions/github', () => ({
@@ -96,7 +101,7 @@ describe('fetchWorkflowResults', () => {
   test('should handle retry on failure', async () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
-      .mockImplementation(() => {})
+      .mockImplementation(() => { })
     mockOctokit.rest.actions.getWorkflowRunAttempt.mockRejectedValueOnce(
       new Error('API Error')
     )
@@ -120,8 +125,8 @@ describe('fetchWorkflowResults', () => {
   test('should throw error when max retries exceeded', async () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
-      .mockImplementation(() => {})
-    const coreErrorSpy = vi.spyOn(core, 'error').mockImplementation(() => {})
+      .mockImplementation(() => { })
+    const coreErrorSpy = vi.spyOn(core, 'error').mockImplementation(() => { })
     mockOctokit.rest.actions.getWorkflowRunAttempt.mockRejectedValue(
       new Error('API Error')
     )
@@ -205,7 +210,7 @@ describe('getLatestCompletedAt', () => {
 describe('Type converters', () => {
   describe('toWorkflowStep', () => {
     test('should convert valid step response', () => {
-      const stepResponse: WorkflowStep = {
+      const stepResponse: WorkflowStepResponse = {
         name: 'test-step',
         status: 'completed',
         number: 1,
@@ -213,9 +218,15 @@ describe('Type converters', () => {
         started_at: '2023-01-01T00:01:00Z',
         completed_at: '2023-01-01T00:02:00Z'
       }
+      const expected: WorkflowStep = {
+        name: 'test-step',
+        conclusion: 'success',
+        started_at: '2023-01-01T00:01:00Z',
+        completed_at: '2023-01-01T00:02:00Z'
+      }
 
       const result = toWorkflowStep(stepResponse)
-      expect(result).toEqual(stepResponse)
+      expect(result).toEqual(expected)
     })
 
     test('should throw error when conclusion is missing', () => {
