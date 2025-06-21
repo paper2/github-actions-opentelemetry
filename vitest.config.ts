@@ -17,7 +17,13 @@ const defaultEnv = {
   OTEL_SERVICE_NAME: 'github-actions-opentelemetry',
   OWNER: 'paper2',
   REPOSITORY: 'github-actions-opentelemetry',
-  WORKFLOW_RUN_ID: '12246387114'
+  WORKFLOW_RUN_ID: '15793094512',
+  CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_TEST_WORKFLOW_1: 'test-workflow-1',
+  CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_TEST_WORKFLOW_2: 'test-workflow-2',
+  CUSTOM_ATTRIBUTE_TRACE_JOB_TEST_JOB_1: 'test-job-1',
+  CUSTOM_ATTRIBUTE_TRACE_JOB_TEST_JOB_2: 'test-job-2',
+  CUSTOM_ATTRIBUTE_TRACE_STEP_TEST_STEP_1: 'test-step-1',
+  CUSTOM_ATTRIBUTE_TRACE_STEP_TEST_STEP_2: 'test-step-2',
 }
 
 const CIEnv = {
