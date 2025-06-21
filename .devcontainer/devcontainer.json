@@ -6,11 +6,15 @@
     "add-claude-code": "npm install -g @anthropic-ai/claude-code",
     "add-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}"
   },
-  "dockerComposeFile": ["./compose.yml"],
+  "dockerComposeFile": [
+    "./compose.yml"
+  ],
   "service": "dev-container",
   "customizations": {
     "codespaces": {
-      "openFiles": ["README.md"]
+      "openFiles": [
+        "README.md"
+      ]
     },
     "vscode": {
       "extensions": [
@@ -31,9 +35,15 @@
         "claude-code.vsix"
       ],
       "settings": {
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.tabSize": 2,
-        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
         "markdown.extension.list.indentationSize": "adaptive",
         "markdown.extension.italic.indicator": "_",
         "markdown.extension.orderedList.marker": "one"
