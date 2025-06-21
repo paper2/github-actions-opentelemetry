@@ -57,7 +57,7 @@ context like environment, or team information:
 
 ```yaml
 env:
-  OTEL_RESOURCE_ATTRIBUTES: "environment=production,team=backend"
+  OTEL_RESOURCE_ATTRIBUTES: 'environment=production,team=backend'
 ```
 
 These custom attributes will be included as resource attributes in all exported
