@@ -31,7 +31,18 @@ export const createWorkflowJobSpan = (
   ctx: Context,
   job: WorkflowJob
 ): Context => {
-  if (!job.completed_at || job.steps === undefined) fail()
+  if (!job.completed_at) {
+    throw new Error(
+      `Job completed_at is required for span creation: ${job.name} (id: ${job.id})`
+    )
+  }
+
+  if (job.steps === undefined) {
+    console.warn(
+      `Job ${job.name} (id: ${job.id}) has no steps, skipping step processing`
+    )
+  }
+
   const spanWithWaiting = createSpan(
     ctx,
     `${job.name} with time of waiting runner`,
@@ -78,9 +89,20 @@ export const createWorkflowRunStepSpan = (
   ctx: Context,
   job: WorkflowJob
 ): void => {
-  if (job.steps === undefined) fail()
-  job.steps.map(step => {
-    if (step.started_at == null || step.completed_at == null) fail()
+  if (job.steps === undefined) {
+    console.warn(
+      `Job ${job.name} (id: ${job.id}) has no steps, skipping step span creation`
+    )
+    return
+  }
+
+  job.steps.forEach(step => {
+    if (step.started_at == null || step.completed_at == null) {
+      console.warn(
+        `Step ${step.name} in job ${job.name} has null timestamps, skipping span creation`
+      )
+      return
+    }
     createSpan(
       ctx,
       step.name,
@@ -123,6 +145,8 @@ const getSpanStatusFromConclusion = (
     case 'failure':
     case 'timed_out':
       return { code: opentelemetry.SpanStatusCode.ERROR }
+    case 'in_progress':
+      return { code: opentelemetry.SpanStatusCode.UNSET }
     default:
       return { code: opentelemetry.SpanStatusCode.UNSET }
   }

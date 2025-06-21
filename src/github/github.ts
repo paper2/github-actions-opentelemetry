@@ -110,25 +110,41 @@ const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
   return {
     owner: settings.owner ?? context.repo.owner,
     repo: settings.repository ?? context.repo.repo,
-    attempt_number:
-      workflowRunEvent?.workflow_run?.run_attempt || context.runNumber || 1,
+    attempt_number: workflowRunEvent?.workflow_run?.run_attempt || 1,
     runId
   }
 }
 
 export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
-  // Filter jobs that have completed_at (some might be null for incomplete jobs)
-  const completedJobs = jobs.filter(job => job.completed_at)
+  // Filter jobs that have completed_at with proper type guard
+  const completedJobs = jobs.filter(
+    (job): job is WorkflowJob & { completed_at: string } =>
+      job.completed_at !== null && job.completed_at !== undefined
+  )
 
   if (completedJobs.length === 0) {
     // Fallback: use current time if no completed jobs
-    console.log('No completed jobs found, using current time')
+    console.warn(
+      'No completed jobs found, using current time. This may indicate workflow is still in progress.'
+    )
     return new Date().toISOString()
   }
 
-  const jobCompletedAtDates = completedJobs.map(
-    job => new Date(job.completed_at)
-  )
-  const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
-  return new Date(maxDateNumber).toISOString()
+  try {
+    const jobCompletedAtDates = completedJobs.map(job => {
+      const date = new Date(job.completed_at)
+      if (isNaN(date.getTime())) {
+        throw new Error(
+          `Invalid completed_at timestamp: ${job.completed_at} for job: ${job.name}`
+        )
+      }
+      return date
+    })
+    const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
+    return new Date(maxDateNumber).toISOString()
+  } catch (error) {
+    console.error('Error processing job completion times:', error)
+    // Fallback to current time but log the issue
+    return new Date().toISOString()
+  }
 }

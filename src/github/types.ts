@@ -89,10 +89,19 @@ export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob | null => {
     return null
   }
 
-  if (!job.conclusion) throw new Error('Job conclusion is required')
+  if (!job.conclusion)
+    throw new Error(
+      `Job conclusion is required for job: ${job.name} (id: ${job.id})`
+    )
   // FIXME: should exit immediately because it is not recoverable empirically.
-  if (!job.completed_at) throw new Error('Job completed_at is required')
-  if (!job.workflow_name) throw new Error('Job workflow_name is required')
+  if (!job.completed_at)
+    throw new Error(
+      `Job completed_at is required for job: ${job.name} (id: ${job.id})`
+    )
+  if (!job.workflow_name)
+    throw new Error(
+      `Job workflow_name is required for job: ${job.name} (id: ${job.id})`
+    )
 
   return {
     id: job.id,
