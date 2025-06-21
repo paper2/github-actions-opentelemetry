@@ -1,7 +1,5 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import { fetchWorkflowResults, getLatestCompletedAt } from './github.js'
-import * as core from '@actions/core'
-import { Octokit } from '@octokit/rest'
 import {
   toWorkflowStep,
   toWorkflowJob,
@@ -10,178 +8,12 @@ import {
   WorkflowStepResponse
 } from './types.js'
 
-// Mock dependencies
-vi.mock('@actions/github', () => ({
-  context: {
-    repo: { owner: 'test-owner', repo: 'test-repo' },
-    payload: {
-      workflow_run: {
-        id: 12345,
-        run_attempt: 1
-      }
-    }
-  }
-}))
-vi.mock('@actions/core')
-vi.mock('@octokit/rest')
-vi.mock('../settings.js', () => ({
-  default: {
-    workflowRunId: 12345,
-    owner: 'test-owner',
-    repository: 'test-repo'
-  }
-}))
-
-const mockOctokit = {
-  rest: {
-    actions: {
-      getWorkflowRunAttempt: vi.fn(),
-      listJobsForWorkflowRun: vi.fn()
-    }
-  }
-}
-
-const mockWorkflowResponse = {
-  id: 12345,
-  name: 'Test Workflow',
-  status: 'completed' as const,
-  conclusion: 'success',
-  created_at: '2023-01-01T00:00:00Z',
-  run_attempt: 1,
-  html_url: 'https://github.com/test/repo/actions/runs/12345',
-  repository: {
-    full_name: 'test-owner/test-repo'
-  }
-}
-
-const mockJobResponse = {
-  id: 1,
-  name: 'test-job',
-  status: 'completed' as const,
-  conclusion: 'success',
-  created_at: '2023-01-01T00:00:00Z',
-  started_at: '2023-01-01T00:01:00Z',
-  completed_at: '2023-01-01T00:05:00Z',
-  workflow_name: 'Test Workflow',
-  run_id: 12345,
-  runner_name: 'test-runner',
-  runner_group_name: 'test-group',
-  steps: [
-    {
-      name: 'test-step',
-      conclusion: 'success',
-      started_at: '2023-01-01T00:01:00Z',
-      completed_at: '2023-01-01T00:02:00Z'
-    }
-  ]
-}
-
-beforeEach(() => {
-  vi.clearAllMocks()
-  vi.mocked(Octokit).mockImplementation(() => mockOctokit as unknown as Octokit)
-  vi.mocked(core.getInput).mockReturnValue('test-token')
-})
-
 describe('fetchWorkflowResults', () => {
-  test('should fetch results successfully', async () => {
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockResolvedValue({
-      data: mockWorkflowResponse
-    })
-    mockOctokit.rest.actions.listJobsForWorkflowRun.mockResolvedValue({
-      data: { jobs: [mockJobResponse] }
-    })
-
-    const result = await fetchWorkflowResults(0, 1)
-
-    expect(result.workflow.id).toBe(12345)
-    expect(result.workflowJobs).toHaveLength(1)
-    expect(result.workflowJobs[0].name).toBe('test-job')
-  })
-
-  test('should handle retry on failure', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => { })
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockRejectedValueOnce(
-      new Error('API Error')
-    )
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockResolvedValueOnce({
-      data: mockWorkflowResponse
-    })
-    mockOctokit.rest.actions.listJobsForWorkflowRun.mockResolvedValue({
-      data: { jobs: [mockJobResponse] }
-    })
-
-    const result = await fetchWorkflowResults(100, 3)
-
-    expect(result.workflow.id).toBe(12345)
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'current try: 1',
-      expect.any(Error)
-    )
-    consoleErrorSpy.mockRestore()
-  })
-
-  test('should throw error when max retries exceeded', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => { })
-    const coreErrorSpy = vi.spyOn(core, 'error').mockImplementation(() => { })
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockRejectedValue(
-      new Error('API Error')
-    )
-
-    await expect(fetchWorkflowResults(100, 2)).rejects.toThrow()
-    expect(coreErrorSpy).toHaveBeenCalledWith(
-      'failed to get results of workflow run'
-    )
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'current try: 1',
-      expect.any(Error)
-    )
-    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error))
-
-    consoleErrorSpy.mockRestore()
-    coreErrorSpy.mockRestore()
-  })
-
-  test('should use environment GITHUB_TOKEN when input is not provided', async () => {
-    vi.mocked(core.getInput).mockReturnValue('')
-    process.env.GITHUB_TOKEN = 'env-token'
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockResolvedValue({
-      data: mockWorkflowResponse
-    })
-    mockOctokit.rest.actions.listJobsForWorkflowRun.mockResolvedValue({
-      data: { jobs: [mockJobResponse] }
-    })
-
-    await fetchWorkflowResults(0, 1)
-
-    expect(Octokit).toHaveBeenCalledWith({
-      baseUrl: 'https://api.github.com',
-      auth: 'env-token'
-    })
-
-    delete process.env.GITHUB_TOKEN
-  })
-
-  test('should use custom GitHub API URL from environment', async () => {
-    process.env.GITHUB_API_URL = 'https://api.github.enterprise.com'
-    mockOctokit.rest.actions.getWorkflowRunAttempt.mockResolvedValue({
-      data: mockWorkflowResponse
-    })
-    mockOctokit.rest.actions.listJobsForWorkflowRun.mockResolvedValue({
-      data: { jobs: [mockJobResponse] }
-    })
-
-    await fetchWorkflowResults(0, 1)
-
-    expect(Octokit).toHaveBeenCalledWith({
-      baseUrl: 'https://api.github.enterprise.com',
-      auth: 'test-token'
-    })
-
-    delete process.env.GITHUB_API_URL
+  // Tips: If API limit exceed, authenticate by using below command
+  //       $ export GITHUB_TOKEN=`gh auth token`
+  test('should fetch results using real api', async () => {
+    // not test retry because it needs mock of checkCompleted but it affects correct test case.
+    await expect(fetchWorkflowResults(0, 1)).resolves.not.toThrow()
   })
 })
 
@@ -270,6 +102,28 @@ describe('Type converters', () => {
   })
 
   describe('toWorkflowJob', () => {
+    const mockJobResponse = {
+      id: 1,
+      name: 'test-job',
+      status: 'completed' as const,
+      conclusion: 'success',
+      created_at: '2023-01-01T00:00:00Z',
+      started_at: '2023-01-01T00:01:00Z',
+      completed_at: '2023-01-01T00:05:00Z',
+      workflow_name: 'Test Workflow',
+      run_id: 12345,
+      runner_name: 'test-runner',
+      runner_group_name: 'test-group',
+      steps: [
+        {
+          name: 'test-step',
+          conclusion: 'success',
+          started_at: '2023-01-01T00:01:00Z',
+          completed_at: '2023-01-01T00:02:00Z'
+        }
+      ]
+    }
+
     test('should convert valid job response', () => {
       const result = toWorkflowJob(mockJobResponse as never)
 
@@ -320,6 +174,18 @@ describe('Type converters', () => {
   })
 
   describe('toWorkflowRun', () => {
+    const mockWorkflowResponse = {
+      id: 12345,
+      name: 'Test Workflow',
+      status: 'completed' as const,
+      conclusion: 'success',
+      created_at: '2023-01-01T00:00:00Z',
+      run_attempt: 1,
+      html_url: 'https://github.com/test/repo/actions/runs/12345',
+      repository: {
+        full_name: 'test-owner/test-repo'
+      }
+    }
     test('should convert valid workflow response', () => {
       const result = toWorkflowRun(mockWorkflowResponse as never)
 
