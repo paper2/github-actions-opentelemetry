@@ -33,6 +33,13 @@ Each metric has associated attributes.
 
 ![Attributes Sample](./img/trace-attributes.png)
 
+Traces include several attributes to help identify and analyze workflow
+execution:
+
+- **Workflow-level attributes**: `run_id`, `run_attempt`, `repository`, `url`
+- **Job-level attributes**: `job.id`, `job.conclusion`, `runner.name`,
+  `runner.group`
+
 You can find a trace by the `run_id` attribute attached to the root span.
 `run_id` is visible in the workflow results URL. For example, if the URL is:
 
@@ -41,6 +48,20 @@ https://github.com/paper2/github-actions-opentelemetry/actions/runs/12246387114
 ```
 
 Then the `run_id` is `12246387114`.
+
+### Adding Custom Resource Attributes
+
+You can add custom attributes to all traces and metrics using the
+`OTEL_RESOURCE_ATTRIBUTES` environment variable. This is useful for adding
+context like environment, or team information:
+
+```yaml
+env:
+  OTEL_RESOURCE_ATTRIBUTES: 'environment=production,team=backend'
+```
+
+These custom attributes will be included as resource attributes in all exported
+telemetry data.
 
 ![search-trace-run-id](./img/search-trace-run-id.png)
 
@@ -123,16 +144,17 @@ jobs:
 
 To configure the action, you need to set the following environment variables:
 
-| Environment Variable                  | Required | Default Value | Description                                                                                      |
-| ------------------------------------- | -------- | ------------- | ------------------------------------------------------------------------------------------------ |
-| `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                                                    |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`         | Yes      | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                      |
-| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                 |
-| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value" |
-| `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
-| `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
-| `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
+| Environment Variable                  | Required | Default Value | Description                                                                                        |
+| ------------------------------------- | -------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `OTEL_SERVICE_NAME`                   | Yes      | -             | Service name.                                                                                      |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`         | Yes      | -             | OTLP Endpoint for Traces and Metrics. e.g., <https://collector-example.com>                        |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | No       | -             | OTLP Endpoint for Metrics instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                  |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | No       | -             | OTLP Endpoint for Traces instead of OTEL_EXPORTER_OTLP_ENDPOINT.                                   |
+| `OTEL_EXPORTER_OTLP_HEADERS`          | No       | -             | Additional OTLP headers. Useful for authentication. e.g., "api-key=key,other-config-value=value"   |
+| `OTEL_RESOURCE_ATTRIBUTES`            | No       | -             | Additional resource attributes for traces and metrics. e.g., "environment=production,team=backend" |
+| `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                              |
+| `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                            |
+| `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                         |
 
 ### Getting Started
 

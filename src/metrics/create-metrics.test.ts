@@ -253,6 +253,22 @@ describe('should export expected attributes', () => {
     expect(metric.dataPoints).toHaveLength(1)
     expect(metric.dataPoints[0].attributes[ak.JOB_CONCLUSION]).toBeUndefined()
   })
+
+  test('should verify resource attributes', async () => {
+    await createMetrics(workflowRunResults)
+    await forceFlush()
+
+    const metrics = exporter.getMetrics()
+    expect(metrics).toHaveLength(1)
+
+    const resourceAttributes = metrics[0].resource.attributes
+    // NOTE: Resource attributes are defined in vitest.config.ts
+    expect(resourceAttributes).toMatchObject({
+      'service.name': 'github-actions-opentelemetry',
+      'test.attribute': 'example',
+      'test.attribute2': 'example2'
+    })
+  })
 })
 
 const findMetricByDescriptorName = (

@@ -26,6 +26,10 @@ code in this repository.
 - `npm run format:check` - Check code formatting
 - `npm run coverage` - Generate coverage badge
 
+## Development Best Practices
+
+- Always run `npm run all` at last to ensure complete build validation
+
 ## Architecture Overview
 
 This is a GitHub Action that collects OpenTelemetry metrics and traces from

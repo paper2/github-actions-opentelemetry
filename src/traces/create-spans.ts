@@ -142,6 +142,7 @@ const buildWorkflowAttributes = (
 const buildWorkflowJobAttributes = (
   job: WorkflowJob
 ): opentelemetry.Attributes => ({
+  'job.id': job.id,
   'job.conclusion': job.conclusion,
   'runner.name': job.runner_name || undefined,
   'runner.group': job.runner_group_name || undefined

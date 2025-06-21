@@ -15,9 +15,12 @@ const defaultEnv = {
     'http://prometheus:9090/api/v1/otlp/v1/metrics',
   OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://jaeger:4318/v1/traces',
   OTEL_SERVICE_NAME: 'github-actions-opentelemetry',
+  // OTEL_RESOURCE_ATTRIBUTES: Used to test custom resource attributes functionality
+  // These test attributes are verified in create-trace.test.ts and create-metrics.test.ts
+  OTEL_RESOURCE_ATTRIBUTES: 'test.attribute=example,test.attribute2=example2',
   OWNER: 'paper2',
   REPOSITORY: 'github-actions-opentelemetry',
-  WORKFLOW_RUN_ID: '12246387114'
+  WORKFLOW_RUN_ID: '15793094512'
 }
 
 const CIEnv = {
