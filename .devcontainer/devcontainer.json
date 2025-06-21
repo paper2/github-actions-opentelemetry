@@ -38,9 +38,6 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.tabSize": 2,
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
-        },
         "[typescript]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
