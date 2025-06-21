@@ -1,8 +1,8 @@
 import settings from '../settings.js'
 import { WorkflowResults } from 'src/github/types.js'
 import {
-  createWorkflowRunTrace,
-  createWorkflowRunJobSpan,
+  createWorkflowTrace,
+  createWorkflowJobSpan,
   createWorkflowRunStepSpan
 } from './create-spans.js'
 import * as opentelemetry from '@opentelemetry/api'
@@ -14,10 +14,10 @@ export const createTrace = async (
     console.log('trace feature is disabled.')
     return
   }
-  const { workflowRun, workflowRunJobs } = results
-  const rootCtx = createWorkflowRunTrace(workflowRun, workflowRunJobs)
+  const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results
+  const rootCtx = createWorkflowTrace(workflowRun, workflowRunJobs)
   for (const job of workflowRunJobs) {
-    const jobCtx = createWorkflowRunJobSpan(rootCtx, job)
+    const jobCtx = createWorkflowJobSpan(rootCtx, job)
     createWorkflowRunStepSpan(jobCtx, job)
   }
 
