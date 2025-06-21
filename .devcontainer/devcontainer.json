@@ -3,6 +3,7 @@
   "workspaceFolder": "/workspaces/github-actions-opentelemetry",
   "postAttachCommand": {
     "npm": "npm install",
+    "add-claude-code": "npm install -g @anthropic-ai/claude-code",
     "add-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}"
   },
   "dockerComposeFile": ["./compose.yml"],
@@ -26,7 +27,8 @@
         "rvest.vs-code-prettier-eslint",
         "yzhang.markdown-all-in-one",
         "streetsidesoftware.code-spell-checker",
-        "vitest.explorer"
+        "vitest.explorer",
+        "claude-code.vsix"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -43,6 +45,6 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers-contrib/features/prettier:1": {}
+    "ghcr.io/devcontainers-community/npm-features/prettier:1": {}
   }
 }

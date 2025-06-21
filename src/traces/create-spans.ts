@@ -1,35 +1,35 @@
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api'
 import {
-  WorkflowRun,
-  WorkflowRunJobs,
-  WorkflowRunJob,
+  WorkflowJob,
+  WorkflowJobs,
   getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
 import { fail } from 'assert'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
+import { Workflow } from 'src/github/types.js'
 
-export const createWorkflowRunTrace = (
-  workflowRun: WorkflowRun,
-  workflowRunJobs: WorkflowRunJobs
+export const createWorkflowTrace = (
+  workflow: Workflow,
+  workflowJobs: WorkflowJobs
 ): Context => {
-  if (!workflowRun.name) fail()
+  if (!workflow.name) fail()
   const span = createSpan(
     ROOT_CONTEXT,
-    workflowRun.name,
-    workflowRun.created_at,
-    getLatestCompletedAt(workflowRunJobs),
-    workflowRun.conclusion,
-    { ...buildWorkflowRunAttributes(workflowRun) }
+    workflow.name,
+    workflow.created_at,
+    getLatestCompletedAt(workflowJobs),
+    workflow.conclusion,
+    { ...buildWorkflowAttributes(workflow) }
   )
 
   return opentelemetry.trace.setSpan(ROOT_CONTEXT, span)
 }
 
-export const createWorkflowRunJobSpan = (
+export const createWorkflowJobSpan = (
   ctx: Context,
-  job: WorkflowRunJob
+  job: WorkflowJob
 ): Context => {
   if (!job.completed_at || job.steps === undefined) fail()
   const spanWithWaiting = createSpan(
@@ -38,7 +38,7 @@ export const createWorkflowRunJobSpan = (
     job.created_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowRunJobAttributes(job) }
+    { ...buildWorkflowJobAttributes(job) }
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
@@ -54,7 +54,7 @@ export const createWorkflowRunJobSpan = (
       job.created_at,
       job.started_at,
       'success', // waiting runner is not a error.
-      { ...buildWorkflowRunJobAttributes(job) }
+      { ...buildWorkflowJobAttributes(job) }
     )
   } else {
     core.notice(
@@ -68,7 +68,7 @@ export const createWorkflowRunJobSpan = (
     job.started_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowRunJobAttributes(job) }
+    { ...buildWorkflowJobAttributes(job) }
   )
 
   return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
@@ -76,7 +76,7 @@ export const createWorkflowRunJobSpan = (
 
 export const createWorkflowRunStepSpan = (
   ctx: Context,
-  job: WorkflowRunJob
+  job: WorkflowJob
 ): void => {
   if (job.steps === undefined) fail()
   job.steps.map(step => {
@@ -97,7 +97,7 @@ const createSpan = (
   name: string,
   startAt: string,
   endAt: string,
-  conclusion: string | null,
+  conclusion: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
   const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
@@ -115,7 +115,7 @@ const createSpan = (
 // At the very least, we know that `conclusion` for step, job, and workflow can take the values `success` and `failure`,
 // so I have summarized the definitions accordingly.
 const getSpanStatusFromConclusion = (
-  status: string | null
+  status: string
 ): opentelemetry.SpanStatus => {
   switch (status) {
     case 'success':
@@ -128,8 +128,9 @@ const getSpanStatusFromConclusion = (
   }
 }
 
-const buildWorkflowRunAttributes = (
-  workflowRun: WorkflowRun
+// TODO: add tests for these functions
+const buildWorkflowAttributes = (
+  workflowRun: Workflow
 ): opentelemetry.Attributes => ({
   repository: workflowRun.repository.full_name,
   run_id: workflowRun.id,
@@ -137,10 +138,11 @@ const buildWorkflowRunAttributes = (
   url: workflowRun.html_url
 })
 
-const buildWorkflowRunJobAttributes = (
-  job: WorkflowRunJob
+// TODO: add tests for these functions
+const buildWorkflowJobAttributes = (
+  job: WorkflowJob
 ): opentelemetry.Attributes => ({
-  'job.conclusion': job.conclusion || undefined,
+  'job.conclusion': job.conclusion,
   'runner.name': job.runner_name || undefined,
   'runner.group': job.runner_group_name || undefined
 })

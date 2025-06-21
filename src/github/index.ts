@@ -1,2 +1,8 @@
 export * from './github.js'
-export * from './types.js'
+export {
+  WorkflowResults,
+  Workflow as WorkflowRun,
+  WorkflowJob,
+  WorkflowJobs,
+  WorkflowStep
+} from './types.js'
