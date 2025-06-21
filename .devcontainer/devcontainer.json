@@ -6,15 +6,11 @@
     "add-claude-code": "npm install -g @anthropic-ai/claude-code",
     "add-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}"
   },
-  "dockerComposeFile": [
-    "./compose.yml"
-  ],
+  "dockerComposeFile": ["./compose.yml"],
   "service": "dev-container",
   "customizations": {
     "codespaces": {
-      "openFiles": [
-        "README.md"
-      ]
+      "openFiles": ["README.md"]
     },
     "vscode": {
       "extensions": [
