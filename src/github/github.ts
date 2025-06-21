@@ -38,7 +38,9 @@ export const fetchWorkflowResults = async (
         )
         return {
           workflow: toWorkflow(workflowRes),
-          workflowJobs: workflowJobsRes.map(toWorkflowJob)
+          workflowJobs: workflowJobsRes
+            .map(toWorkflowJob)
+            .filter((job): job is WorkflowJob => job !== null)
         }
       },
       {
@@ -94,19 +96,39 @@ const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
     | EventPayloadMap['workflow_run']
     | undefined
 
-  const runId = settings.workflowRunId ?? workflowRunEvent?.workflow_run?.id
+  // Priority order:
+  // 1. Environment variable (for testing)
+  // 2. workflow_run event payload (existing functionality)
+  // 3. Current workflow's runId (new functionality for push, pull_request, etc.)
+  const runId =
+    settings.workflowRunId ??
+    workflowRunEvent?.workflow_run?.id ??
+    context.runId
+
   if (!runId) fail('Workflow run id should be defined.')
 
   return {
     owner: settings.owner ?? context.repo.owner,
     repo: settings.repository ?? context.repo.repo,
-    attempt_number: workflowRunEvent?.workflow_run?.run_attempt || 1,
+    attempt_number:
+      workflowRunEvent?.workflow_run?.run_attempt || context.runNumber || 1,
     runId
   }
 }
 
 export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
-  const jobCompletedAtDates = jobs.map(job => new Date(job.completed_at))
+  // Filter jobs that have completed_at (some might be null for incomplete jobs)
+  const completedJobs = jobs.filter(job => job.completed_at)
+
+  if (completedJobs.length === 0) {
+    // Fallback: use current time if no completed jobs
+    console.log('No completed jobs found, using current time')
+    return new Date().toISOString()
+  }
+
+  const jobCompletedAtDates = completedJobs.map(
+    job => new Date(job.completed_at)
+  )
   const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
   return new Date(maxDateNumber).toISOString()
 }

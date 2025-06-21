@@ -20,7 +20,7 @@ export const createWorkflowTrace = (
     workflow.name,
     workflow.created_at,
     getLatestCompletedAt(workflowJobs),
-    workflow.conclusion,
+    workflow.conclusion || 'in_progress',
     { ...buildWorkflowAttributes(workflow) }
   )
 

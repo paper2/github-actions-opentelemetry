@@ -45,9 +45,9 @@ export type WorkflowJobs = WorkflowJob[]
 export type Workflow = {
   readonly id: number
   readonly name: string
-  readonly status: 'completed'
+  readonly status: 'completed' | 'in_progress'
   // TODO: use union type for conclusion
-  readonly conclusion: string
+  readonly conclusion: string | null
   // TODO: use Date type
   readonly created_at: string
   readonly run_attempt: number
@@ -81,9 +81,14 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
     completed_at: step.completed_at
   }
 }
-export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
-  if (job.status !== 'completed')
-    throw new Error(`This job is not completed. id: ${job.id}`)
+export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob | null => {
+  // Skip incomplete jobs for new functionality (push, pull_request, etc.)
+  // This maintains backward compatibility with workflow_run events
+  if (job.status !== 'completed') {
+    console.log(`Skipping incomplete job: ${job.name} (status: ${job.status})`)
+    return null
+  }
+
   if (!job.conclusion) throw new Error('Job conclusion is required')
   // FIXME: should exit immediately because it is not recoverable empirically.
   if (!job.completed_at) throw new Error('Job completed_at is required')
@@ -105,11 +110,30 @@ export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
   }
 }
 export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
-  if (workflowRun.status !== 'completed')
-    throw new Error(`This workflow is not completed. id: ${workflowRun.id}`)
+  // Allow in_progress workflows for new functionality (push, pull_request, etc.)
+  // while maintaining strict validation for workflow_run events
+  if (
+    workflowRun.status !== 'completed' &&
+    workflowRun.status !== 'in_progress'
+  ) {
+    throw new Error(
+      `Unsupported workflow status: ${workflowRun.status} for workflow id: ${workflowRun.id}`
+    )
+  }
+
+  if (workflowRun.status === 'in_progress') {
+    console.log(`Processing in-progress workflow: ${workflowRun.id}`)
+  }
+
   if (!workflowRun.name) throw new Error('Workflow run name is required')
-  if (!workflowRun.conclusion)
-    throw new Error('Workflow run conclusion is required')
+
+  // For in_progress workflows, conclusion might be null
+  if (workflowRun.status === 'completed' && !workflowRun.conclusion) {
+    throw new Error(
+      'Workflow run conclusion is required for completed workflows'
+    )
+  }
+
   if (!workflowRun.run_attempt)
     throw new Error('Workflow run attempt is required')
 
@@ -117,7 +141,7 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
     id: workflowRun.id,
     name: workflowRun.name,
     status: workflowRun.status,
-    conclusion: workflowRun.conclusion,
+    conclusion: workflowRun.conclusion || null,
     created_at: workflowRun.created_at,
     run_attempt: workflowRun.run_attempt,
     html_url: workflowRun.html_url,

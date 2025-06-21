@@ -9,8 +9,6 @@ code in this repository.
 
 - `npm run all` - Complete build process: format, lint, test, coverage, and
   package
-- `npm run package` - Compile TypeScript to `dist/index.js` using ncc (required
-  for GitHub Actions)
 - `npm run bundle` - Format and package in one command
 
 ### Testing
@@ -35,7 +33,8 @@ completed GitHub workflows. The architecture follows these key patterns:
 
 ### Core Flow
 
-1. **Trigger**: Action runs on `workflow_run` completion events
+1. **Trigger**: Action runs on `workflow_run` completion events (original) OR as
+   final job in current workflow (new)
 2. **Data Collection**: Uses GitHub API to fetch workflow/job data via
    `fetchWorkflowResults()`
 3. **Telemetry Generation**: Creates both metrics and traces from the collected
@@ -64,6 +63,13 @@ The action processes GitHub workflow data through these key types:
 - Spans are created hierarchically: root workflow span → job spans (with waiting
   time) → step spans
 - Metrics track durations at workflow and job levels with associated attributes
+
+#### Two Operating Modes
+
+1. **workflow_run mode**: Processes completed workflows triggered by
+   workflow_run events (all jobs completed)
+2. **current workflow mode**: Processes current workflow when run as final job
+   (incomplete jobs are filtered out)
 
 ### Important Build Requirement
 
@@ -95,3 +101,7 @@ The action is configured via OpenTelemetry standard environment variables:
 - Always run `npm run all` before commits to ensure complete build validation
 - When adding new attributes to traces/metrics, update corresponding tests and
   documentation
+- When modifying data collection logic, ensure both workflow_run and current
+  workflow modes work correctly
+- New features should gracefully handle incomplete jobs (return null) to
+  maintain backward compatibility

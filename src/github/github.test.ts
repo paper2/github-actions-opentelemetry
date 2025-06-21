@@ -31,6 +31,24 @@ describe('getLatestCompletedAt', () => {
     const result = getLatestCompletedAt(jobs as never)
     expect(result).toBe('2023-01-01T00:05:00.000Z')
   })
+
+  test('should handle empty jobs array', () => {
+    const result = getLatestCompletedAt([])
+
+    // Should return current time, just check it's a valid ISO string
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+  })
+
+  test('should handle jobs with null completed_at', () => {
+    const mixedJobs = [
+      { completed_at: '2023-01-01T10:00:00Z' } as WorkflowJob,
+      { completed_at: null } as Partial<WorkflowJob>,
+      { completed_at: '2023-01-01T12:00:00Z' } as WorkflowJob
+    ]
+
+    const result = getLatestCompletedAt(mixedJobs)
+    expect(result).toBe('2023-01-01T12:00:00.000Z')
+  })
 })
 
 describe('Type converters', () => {
@@ -71,12 +89,11 @@ describe('Type converters', () => {
       expect(result.steps).toEqual([])
     })
 
-    test('should throw error when job is not completed', () => {
+    test('should return null when job is not completed', () => {
       const incompleteJob = { ...mockJobResponse, status: 'in_progress' }
 
-      expect(() => toWorkflowJob(incompleteJob as never)).toThrow(
-        'This job is not completed. id: 1'
-      )
+      const result = toWorkflowJob(incompleteJob as never)
+      expect(result).toBeNull()
     })
 
     test('should throw error when conclusion is missing', () => {
@@ -124,14 +141,26 @@ describe('Type converters', () => {
       expect(result).toEqual(expected)
     })
 
-    test('should throw error when workflow is not completed', () => {
+    test('should handle in_progress workflow', () => {
       const incompleteWorkflow = {
         ...mockWorkflowResponse,
-        status: 'in_progress'
+        status: 'in_progress',
+        conclusion: null
       }
 
-      expect(() => toWorkflowRun(incompleteWorkflow as never)).toThrow(
-        'This workflow is not completed. id: 12345'
+      const result = toWorkflowRun(incompleteWorkflow as never)
+      expect(result.status).toBe('in_progress')
+      expect(result.conclusion).toBeNull()
+    })
+
+    test('should throw error for unsupported workflow status', () => {
+      const failedWorkflow = {
+        ...mockWorkflowResponse,
+        status: 'failed'
+      }
+
+      expect(() => toWorkflowRun(failedWorkflow as never)).toThrow(
+        'Unsupported workflow status: failed for workflow id: 12345'
       )
     })
 
