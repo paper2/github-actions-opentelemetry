@@ -1,5 +1,5 @@
 import { test, describe, expect } from 'vitest'
-import { createSettings } from './settings.js'
+import { createSettings, extractCustomAttributes } from './settings.js'
 
 describe('settings', () => {
   test('should parse WORKFLOW_RUN_ID correctly', async () => {
@@ -64,5 +64,111 @@ describe('settings', () => {
     delete process.env.OTEL_LOG_LEVEL
     const settings = createSettings(process.env)
     expect(settings.logeLevel).toBe('info')
+  })
+})
+
+describe('extractCustomAttributes', () => {
+  test('should extract custom attributes from environment variables', async () => {
+    const env = {
+      CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM: 'backend-team',
+      CUSTOM_ATTRIBUTE_TRACE_JOB_ENVIRONMENT: 'production',
+      CUSTOM_ATTRIBUTE_TRACE_JOB_REGION: 'us-west-2',
+      OTHER_ENV_VAR: 'should-be-ignored'
+    }
+
+    const result = extractCustomAttributes(env, 'CUSTOM_ATTRIBUTE_TRACE_JOB')
+
+    expect(result).toEqual({
+      team: 'backend-team',
+      environment: 'production',
+      region: 'us-west-2'
+    })
+  })
+
+  test('should return empty object when no matching environment variables exist', async () => {
+    const env = {
+      OTHER_ENV_VAR: 'some-value',
+      ANOTHER_VAR: 'another-value'
+    }
+
+    const result = extractCustomAttributes(env, 'CUSTOM_ATTRIBUTE_TRACE_JOB')
+
+    expect(result).toEqual({})
+  })
+
+  test('should ignore environment variables with undefined values', async () => {
+    const env = {
+      CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM: 'backend-team',
+      CUSTOM_ATTRIBUTE_TRACE_JOB_REGION: undefined,
+      CUSTOM_ATTRIBUTE_TRACE_JOB_ENVIRONMENT: ''
+    }
+
+    const result = extractCustomAttributes(env, 'CUSTOM_ATTRIBUTE_TRACE_JOB')
+
+    expect(result).toEqual({
+      team: 'backend-team'
+    })
+  })
+
+  test('should convert attribute names to lowercase', async () => {
+    const env = {
+      CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM_NAME: 'backend-team',
+      CUSTOM_ATTRIBUTE_TRACE_JOB_DEPLOYMENT_ENVIRONMENT: 'production'
+    }
+
+    const result = extractCustomAttributes(env, 'CUSTOM_ATTRIBUTE_TRACE_JOB')
+
+    expect(result).toEqual({
+      team_name: 'backend-team',
+      deployment_environment: 'production'
+    })
+  })
+
+  test('should work with different prefixes', async () => {
+    const env = {
+      CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_PROJECT: 'my-app',
+      CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_VERSION: 'v1.2.3',
+      CUSTOM_ATTRIBUTE_TRACE_STEP_CATEGORY: 'build'
+    }
+
+    const workflowResult = extractCustomAttributes(
+      env,
+      'CUSTOM_ATTRIBUTE_TRACE_WORKFLOW'
+    )
+    const stepResult = extractCustomAttributes(
+      env,
+      'CUSTOM_ATTRIBUTE_TRACE_STEP'
+    )
+
+    expect(workflowResult).toEqual({
+      project: 'my-app',
+      version: 'v1.2.3'
+    })
+
+    expect(stepResult).toEqual({
+      category: 'build'
+    })
+  })
+})
+
+describe('createSettings with custom attributes', () => {
+  test('should include custom attributes in settings', async () => {
+    const env = {
+      CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM: 'backend-team',
+      CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_PROJECT: 'my-app',
+      CUSTOM_ATTRIBUTE_TRACE_STEP_CATEGORY: 'build'
+    }
+
+    const settings = createSettings(env)
+
+    expect(settings.customJobAttributes).toEqual({
+      team: 'backend-team'
+    })
+    expect(settings.customWorkflowAttributes).toEqual({
+      project: 'my-app'
+    })
+    expect(settings.customStepAttributes).toEqual({
+      category: 'build'
+    })
   })
 })

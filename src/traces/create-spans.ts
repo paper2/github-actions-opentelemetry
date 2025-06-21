@@ -9,6 +9,7 @@ import { fail } from 'assert'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
 import { Workflow } from 'src/github/types.js'
+import settings from '../settings.js'
 
 export const createWorkflowTrace = (
   workflow: Workflow,
@@ -87,7 +88,7 @@ export const createWorkflowRunStepSpan = (
       step.started_at,
       step.completed_at,
       step.conclusion,
-      {}
+      settings.customStepAttributes
     )
   })
 }
@@ -135,7 +136,8 @@ const buildWorkflowAttributes = (
   repository: workflowRun.repository.full_name,
   run_id: workflowRun.id,
   run_attempt: workflowRun.run_attempt,
-  url: workflowRun.html_url
+  url: workflowRun.html_url,
+  ...settings.customWorkflowAttributes
 })
 
 // TODO: add tests for these functions
@@ -144,5 +146,6 @@ const buildWorkflowJobAttributes = (
 ): opentelemetry.Attributes => ({
   'job.conclusion': job.conclusion,
   'runner.name': job.runner_name || undefined,
-  'runner.group': job.runner_group_name || undefined
+  'runner.group': job.runner_group_name || undefined,
+  ...settings.customJobAttributes
 })

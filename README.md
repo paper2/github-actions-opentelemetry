@@ -114,6 +114,11 @@ jobs:
           # Basic Authentication: Authorization=Basic <base64-encoded value of userid:password>
           OTEL_EXPORTER_OTLP_HEADERS:
             api-key=${ secrets.API_KEY },other-config-value=value
+          # Custom attributes for traces
+          CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM: backend-team
+          CUSTOM_ATTRIBUTE_TRACE_JOB_ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_PROJECT: my-application
+          CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_VERSION: ${{ github.ref_name }}
         with:
           # Required for collecting workflow data
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -133,6 +138,52 @@ To configure the action, you need to set the following environment variables:
 | `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
+| `CUSTOM_ATTRIBUTE_TRACE_JOB_*`        | No       | -             | Custom attributes for job spans. Replace `*` with attribute name (e.g., `TEAM`, `ENVIRONMENT`)   |
+| `CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_*`   | No       | -             | Custom attributes for workflow spans. Replace `*` with attribute name                            |
+| `CUSTOM_ATTRIBUTE_TRACE_STEP_*`       | No       | -             | Custom attributes for step spans. Replace `*` with attribute name                                |
+
+#### Custom Trace Attributes
+
+You can add custom attributes to traces using environment variables with
+specific naming patterns:
+
+- **Job-level attributes**: `CUSTOM_ATTRIBUTE_TRACE_JOB_<ATTRIBUTE_NAME>`
+- **Workflow-level attributes**:
+  `CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_<ATTRIBUTE_NAME>`
+- **Step-level attributes**: `CUSTOM_ATTRIBUTE_TRACE_STEP_<ATTRIBUTE_NAME>`
+
+The `<ATTRIBUTE_NAME>` portion will be converted to lowercase and used as the
+attribute key. For example:
+
+```yaml
+env:
+  # Job-level custom attributes
+  CUSTOM_ATTRIBUTE_TRACE_JOB_TEAM: backend-team
+  CUSTOM_ATTRIBUTE_TRACE_JOB_ENVIRONMENT: production
+  CUSTOM_ATTRIBUTE_TRACE_JOB_REGION: us-west-2
+
+  # Workflow-level custom attributes
+  CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_PROJECT: my-application
+  CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_VERSION: v1.2.3
+
+  # Step-level custom attributes
+  CUSTOM_ATTRIBUTE_TRACE_STEP_CATEGORY: build
+```
+
+This will add the following attributes to your traces:
+
+- Job spans: `team: "backend-team"`, `environment: "production"`,
+  `region: "us-west-2"`
+- Workflow spans: `project: "my-application"`, `version: "v1.2.3"`
+- Step spans: `category: "build"`
+
+Custom attributes are useful for:
+
+- **Team identification**: Track which team owns specific jobs
+- **Environment labeling**: Distinguish between dev/staging/production workflows
+- **Resource tagging**: Add cloud region, deployment target information
+- **Project organization**: Group traces by project or service
+- **Version tracking**: Include version numbers or commit information
 
 ### Getting Started
 
