@@ -6,7 +6,9 @@
       "Bash(npm run lint)",
       "Bash(npm run all)",
       "Bash(npm run format:write:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
