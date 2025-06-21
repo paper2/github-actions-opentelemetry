@@ -11,19 +11,20 @@ import { fail } from 'assert'
 import settings from '../settings.js'
 import { SpanStatusCode } from '@opentelemetry/api'
 
-const workflowRunResults = {
-  workflowRun: {
+const workflowRunResults: WorkflowResults = {
+  workflow: {
     created_at: '2024-09-01T00:00:00Z',
     status: 'completed',
     id: 10000000000,
     name: 'Test Run',
-    run_number: 14,
+    run_attempt: 14,
     repository: {
       full_name: 'paper2/github-actions-opentelemetry'
     },
-    conclusion: 'failure'
+    conclusion: 'failure',
+    html_url: 'http://example.com/workflow_run'
   },
-  workflowRunJobs: [
+  workflowJobs: [
     {
       created_at: '2024-09-01T00:02:00Z',
       started_at: '2024-09-01T00:05:00Z',
@@ -44,16 +45,18 @@ const workflowRunResults = {
         {
           name: 'step1_2',
           started_at: '2024-09-01T00:05:30Z',
-          completed_at: '2024-09-01T00:05:35',
+          completed_at: '2024-09-01T00:05:35Z',
           conclusion: 'success'
         },
         {
           name: 'step1_3',
-          started_at: '2024-09-01T00:05:40',
-          completed_at: '2024-09-01T00:05:50',
+          started_at: '2024-09-01T00:05:40Z',
+          completed_at: '2024-09-01T00:05:50Z',
           conclusion: 'success'
         }
-      ]
+      ],
+      runner_name: null,
+      runner_group_name: null
     },
     {
       created_at: '2024-09-01T00:12:00Z',
@@ -84,11 +87,14 @@ const workflowRunResults = {
           completed_at: '2024-09-01T00:15:50',
           conclusion: 'failure'
         }
-      ]
+      ],
+      runner_name: null,
+      runner_group_name: null
     }
   ]
-} as WorkflowResults
-const { workflowRun, workflowRunJobs } = workflowRunResults
+}
+const { workflow: workflowRun, workflowJobs: workflowRunJobs } =
+  workflowRunResults
 
 describe('should export expected spans', () => {
   const exporter = new InMemorySpanExporter()
