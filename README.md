@@ -138,8 +138,8 @@ To configure the action, you need to set the following environment variables:
 | `FEATURE_TRACE`                       | No       | `true`        | Enable trace feature.                                                                            |
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                          |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                       |
-| `CUSTOM_ATTRIBUTE_TRACE_JOB_*`        | No       | -             | Custom attributes for job spans. Replace `*` with attribute name (e.g., `TEAM`, `ENVIRONMENT`)   |
 | `CUSTOM_ATTRIBUTE_TRACE_WORKFLOW_*`   | No       | -             | Custom attributes for workflow spans. Replace `*` with attribute name                            |
+| `CUSTOM_ATTRIBUTE_TRACE_JOB_*`        | No       | -             | Custom attributes for job spans. Replace `*` with attribute name (e.g., `TEAM`, `ENVIRONMENT`)   |
 | `CUSTOM_ATTRIBUTE_TRACE_STEP_*`       | No       | -             | Custom attributes for step spans. Replace `*` with attribute name                                |
 
 #### Custom Trace Attributes
