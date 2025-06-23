@@ -24,17 +24,16 @@
         "github.vscode-pull-request-github",
         "me-dutour-mathieu.vscode-github-actions",
         "redhat.vscode-yaml",
-        "rvest.vs-code-prettier-eslint",
         "yzhang.markdown-all-in-one",
         "streetsidesoftware.code-spell-checker",
         "vitest.explorer",
         "claude-code.vsix"
       ],
       "settings": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.tabSize": 2,
         "editor.formatOnSave": true,
         "markdown.extension.list.indentationSize": "adaptive",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "json.format.enable": false,
         "markdown.extension.italic.indicator": "_",
         "markdown.extension.orderedList.marker": "one"
       }
