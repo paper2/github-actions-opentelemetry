@@ -27,7 +27,7 @@
         "yzhang.markdown-all-in-one",
         "streetsidesoftware.code-spell-checker",
         "vitest.explorer",
-        "claude-code.vsix"
+        "Anthropic.claude-code"
       ],
       "settings": {
         "editor.formatOnSave": true,
