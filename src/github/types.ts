@@ -45,7 +45,6 @@ export type WorkflowJobs = WorkflowJob[]
 export type Workflow = {
   readonly id: number
   readonly name: string
-  readonly status: 'completed' | 'in_progress'
   // TODO: use union type for conclusion
   readonly conclusion: string | null
   // TODO: use Date type
@@ -119,29 +118,19 @@ export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob | null => {
   }
 }
 export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
-  // Allow in_progress workflows for new functionality (push, pull_request, etc.)
-  // while maintaining strict validation for workflow_run events
+  // Special handling remains for backward compatibility as the initial specification retried until workflow_run events reached completed status.
   if (
-    workflowRun.status !== 'completed' &&
-    workflowRun.status !== 'in_progress'
-  ) {
-    throw new Error(
-      `Unsupported workflow status: ${workflowRun.status} for workflow id: ${workflowRun.id}`
-    )
-  }
+    workflowRun.event === 'workflow_run' &&
+    workflowRun.status !== 'completed'
+  )
+    throw new Error('workflow status must be completed on workflow_run event')
 
+  // Output support inquiry log when enabled to work beyond workflow_run events
   if (workflowRun.status === 'in_progress') {
     console.log(`Processing in-progress workflow: ${workflowRun.id}`)
   }
 
   if (!workflowRun.name) throw new Error('Workflow run name is required')
-
-  // For in_progress workflows, conclusion might be null
-  if (workflowRun.status === 'completed' && !workflowRun.conclusion) {
-    throw new Error(
-      'Workflow run conclusion is required for completed workflows'
-    )
-  }
 
   if (!workflowRun.run_attempt)
     throw new Error('Workflow run attempt is required')
@@ -149,8 +138,7 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
   return {
     id: workflowRun.id,
     name: workflowRun.name,
-    status: workflowRun.status,
-    conclusion: workflowRun.conclusion || null,
+    conclusion: workflowRun.conclusion,
     created_at: workflowRun.created_at,
     run_attempt: workflowRun.run_attempt,
     html_url: workflowRun.html_url,

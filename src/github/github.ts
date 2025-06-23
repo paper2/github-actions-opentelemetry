@@ -1,6 +1,5 @@
 import { Octokit } from '@octokit/rest'
 import * as github from '@actions/github'
-import { EventPayloadMap } from '@octokit/webhooks-types'
 import settings from '../settings.js'
 import {
   WorkflowContext,
@@ -13,8 +12,8 @@ import {
   WorkflowJobsResponse
 } from './types.js'
 import * as core from '@actions/core'
-import { fail } from 'assert'
 import { isTooManyTries, retryAsync } from 'ts-retry'
+import { WorkflowRunEvent } from '@octokit/webhooks-types'
 
 export const fetchWorkflowResults = async (
   delayMs = 1000,
@@ -90,28 +89,25 @@ const fetchWorkflowJobs = async (
 }
 
 const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
-  // If this workflow is trigged on `workflow_run`, set runId it's id.
+  const owner = settings.owner ?? context.repo.owner
+  const repo = settings.repository ?? context.repo.repo
+
+  if (context.eventName !== 'workflow_run')
+    return {
+      owner,
+      repo,
+      attempt_number: context.runNumber || 1, // 1 is for testing.
+      runId: settings.workflowRunId ?? context.runId
+    }
+
+  // If this workflow is trigged on `workflow_run`, set runId targeted workflow's id.
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
-  const workflowRunEvent = context.payload as
-    | EventPayloadMap['workflow_run']
-    | undefined
-
-  // Priority order:
-  // 1. Environment variable (for testing)
-  // 2. workflow_run event payload (existing functionality)
-  // 3. Current workflow's runId (new functionality for push, pull_request, etc.)
-  const runId =
-    settings.workflowRunId ??
-    workflowRunEvent?.workflow_run?.id ??
-    context.runId
-
-  if (!runId) fail('Workflow run id should be defined.')
-
+  const workflowRunEvent = context.payload as WorkflowRunEvent
   return {
-    owner: settings.owner ?? context.repo.owner,
-    repo: settings.repository ?? context.repo.repo,
-    attempt_number: workflowRunEvent?.workflow_run?.run_attempt || 1,
-    runId
+    owner,
+    repo,
+    attempt_number: workflowRunEvent.workflow_run.run_attempt || 1, // 1 is for testing.
+    runId: settings.workflowRunId ?? workflowRunEvent.workflow_run.id
   }
 }
 
