@@ -19,5 +19,6 @@
       "Bash(npx vitest:*)"
     ],
     "deny": []
-  }
+  },
+  "preferredNotifChannel": "terminal_bell"
 }
