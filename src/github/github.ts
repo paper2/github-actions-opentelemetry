@@ -96,7 +96,7 @@ const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
     return {
       owner,
       repo,
-      attempt_number: context.runNumber || 1, // 1 is for testing.
+      attempt_number: context.runAttempt || 1, // 1 is for testing.
       runId: settings.workflowRunId ?? context.runId
     }
 
