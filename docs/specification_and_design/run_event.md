@@ -7,5 +7,7 @@
 
 ## design
 
-- Considered having the Workflow model hold events to enable event-specific behavior, but decided against it since we could comprehensively support various events
+- Considered having the Workflow model hold events to enable event-specific
+  behavior, but decided against it since we could comprehensively support
+  various events
 - Ensure backward compatibility
