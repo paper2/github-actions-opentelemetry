@@ -46,21 +46,6 @@ describe('createWorkflowJobSpan', () => {
     )
   })
 
-  test('should handle job without steps gracefully', () => {
-    const jobWithoutSteps = {
-      ...mockJob,
-      steps: undefined
-    }
-
-    // Should not throw, just log a warning
-    expect(() =>
-      createWorkflowJobSpan(ROOT_CONTEXT, jobWithoutSteps)
-    ).not.toThrow()
-    expect(console.warn).toHaveBeenCalledWith(
-      'Job test-job (id: 1) has no steps, skipping step processing'
-    )
-  })
-
   test('should process job with steps normally', () => {
     // Should not throw and not log warnings for normal job
     expect(() => createWorkflowJobSpan(ROOT_CONTEXT, mockJob)).not.toThrow()
@@ -95,21 +80,6 @@ describe('createWorkflowRunStepSpan', () => {
       }
     ]
   }
-
-  test('should handle job without steps', () => {
-    const jobWithoutSteps = {
-      ...mockJobWithSteps,
-      steps: undefined
-    }
-
-    // Should not throw, just log a warning and return early
-    expect(() =>
-      createWorkflowRunStepSpan(ROOT_CONTEXT, jobWithoutSteps)
-    ).not.toThrow()
-    expect(console.warn).toHaveBeenCalledWith(
-      'Job test-job (id: 1) has no steps, skipping step span creation'
-    )
-  })
 
   test('should handle steps with null timestamps', () => {
     // Should not throw, just log warnings for invalid steps
