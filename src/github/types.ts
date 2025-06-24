@@ -80,10 +80,15 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
     completed_at: step.completed_at
   }
 }
-export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob | null => {
-  // Skip incomplete jobs for new functionality (push, pull_request, etc.)
-  // This maintains backward compatibility with workflow_run events
-  if (job.status !== 'completed') {
+export const toWorkflowJob = (
+  job: WorkflowJobResponse,
+  eventName: string
+): WorkflowJob | null => {
+  if (eventName === 'workflow_run' && job.status !== 'completed') {
+    // This error is for backward compatibility.
+    throw new Error('job.status must be completed on workflow_run event')
+  } else if (job.status !== 'completed') {
+    // Skip incomplete jobs for push, pull_request, etc.
     console.log(`Skipping incomplete job: ${job.name} (status: ${job.status})`)
     return null
   }

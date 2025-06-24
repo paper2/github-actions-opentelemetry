@@ -38,7 +38,7 @@ export const fetchWorkflowResults = async (
         return {
           workflow: toWorkflow(workflowRes),
           workflowJobs: workflowJobsRes
-            .map(toWorkflowJob)
+            .map(job => toWorkflowJob(job, workflowRes.event))
             .filter((job): job is WorkflowJob => job !== null)
         }
       },
