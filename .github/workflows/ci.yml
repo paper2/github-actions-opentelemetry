@@ -49,7 +49,7 @@ jobs:
         run: npm run test
 
   test-action:
-    name: GitHub Actions Test
+    name: GitHub Actions Test for push or pull_request event
     runs-on: ubuntu-latest
     services:
       # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
@@ -67,9 +67,5 @@ jobs:
         uses: ./
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
-          OWNER: paper2
-          REPOSITORY: github-actions-opentelemetry
-          # If this job is removed, update it.
-          WORKFLOW_RUN_ID: 15793094512
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
