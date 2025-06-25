@@ -67,5 +67,7 @@ jobs:
         uses: ./
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
+          OTEL_EXPORTER_OTLP_ENDPOINT:
+            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
