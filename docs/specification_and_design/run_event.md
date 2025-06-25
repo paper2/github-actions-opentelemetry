@@ -11,6 +11,8 @@
   - `github.job.duration`
     - Duration of job
   - `github.job.queued_duration`
+- metrics and traces do not include jobs that are not completed
+  - Github Actions OpenTelemetry job's telemetry is not collected.
 
 ## design
 
