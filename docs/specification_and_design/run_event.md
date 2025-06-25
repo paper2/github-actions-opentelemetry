@@ -4,6 +4,13 @@
 
 - Can be executed on any event
 - Incomplete jobs output warning logs and are skipped
+- metrics
+  - `github.workflow.duration`
+    - Duration of workflow
+    - Calculated as the difference between the start of workflow and end time of last job completed. Notice that the end time is not the target workflow end time. This is for github specificity.
+  - `github.job.duration`
+    - Duration of job
+  - `github.job.queued_duration`
 
 ## design
 

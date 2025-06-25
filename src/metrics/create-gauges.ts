@@ -36,6 +36,7 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
+  // workflow run context has no end time, so use the latest job's completed_at
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
     dn.WORKFLOW_DURATION,

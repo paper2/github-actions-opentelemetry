@@ -14,6 +14,8 @@ import {
 import * as core from '@actions/core'
 import { isTooManyTries, retryAsync } from 'ts-retry'
 import { WorkflowRunEvent } from '@octokit/webhooks-types'
+import { a } from 'vitest/dist/chunks/suite.BJU7kdY9.js'
+import assert from 'assert'
 
 export const fetchWorkflowResults = async (
   delayMs = 1000,
@@ -35,11 +37,15 @@ export const fetchWorkflowResults = async (
           octokit,
           workflowContext
         )
+        const workflowJobs = workflowJobsRes
+          .map(job => toWorkflowJob(job, workflowRes.event))
+          .filter((job): job is WorkflowJob => job !== null)
+        if (workflowJobs.length === 0) {
+          throw new Error(`no completed jobs found for workflow run.`)
+        }
         return {
           workflow: toWorkflow(workflowRes),
-          workflowJobs: workflowJobsRes
-            .map(job => toWorkflowJob(job, workflowRes.event))
-            .filter((job): job is WorkflowJob => job !== null)
+          workflowJobs
         }
       },
       {
@@ -112,35 +118,9 @@ const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
 }
 
 export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
-  // Filter jobs that have completed_at with proper type guard
-  const completedJobs = jobs.filter(
-    (job): job is WorkflowJob & { completed_at: string } =>
-      job.completed_at !== null && job.completed_at !== undefined
-  )
-
-  if (completedJobs.length === 0) {
-    // Fallback: use current time if no completed jobs
-    console.warn(
-      'No completed jobs found, using current time. This may indicate workflow is still in progress.'
-    )
-    return new Date().toISOString()
-  }
-
-  try {
-    const jobCompletedAtDates = completedJobs.map(job => {
-      const date = new Date(job.completed_at)
-      if (isNaN(date.getTime())) {
-        throw new Error(
-          `Invalid completed_at timestamp: ${job.completed_at} for job: ${job.name}`
-        )
-      }
-      return date
-    })
-    const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
-    return new Date(maxDateNumber).toISOString()
-  } catch (error) {
-    console.error('Error processing job completion times:', error)
-    // Fallback to current time but log the issue
-    return new Date().toISOString()
-  }
+  if (jobs.length === 0)
+    throw new Error('no jobs found to get latest completed_at date.')
+  const jobCompletedAtDates = jobs.map(job => new Date(job.completed_at))
+  const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
+  return new Date(maxDateNumber).toISOString()
 }
