@@ -49,6 +49,8 @@ jobs:
         run: npm run test
 
   test-action:
+    # This job should be last job in the workflow.
+    needs: test-typescript
     name: GitHub Actions Test for push or pull_request event
     runs-on: ubuntu-latest
     services:
