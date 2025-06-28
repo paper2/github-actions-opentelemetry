@@ -16,7 +16,10 @@
       "Bash(npm test:*)",
       "Bash(rg:*)",
       "Bash(npm run lint:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   },

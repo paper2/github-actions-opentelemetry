@@ -14,8 +14,6 @@ import {
 import * as core from '@actions/core'
 import { isTooManyTries, retryAsync } from 'ts-retry'
 import { WorkflowRunEvent } from '@octokit/webhooks-types'
-import { a } from 'vitest/dist/chunks/suite.BJU7kdY9.js'
-import assert from 'assert'
 
 export const fetchWorkflowResults = async (
   delayMs = 1000,

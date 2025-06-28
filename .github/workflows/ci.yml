@@ -54,22 +54,81 @@ jobs:
     name: GitHub Actions Test for push or pull_request event
     runs-on: ubuntu-latest
     services:
-      # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
+      # OpenTelemetry Collector service with custom configuration for JSON logging
+      # Uses contrib image which includes file exporter for writing logs to JSON files
       collector:
         image: otel/opentelemetry-collector-contrib:0.115.1
         ports:
-          - 4318:4318
+          - 4318:4318 # OTLP HTTP endpoint for receiving telemetry data
+        volumes:
+          # Mount custom collector configuration that enables JSON logging
+          - ${{
+            github.workspace}}/.github/configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+          # Mount directory for log file output (collector writes to /tmp inside container)
+          - ${{ github.workspace }}/collector-logs:/tmp
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
 
+      # Create directory on runner for collector log files
+      # The Directory mounted by service container is not made automatically.
+      - name: Create log directory
+        run: mkdir -p collector-logs
+
+      # Execute the GitHub Action which sends telemetry data to the collector
       - name: Test Local Action
         id: test-action
         uses: ./
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
-          OTEL_EXPORTER_OTLP_ENDPOINT:
-            ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          # Point to local collector service (not external endpoint)
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Allow time for collector to flush logs to files
+      - name: Wait for logs to be written
+        run: sleep 5
+
+      # Validate that collector generated the expected JSON log files with correct content
+      - name: Validate collector logs
+        run: |
+          echo "=== Checking if log files exist ==="
+          ls -la collector-logs/
+
+          echo "=== Validating collector internal logs ==="
+          # Check collector's own operational logs (internal telemetry)
+          if [ -f "collector-logs/collector-logs.json" ]; then
+            echo "Collector internal logs found"
+            cat collector-logs/collector-logs.json | head -20
+            
+            # Verify that logs contain the expected service name from our action
+            if grep -q "github-actions-opentelemetry" collector-logs/collector-logs.json; then
+              echo "✓ Service name found in logs"
+            else
+              echo "✗ Service name not found in logs"
+              exit 1
+            fi
+          else
+            echo "✗ Collector internal logs not found"
+            exit 1
+          fi
+
+          echo "=== Validating telemetry data logs ==="
+          # Check logs containing the actual metrics and traces received by collector
+          if [ -f "collector-logs/otel-logs.json" ]; then
+            echo "Telemetry data logs found"
+            cat collector-logs/otel-logs.json | head -20
+            
+            # Verify that telemetry data was actually received and logged
+            if [ -s "collector-logs/otel-logs.json" ]; then
+              echo "✓ Telemetry data received"
+            else
+              echo "✗ No telemetry data received"
+              exit 1
+            fi
+          else
+            echo "✗ Telemetry data logs not found"
+            exit 1
+          fi
