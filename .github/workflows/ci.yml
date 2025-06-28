@@ -53,28 +53,49 @@ jobs:
     needs: test-typescript
     name: GitHub Actions Test for push or pull_request event
     runs-on: ubuntu-latest
-    services:
-      # OpenTelemetry Collector service with custom configuration for JSON logging
-      # Uses contrib image which includes file exporter for writing logs to JSON files
-      collector:
-        image: otel/opentelemetry-collector-contrib:0.115.1
-        ports:
-          - 4318:4318 # OTLP HTTP endpoint for receiving telemetry data
-        volumes:
-          # Mount custom collector configuration that enables JSON logging
-          - ${{
-            github.workspace}}/.github/configs/otel-collector-config.yaml:/etc/otel-collector-contrib/config.yaml:ro
-          # Mount directory for log file output (collector writes to /tmp inside container)
-          - ${{ github.workspace }}/collector-logs:/tmp
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
 
-      # Create directory on runner for collector log files
-      # The Directory mounted by service container is not made automatically.
-      - name: Create log directory
-        run: mkdir -p collector-logs
+      # Create directory with proper permissions
+      - name: Create log directory with proper permissions
+        run: |
+          mkdir -p collector-logs
+          chmod 777 collector-logs
+
+      # Start OpenTelemetry Collector manually after checkout
+      - name: Start OpenTelemetry Collector
+        run: |
+          echo "Starting OpenTelemetry Collector with custom configuration..."
+          docker run -d \
+            --name otel-collector \
+            -p 13133:13133 \
+            -p 4318:4318 \
+            -v ${{ github.workspace }}/.github/configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro \
+            -v ${{ github.workspace }}/collector-logs:/tmp \
+            --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:13133/ || exit 1" \
+            --health-interval 10s \
+            --health-timeout 5s \
+            --health-retries 3 \
+            otel/opentelemetry-collector-contrib:0.115.1
+
+      # Wait for collector to be healthy and ready
+      - name: Wait for collector to be ready
+        run: |
+          echo "Waiting for OpenTelemetry Collector to be ready..."
+          timeout 60s bash -c 'until docker ps | grep -q "healthy.*otel-collector"; do sleep 2; docker logs otel-collector; echo "Waiting for collector health check..."; done'
+          echo "Collector is ready"
+
+          # Additional verification
+          docker logs otel-collector
+
+          # Test if collector is responding
+          if curl -f http://localhost:4318/v1/traces -X POST -H "Content-Type: application/json" -d '{}' 2>/dev/null; then
+            echo "✓ Collector HTTP endpoint is responsive"
+          else
+            echo "⚠ Collector HTTP endpoint test failed (expected for empty payload)"
+          fi
 
       # Execute the GitHub Action which sends telemetry data to the collector
       - name: Test Local Action
@@ -89,7 +110,16 @@ jobs:
 
       # Allow time for collector to flush logs to files
       - name: Wait for logs to be written
-        run: sleep 5
+        run: |
+          echo "Waiting for collector to flush logs to files..."
+          sleep 5
+
+          # Show current collector status
+          echo "=== Collector container status ==="
+          docker ps -a | grep otel-collector
+
+          echo "=== Recent collector logs ==="
+          docker logs --tail 20 otel-collector
 
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs
@@ -132,3 +162,16 @@ jobs:
             echo "✗ Telemetry data logs not found"
             exit 1
           fi
+
+      # Show final collector status and logs for debugging
+      - name: Show collector debug info
+        if: always()
+        run: |
+          echo "=== Final collector status ==="
+          docker ps -a | grep otel-collector || echo "Collector container not found"
+
+          echo "=== Complete collector logs ==="
+          docker logs otel-collector || echo "Could not retrieve collector logs"
+
+          echo "=== All generated files ==="
+          find collector-logs -type f -exec echo "File: {}" \; -exec head -10 {} \; -exec echo "---" \; 2>/dev/null || echo "No files found"
