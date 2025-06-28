@@ -19,7 +19,8 @@
       "Bash(npx vitest:*)",
       "WebFetch(domain:stackoverflow.com)",
       "Bash(find:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:hub.docker.com)"
     ],
     "deny": []
   },

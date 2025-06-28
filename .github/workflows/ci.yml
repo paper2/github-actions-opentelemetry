@@ -63,7 +63,7 @@ jobs:
         volumes:
           # Mount custom collector configuration that enables JSON logging
           - ${{
-            github.workspace}}/.github/configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+            github.workspace}}/.github/configs/otel-collector-config.yaml:/etc/otel-collector-contrib/config.yaml:ro
           # Mount directory for log file output (collector writes to /tmp inside container)
           - ${{ github.workspace }}/collector-logs:/tmp
     steps:
