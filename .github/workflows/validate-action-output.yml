@@ -45,7 +45,7 @@ jobs:
           mkdir -p collector-logs
           chmod 777 collector-logs
 
-      # Start OpenTelemetry Collector manually after checkout
+      # Start OpenTelemetry Collector manually because GitHub Actions service container does not read custom config files before checkout
       - name: Start OpenTelemetry Collector
         # port 13133 is used for health checks, 4318 for OTLP HTTP endpoint
         run: |
