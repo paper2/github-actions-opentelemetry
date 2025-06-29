@@ -120,6 +120,60 @@ jobs:
             # Check if traces file has content
             if [ -s "collector-logs/traces.json" ]; then
               echo "✓ Traces data received"
+              
+              # Validate traces structure matches expected format by comparing with test data
+              echo "=== Validating trace structure ==="
+              if [ -f ".github/test-data/traces.json" ]; then
+                # Apply jq transformation to remove dynamic fields from collected traces
+                jq '
+                  .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
+                    del(.traceId) |
+                    del(.spanId) |
+                    del(.parentSpanId) |
+                    del(.startTimeUnixNano) |
+                    del(.endTimeUnixNano)
+                  ) |
+                  .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
+                    if .key == "run_id" then del(.value)
+                    elif .key == "job.id" then del(.value)
+                    elif .key == "url" then del(.value)
+                    elif .key == "runner.name" then del(.value)
+                    else .
+                    end
+                  )
+                ' collector-logs/traces.json > collector-logs/traces-normalized.json
+                
+                # Apply same transformation to expected test data
+                jq '
+                  .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
+                    del(.traceId) |
+                    del(.spanId) |
+                    del(.parentSpanId) |
+                    del(.startTimeUnixNano) |
+                    del(.endTimeUnixNano)
+                  ) |
+                  .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
+                    if .key == "run_id" then del(.value)
+                    elif .key == "job.id" then del(.value)
+                    elif .key == "url" then del(.value)
+                    elif .key == "runner.name" then del(.value)
+                    else .
+                    end
+                  )
+                ' .github/test-data/traces.json > collector-logs/traces-expected.json
+                
+                # Compare normalized traces
+                if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
+                  echo "✓ Trace structure matches expected format"
+                else
+                  echo "✗ Trace structure differs from expected format"
+                  echo "=== Differences ==="
+                  diff collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
+                  exit 1
+                fi
+              else
+                echo "⚠ Test data file not found, skipping structure validation"
+              fi
             else
               echo "⚠ Traces file is empty"
             fi

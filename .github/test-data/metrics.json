@@ -1,0 +1,124 @@
+{
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "github-actions-opentelemetry" }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": { "stringValue": "nodejs" }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": { "stringValue": "opentelemetry" }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": { "stringValue": "1.29.0" }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "scope": { "name": "github-actions-metrics" },
+          "metrics": [
+            {
+              "name": "github.workflow.duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": { "stringValue": "Continuous Integration" }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "1751157342557000000",
+                    "timeUnixNano": "1751157342562000000",
+                    "asDouble": 41
+                  }
+                ]
+              }
+            },
+            {
+              "name": "github.job.duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": { "stringValue": "Continuous Integration" }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": { "stringValue": "TypeScript Tests" }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": { "stringValue": "success" }
+                      }
+                    ],
+                    "startTimeUnixNano": "1751157342557000000",
+                    "timeUnixNano": "1751157342562000000",
+                    "asDouble": 36
+                  }
+                ]
+              }
+            },
+            {
+              "name": "github.job.queued_duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": { "stringValue": "Continuous Integration" }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": { "stringValue": "TypeScript Tests" }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": { "stringValue": "success" }
+                      }
+                    ],
+                    "startTimeUnixNano": "1751157342557000000",
+                    "timeUnixNano": "1751157342562000000",
+                    "asDouble": 5
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
