@@ -83,11 +83,10 @@ jobs:
           echo "Waiting for file writes to complete..."
           sleep 5
 
-      # Define JQ filters for normalization (setting dynamic fields to fixed values)
-      - name: Set JQ filters for normalization
-        id: set-jq-filters
+      # Setup normalization filters
+      - name: Setup normalization filters
         run: |
-          # JQ filter for trace normalization
+          # Create JQ filters for normalization
           cat > /tmp/normalize-traces.jq << 'EOF'
           del(.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) |
           del(.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) |
@@ -104,12 +103,36 @@ jobs:
           )
           EOF
 
-          # JQ filter for metrics normalization
           cat > /tmp/normalize-metrics.jq << 'EOF'
           del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) |
           del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) |
           del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble)
           EOF
+
+      # Generate normalized files
+      - name: Generate normalized files
+        run: |
+          # Create normalized files from collector output
+          if [ -f "collector-logs/traces.json" ]; then
+            jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-normalized.json
+            echo "✓ Created normalized traces file"
+          fi
+
+          if [ -f "collector-logs/metrics.json" ]; then
+            jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
+            echo "✓ Created normalized metrics file"
+          fi
+
+          # Create expected normalized files for comparison
+          if [ -f ".github/test-data/${{ inputs.test-data-directory }}/traces.json" ]; then
+            jq -f /tmp/normalize-traces.jq ".github/test-data/${{ inputs.test-data-directory }}/traces.json" > collector-logs/traces-expected.json
+            echo "✓ Created expected traces file"
+          fi
+
+          if [ -f ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" ]; then
+            jq -f /tmp/normalize-metrics.jq ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" > collector-logs/metrics-expected.json
+            echo "✓ Created expected metrics file"
+          fi
 
       # Upload collector logs as GitHub artifact for debugging
       - name: Upload collector logs as artifact
@@ -120,34 +143,21 @@ jobs:
           path: collector-logs/
           retention-days: ${{ inputs.retention-days }}
 
-      # Validate that collector generated the expected JSON log files with correct content
-      - name: Validate collector logs (Traces)
+      - name: Validate Traces
         run: |
           echo "=== Validating traces data ==="
           if [ -f "collector-logs/traces.json" ]; then
             echo "✓ Traces file found"
-            echo "Traces content preview (first 5 lines):"
             head -5 collector-logs/traces.json
             
-            # Check if traces file has content
             if [ -s "collector-logs/traces.json" ]; then
               echo "✓ Traces data received"
               
-              # Validate traces structure matches expected format by comparing with test data
-              echo "=== Validating trace structure ==="
-              if [ -f ".github/test-data/${{ inputs.test-data-directory }}/traces.json" ]; then
-                # Apply jq transformation to remove dynamic fields from collected traces
-                jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-normalized.json
-                
-                # Apply same transformation to expected test data
-                jq -f /tmp/normalize-traces.jq .github/test-data/${{ inputs.test-data-directory }}/traces.json > collector-logs/traces-expected.json
-                
-                # Compare normalized traces
+              if [ -f "collector-logs/traces-expected.json" ]; then
                 if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
                   echo "✓ Trace structure matches expected format"
                 else
                   echo "✗ Trace structure differs from expected format"
-                  echo "=== Differences ==="
                   diff collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
                   exit 1
                 fi
@@ -161,33 +171,21 @@ jobs:
             echo "⚠ Traces file not found (no trace data received)"
           fi
 
-      - name: Validate collector logs (Metrics)
+      - name: Validate metrics
         run: |
           echo "=== Validating metrics data ==="
           if [ -f "collector-logs/metrics.json" ]; then
             echo "✓ Metrics file found"
-            echo "Metrics content preview (first 5 lines):"
             head -5 collector-logs/metrics.json
             
-            # Check if metrics file has content
             if [ -s "collector-logs/metrics.json" ]; then
               echo "✓ Metrics data received"
               
-              # Validate metrics structure matches expected format by comparing with test data
-              echo "=== Validating metrics structure ==="
-              if [ -f ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" ]; then
-                # Apply jq transformation to remove dynamic fields from collected metrics
-                jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
-                
-                # Apply same transformation to expected test data
-                jq -f /tmp/normalize-metrics.jq .github/test-data/${{ inputs.test-data-directory }}/metrics.json > collector-logs/metrics-expected.json
-                
-                # Compare normalized metrics
+              if [ -f "collector-logs/metrics-expected.json" ]; then
                 if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
                   echo "✓ Metrics structure matches expected format"
                 else
                   echo "✗ Metrics structure differs from expected format"
-                  echo "=== Differences ==="
                   diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
                   exit 1
                 fi
