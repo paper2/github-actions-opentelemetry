@@ -51,10 +51,10 @@ jobs:
   # This job tests the GitHub Action by running it against the collector and validating the output.
   # It compares the collected telemetry data with expected test data to ensure consistent structure.
   #
-  # To update test data (.github/test-data/traces.json and metrics.json):
+  # To update test data (.github/test-data/integration-tests/traces.json and metrics.json):
   # 1. Run this workflow by pushing changes or creating a PR
   # 2. After workflow completion, download the 'collector-logs' artifact from the GitHub Actions run page
-  # 3. Extract the artifact and copy traces.json and metrics.json to .github/test-data/ directory
+  # 3. Extract the artifact and copy traces.json and metrics.json to .github/test-data/integration-tests/ directory
   # 4. Commit and push the updated test data files
   test-action:
     # This job should be last job in the workflow.
@@ -163,12 +163,12 @@ jobs:
               
               # Validate traces structure matches expected format by comparing with test data
               echo "=== Validating trace structure ==="
-              if [ -f ".github/test-data/traces.json" ]; then
+              if [ -f ".github/test-data/integration-tests/traces.json" ]; then
                 # Apply jq transformation to remove dynamic fields from collected traces
                 jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-normalized.json
                 
                 # Apply same transformation to expected test data
-                jq -f /tmp/normalize-traces.jq .github/test-data/traces.json > collector-logs/traces-expected.json
+                jq -f /tmp/normalize-traces.jq .github/test-data/integration-tests/traces.json > collector-logs/traces-expected.json
                 
                 # Compare normalized traces
                 if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
@@ -203,12 +203,12 @@ jobs:
               
               # Validate metrics structure matches expected format by comparing with test data
               echo "=== Validating metrics structure ==="
-              if [ -f ".github/test-data/metrics.json" ]; then
+              if [ -f ".github/test-data/integration-tests/metrics.json" ]; then
                 # Apply jq transformation to remove dynamic fields from collected metrics
                 jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
                 
                 # Apply same transformation to expected test data
-                jq -f /tmp/normalize-metrics.jq .github/test-data/metrics.json > collector-logs/metrics-expected.json
+                jq -f /tmp/normalize-metrics.jq .github/test-data/integration-tests/metrics.json > collector-logs/metrics-expected.json
                 
                 # Compare normalized metrics
                 if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then

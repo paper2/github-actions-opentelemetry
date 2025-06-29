@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(npm run test:*)",
       "Bash(npm install)",
@@ -23,9 +22,11 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:hub.docker.com)",
       "Bash(ls:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(mv:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   },
   "preferredNotifChannel": "terminal_bell"
 }
