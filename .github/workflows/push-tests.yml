@@ -1,7 +1,6 @@
-name: Integration Tests
+name: Push Tests
 
 on:
-  pull_request:
   push:
 
 permissions:
@@ -54,7 +53,7 @@ jobs:
     name: Test Action (Push/PR Events)
     uses: ./.github/workflows/validate-action-output.yml
     with:
-      test-data-directory: integration-tests
-      artifact-name: collector-logs-integration-tests
+      test-data-directory: push-tests
+      artifact-name: collector-logs-push-tests
       retention-days: 5
     secrets: inherit

@@ -4,7 +4,7 @@ name: Workflow Run Tests
 
 on:
   workflow_run:
-    workflows: ['Integration Tests']
+    workflows: ['Push Tests']
     types:
       - completed
 
