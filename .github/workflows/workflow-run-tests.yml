@@ -1,0 +1,27 @@
+name: Workflow Run Tests
+# This workflow tests the GitHub Action when triggered by workflow_run events
+# It validates that the action works correctly when processing completed workflows
+
+on:
+  workflow_run:
+    workflows:
+      - Example Workflow 01
+      - Example Workflow 02
+      - Example Workflow 03
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  # Test the action for workflow_run events using the reusable workflow
+  test-action-workflow-run:
+    name: Test Action (Workflow Run Events)
+    uses: ./.github/workflows/validate-action-output.yml
+    with:
+      test-data-directory: workflow-run-tests
+      artifact-name: collector-logs-workflow-run
+      retention-days: 5
+    secrets: inherit
