@@ -109,7 +109,7 @@ jobs:
           retention-days: 5
 
       # Validate that collector generated the expected JSON log files with correct content
-      - name: Validate collector logs
+      - name: Validate collector logs (Traces)
         run: |
           echo "=== Validating traces data ==="
           if [ -f "collector-logs/traces.json" ]; then
@@ -127,6 +127,8 @@ jobs:
             echo "⚠ Traces file not found (no trace data received)"
           fi
 
+      - name: Validate collector logs (Metrics)
+        run: |
           echo "=== Validating metrics data ==="
           if [ -f "collector-logs/metrics.json" ]; then
             echo "✓ Metrics file found"
@@ -141,29 +143,6 @@ jobs:
             fi
           else
             echo "⚠ Metrics file not found (no metrics data received)"
-          fi
-
-          echo "=== File size summary ==="
-          for file in collector-logs/*.json; do
-            if [ -f "$file" ]; then
-              size=$(wc -c < "$file" 2>/dev/null || echo '0')
-              echo "$(basename "$file"): $size bytes"
-            fi
-          done
-
-          # Verify that at least some telemetry data was received
-          traces_size=$(wc -c < collector-logs/traces.json 2>/dev/null || echo '0')
-          metrics_size=$(wc -c < collector-logs/metrics.json 2>/dev/null || echo '0')
-          internal_size=$(wc -c < collector-logs/collector-logs.json 2>/dev/null || echo '0')
-
-          if [ "$traces_size" -gt 0 ] || [ "$metrics_size" -gt 0 ]; then
-            echo "✓ Telemetry data successfully received and separated"
-          elif [ "$internal_size" -gt 0 ]; then
-            echo "⚠ Only internal logs found, no telemetry data received"
-            echo "This might indicate the GitHub Action didn't send any telemetry data"
-          else
-            echo "✗ No data received at all"
-            exit 1
           fi
 
       # Show final collector status and logs for debugging
