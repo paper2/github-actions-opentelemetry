@@ -1,4 +1,4 @@
-name: Push Tests
+name: Push Event Tests
 
 on:
   push:
@@ -53,7 +53,7 @@ jobs:
     name: Test Action (Push/PR Events)
     uses: ./.github/workflows/validate-action-output.yml
     with:
-      test-data-directory: push-tests
-      artifact-name: collector-logs-push-tests
+      test-data-directory: push-event-tests
+      artifact-name: collector-logs-push-event-tests
       retention-days: 5
     secrets: inherit
