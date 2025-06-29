@@ -1,0 +1,70 @@
+name: Example App Workflow
+# Reusable workflow that simulates a typical application CI/CD pipeline
+# with configurable sleep times to generate varying telemetry data
+
+on:
+  workflow_call:
+    inputs:
+      fixed-sleep:
+        description: 'Fixed sleep duration for random delay calculations'
+        required: false
+        type: number
+        default: 1
+      random-sleep:
+        description: 'Maximum random sleep duration'
+        required: false
+        type: number
+        default: 3
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        run: sleep 2
+      - name: Setup
+        id: setup
+        run: sleep 2
+      - name: Install Dependencies
+        id: install
+        run: sleep 3
+      - name: Lint
+        id: lint
+        run: sleep 2
+      - name: Test
+        id: test
+        # add a random delay for changing metrics and traces
+        run:
+          sleep $(($RANDOM % ${{ inputs.random-sleep }} + ${{ inputs.fixed-sleep
+          }}))
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        run: sleep 2
+      - name: Setup
+        id: setup
+        run: sleep 2
+      - name: Install Dependencies
+        id: install
+        run: sleep 3
+      - name: Build
+        id: build
+        # add a random delay for changing metrics and traces
+        run:
+          sleep $(($RANDOM % ${{ inputs.random-sleep }} + ${{ inputs.fixed-sleep
+          }}))
+
+  deploy:
+    name: Deploy Application
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        id: deploy
+        run: sleep 2
