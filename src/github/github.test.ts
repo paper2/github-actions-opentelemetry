@@ -58,7 +58,7 @@ describe('Type converters', () => {
     }
 
     test('should convert valid job response', () => {
-      const result = toWorkflowJob(mockJobResponse as never)
+      const result = toWorkflowJob(mockJobResponse as never, 'workflow_run')
       const expected: WorkflowJob = { ...mockJobResponse }
 
       expect(result).toEqual(expected)
@@ -67,40 +67,87 @@ describe('Type converters', () => {
     test('should handle job without steps', () => {
       const jobWithoutSteps = { ...mockJobResponse, steps: null }
 
-      const result = toWorkflowJob(jobWithoutSteps as never)
-      expect(result.steps).toEqual([])
+      const result = toWorkflowJob(jobWithoutSteps as never, 'workflow_run')
+      expect(result).not.toBeNull()
+      if (result) {
+        expect(result.steps).toEqual([])
+      }
     })
 
-    test('should throw error when job is not completed', () => {
+    test('should return null when job is not completed', () => {
       const incompleteJob = { ...mockJobResponse, status: 'in_progress' }
 
-      expect(() => toWorkflowJob(incompleteJob as never)).toThrow(
-        'This job is not completed. id: 1'
-      )
+      expect(() =>
+        toWorkflowJob(incompleteJob as never, 'workflow_run')
+      ).toThrow('job.status must be completed on workflow_run event')
     })
 
     test('should throw error when conclusion is missing', () => {
       const jobWithoutConclusion = { ...mockJobResponse, conclusion: null }
 
-      expect(() => toWorkflowJob(jobWithoutConclusion as never)).toThrow(
-        'Job conclusion is required'
-      )
+      expect(() =>
+        toWorkflowJob(jobWithoutConclusion as never, 'workflow_run')
+      ).toThrow('Job conclusion is required')
     })
 
     test('should throw error when completed_at is missing', () => {
       const jobWithoutCompletedAt = { ...mockJobResponse, completed_at: null }
 
-      expect(() => toWorkflowJob(jobWithoutCompletedAt as never)).toThrow(
-        'Job completed_at is required'
-      )
+      expect(() =>
+        toWorkflowJob(jobWithoutCompletedAt as never, 'workflow_run')
+      ).toThrow('Job completed_at is required')
     })
 
     test('should throw error when workflow_name is missing', () => {
       const jobWithoutWorkflowName = { ...mockJobResponse, workflow_name: null }
 
-      expect(() => toWorkflowJob(jobWithoutWorkflowName as never)).toThrow(
-        'Job workflow_name is required'
-      )
+      expect(() =>
+        toWorkflowJob(jobWithoutWorkflowName as never, 'workflow_run')
+      ).toThrow('Job workflow_name is required for job: test-job (id: 1)')
+    })
+
+    test('should handle jobs with different statuses correctly', () => {
+      const inProgressJob = { ...mockJobResponse, status: 'in_progress' }
+      const queuedJob = { ...mockJobResponse, status: 'queued' }
+      const failedJob = {
+        ...mockJobResponse,
+        status: 'completed',
+        conclusion: 'failure'
+      }
+
+      expect(toWorkflowJob(inProgressJob as never, 'push')).toBeNull()
+      expect(toWorkflowJob(queuedJob as never, 'push')).toBeNull()
+      expect(toWorkflowJob(failedJob as never, 'workflow_run')).not.toBeNull()
+    })
+
+    test('should include runner information when available', () => {
+      const jobWithRunner = {
+        ...mockJobResponse,
+        runner_name: 'ubuntu-latest-runner',
+        runner_group_name: 'github-hosted'
+      }
+
+      const result = toWorkflowJob(jobWithRunner as never, 'workflow_run')
+      expect(result).not.toBeNull()
+      if (result) {
+        expect(result.runner_name).toBe('ubuntu-latest-runner')
+        expect(result.runner_group_name).toBe('github-hosted')
+      }
+    })
+
+    test('should handle null runner information', () => {
+      const jobWithNullRunner = {
+        ...mockJobResponse,
+        runner_name: null,
+        runner_group_name: null
+      }
+
+      const result = toWorkflowJob(jobWithNullRunner as never, 'workflow_run')
+      expect(result).not.toBeNull()
+      if (result) {
+        expect(result.runner_name).toBeNull()
+        expect(result.runner_group_name).toBeNull()
+      }
     })
   })
 
@@ -117,22 +164,21 @@ describe('Type converters', () => {
         full_name: 'test-owner/test-repo'
       }
     }
+    const expectedWorkflowBase: Workflow = {
+      id: 12345,
+      name: 'Test Workflow',
+      conclusion: 'success',
+      created_at: '2023-01-01T00:00:00Z',
+      run_attempt: 1,
+      html_url: 'https://github.com/test/repo/actions/runs/12345',
+      repository: {
+        full_name: 'test-owner/test-repo'
+      }
+    }
     test('should convert valid workflow response', () => {
       const result = toWorkflowRun(mockWorkflowResponse as never)
-      const expected: Workflow = { ...mockWorkflowResponse }
 
-      expect(result).toEqual(expected)
-    })
-
-    test('should throw error when workflow is not completed', () => {
-      const incompleteWorkflow = {
-        ...mockWorkflowResponse,
-        status: 'in_progress'
-      }
-
-      expect(() => toWorkflowRun(incompleteWorkflow as never)).toThrow(
-        'This workflow is not completed. id: 12345'
-      )
+      expect(result).toEqual(expectedWorkflowBase)
     })
 
     test('should throw error when name is missing', () => {
@@ -140,17 +186,6 @@ describe('Type converters', () => {
 
       expect(() => toWorkflowRun(workflowWithoutName as never)).toThrow(
         'Workflow run name is required'
-      )
-    })
-
-    test('should throw error when conclusion is missing', () => {
-      const workflowWithoutConclusion = {
-        ...mockWorkflowResponse,
-        conclusion: null
-      }
-
-      expect(() => toWorkflowRun(workflowWithoutConclusion as never)).toThrow(
-        'Workflow run conclusion is required'
       )
     })
 

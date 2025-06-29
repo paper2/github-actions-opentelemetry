@@ -23,7 +23,9 @@
       "WebFetch(domain:hub.docker.com)",
       "Bash(ls:*)",
       "Bash(mv:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(gh pr:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

@@ -94,9 +94,11 @@ sequenceDiagram
    [workflow_run](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run)
    because this action collects telemetry of completed workflows.
 
-### GitHub Actions Example
+### GitHub Actions Examples
 
-Here's an example of how to set up this action in a GitHub Actions workflow:
+#### Option 1: Monitor Other Workflows (Original)
+
+Monitor completed workflows triggered by `workflow_run` events:
 
 ```yaml
 name: Send Telemetry after Other Workflow
@@ -137,6 +139,50 @@ jobs:
             api-key=${ secrets.API_KEY },other-config-value=value
         with:
           # Required for collecting workflow data
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+#### Option 2: Monitor Current Workflow (New)
+
+Monitor the current workflow by running this action as the last step:
+
+```yaml
+name: CI with Built-in Telemetry
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+
+  # Telemetry job runs after all other jobs complete
+  telemetry:
+    runs-on: ubuntu-latest
+    needs: [build, test] # Wait for other jobs to complete
+    if: always() # Run even if other jobs fail
+    steps:
+      - name: Send Telemetry
+        uses: paper2/github-actions-opentelemetry@main
+        env:
+          OTEL_SERVICE_NAME: my-project-ci
+          OTEL_EXPORTER_OTLP_ENDPOINT: https://collector-example.com
+          OTEL_RESOURCE_ATTRIBUTES: 'environment=ci,team=backend'
+        with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 

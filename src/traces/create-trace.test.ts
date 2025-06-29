@@ -14,7 +14,6 @@ import { SpanStatusCode } from '@opentelemetry/api'
 const workflowRunResults: WorkflowResults = {
   workflow: {
     created_at: '2024-09-01T00:00:00Z',
-    status: 'completed',
     id: 10000000000,
     name: 'Test Run',
     run_attempt: 14,

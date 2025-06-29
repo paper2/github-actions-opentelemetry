@@ -5,8 +5,10 @@ name: Validate Action Output
 # To update test data for any workflow using this reusable workflow:
 # 1. Run the calling workflow (by pushing changes, creating PR, or triggering workflow_run)
 # 2. After workflow completion, download the artifact from the GitHub Actions run page
-# 3. Extract the artifact and copy traces.json and metrics.json to the appropriate .github/test-data/ directory
-# 4. Commit and push the updated test data files
+# 3. Extract the artifact and copy traces-actual.json and metrics-actual.json to the appropriate .github/test-data/ directory
+# 4. Rename them to traces-expected.json and metrics-expected.json (removing the normalized values)
+# 5. Check the differences old vs new expected files to ensure the changes are valid
+# 6. Commit and push the updated test data files
 
 on:
   workflow_call:
@@ -43,7 +45,7 @@ jobs:
           mkdir -p collector-logs
           chmod 777 collector-logs
 
-      # Start OpenTelemetry Collector manually after checkout
+      # Start OpenTelemetry Collector manually because GitHub Actions service container does not read custom config files before checkout
       - name: Start OpenTelemetry Collector
         # port 13133 is used for health checks, 4318 for OTLP HTTP endpoint
         run: |
@@ -67,19 +69,30 @@ jobs:
           timeout 60s bash -c 'until docker ps | grep -q "healthy.*otel-collector"; do sleep 2; echo "Waiting for collector health check..."; done'
           echo "Collector is ready"
 
-      # Define JQ filters for normalization (setting dynamic fields to fixed values)
-      - name: Set JQ filters for normalization
-        id: set-jq-filters
+      # Execute the GitHub Action which sends telemetry data to the collector
+      - name: Execute Action
+        uses: ./
+        env:
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+          # Point to local collector service (not external endpoint)
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for file system operations
         run: |
-          # JQ filter for trace normalization
+          echo "Waiting for file writes to complete..."
+          sleep 5
+
+      - name: Setup normalization filters
+        run: |
+          # Create JQ filters for normalization
           cat > /tmp/normalize-traces.jq << 'EOF'
-          .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
-            .traceId = "00000000000000000000000000000000" |
-            .spanId = "0000000000000000" |
-            .parentSpanId = "0000000000000000" |
-            .startTimeUnixNano = "0000000000000000000" |
-            .endTimeUnixNano = "0000000000000000000"
-          ) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.parentSpanId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.startTimeUnixNano) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.endTimeUnixNano) |
           .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
             if .key == "run_id" then .value = {"intValue": "0"}
             elif .key == "job.id" then .value = {"intValue": "0"}
@@ -90,25 +103,16 @@ jobs:
           )
           EOF
 
-          # JQ filter for metrics normalization
           cat > /tmp/normalize-metrics.jq << 'EOF'
-          .resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]? |= (
-            .startTimeUnixNano = "0000000000000000000" |
-            .timeUnixNano = "0000000000000000000" |
-            .asDouble = 0
-          )
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) |
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) |
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble)
           EOF
 
-      # Execute the GitHub Action which sends telemetry data to the collector
-      - name: Test Local Action
-        id: test-action
-        uses: ./
-        env:
-          OTEL_SERVICE_NAME: github-actions-opentelemetry
-          # Point to local collector service (not external endpoint)
-          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate normalized files
+        run: |
+          jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-actual.json
+          jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-actual.json
 
       # Upload collector logs as GitHub artifact for debugging
       - name: Upload collector logs as artifact
@@ -119,85 +123,20 @@ jobs:
           path: collector-logs/
           retention-days: ${{ inputs.retention-days }}
 
-      # Validate that collector generated the expected JSON log files with correct content
-      - name: Validate collector logs (Traces)
+      - name: Validate Traces
         run: |
-          echo "=== Validating traces data ==="
-          if [ -f "collector-logs/traces.json" ]; then
-            echo "✓ Traces file found"
-            echo "Traces content preview (first 5 lines):"
-            head -5 collector-logs/traces.json
-            
-            # Check if traces file has content
-            if [ -s "collector-logs/traces.json" ]; then
-              echo "✓ Traces data received"
-              
-              # Validate traces structure matches expected format by comparing with test data
-              echo "=== Validating trace structure ==="
-              if [ -f ".github/test-data/${{ inputs.test-data-directory }}/traces.json" ]; then
-                # Apply jq transformation to remove dynamic fields from collected traces
-                jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-normalized.json
-                
-                # Apply same transformation to expected test data
-                jq -f /tmp/normalize-traces.jq .github/test-data/${{ inputs.test-data-directory }}/traces.json > collector-logs/traces-expected.json
-                
-                # Compare normalized traces
-                if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
-                  echo "✓ Trace structure matches expected format"
-                else
-                  echo "✗ Trace structure differs from expected format"
-                  echo "=== Differences ==="
-                  diff collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
-                  exit 1
-                fi
-              else
-                echo "⚠ Test data file not found, skipping structure validation"
-              fi
-            else
-              echo "⚠ Traces file is empty"
-            fi
-          else
-            echo "⚠ Traces file not found (no trace data received)"
+          diff -u collector-logs/traces-actual.json .github/test-data/${{ inputs.test-data-directory }}/traces-expected.json
+          if [ $? -ne 0 ]; then
+            echo "✗ Trace structure differs from expected format"
+            exit 1
           fi
 
-      - name: Validate collector logs (Metrics)
+      - name: Validate Metrics
         run: |
-          echo "=== Validating metrics data ==="
-          if [ -f "collector-logs/metrics.json" ]; then
-            echo "✓ Metrics file found"
-            echo "Metrics content preview (first 5 lines):"
-            head -5 collector-logs/metrics.json
-            
-            # Check if metrics file has content
-            if [ -s "collector-logs/metrics.json" ]; then
-              echo "✓ Metrics data received"
-              
-              # Validate metrics structure matches expected format by comparing with test data
-              echo "=== Validating metrics structure ==="
-              if [ -f ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" ]; then
-                # Apply jq transformation to remove dynamic fields from collected metrics
-                jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
-                
-                # Apply same transformation to expected test data
-                jq -f /tmp/normalize-metrics.jq .github/test-data/${{ inputs.test-data-directory }}/metrics.json > collector-logs/metrics-expected.json
-                
-                # Compare normalized metrics
-                if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
-                  echo "✓ Metrics structure matches expected format"
-                else
-                  echo "✗ Metrics structure differs from expected format"
-                  echo "=== Differences ==="
-                  diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
-                  exit 1
-                fi
-              else
-                echo "⚠ Test data file not found, skipping structure validation"
-              fi
-            else
-              echo "⚠ Metrics file is empty"
-            fi
-          else
-            echo "⚠ Metrics file not found (no metrics data received)"
+          diff -u collector-logs/metrics-actual.json .github/test-data/${{ inputs.test-data-directory }}/metrics-expected.json
+          if [ $? -ne 0 ]; then
+            echo "✗ Metrics structure differs from expected format"
+            exit 1
           fi
 
       # Show final collector status and logs for debugging

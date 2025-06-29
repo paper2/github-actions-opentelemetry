@@ -1,0 +1,59 @@
+name: Push Event Tests
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript:
+    name: TypeScript Tests
+    runs-on: ubuntu-latest
+    services:
+      # Anything is fine as long as it accepts metrics and traces with OTLP because the tests does not check stored data.
+      collector:
+        image: otel/opentelemetry-collector-contrib:0.115.1
+        ports:
+          - 4318:4318
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        id: npm-ci
+        run: npm ci
+
+      - name: Check Format
+        id: npm-format-check
+        run: npm run format:check
+
+      - name: Lint
+        id: npm-lint
+        run: npm run lint
+
+      - name: Test
+        id: npm-test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run test
+
+  # Test the action for push/pull_request events using the reusable workflow
+  test-action:
+    needs: test-typescript
+    name: Test Action (Push Event)
+    uses: ./.github/workflows/validate-action-output.yml
+    with:
+      test-data-directory: push-event-tests
+      artifact-name: collector-logs-push-event-tests
+      retention-days: 5
+    secrets: inherit
