@@ -24,7 +24,8 @@
       "Bash(ls:*)",
       "Bash(mv:*)",
       "Bash(grep:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
