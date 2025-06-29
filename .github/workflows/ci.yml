@@ -85,7 +85,7 @@ jobs:
       - name: Wait for collector to be ready
         run: |
           echo "Waiting for OpenTelemetry Collector to be ready..."
-          timeout 60s bash -c 'until docker ps | grep -q "healthy.*otel-collector"; do sleep 2; echo "-------- Collector Logs -----------"; docker logs otel-collector; echo "--------------------------------" ; echo "Waiting for collector health check..."; done'
+          timeout 60s bash -c 'until docker ps | grep -q "healthy.*otel-collector"; do sleep 2; echo "Waiting for collector health check..."; done'
           echo "Collector is ready"
 
       # Execute the GitHub Action which sends telemetry data to the collector
@@ -111,9 +111,6 @@ jobs:
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs
         run: |
-          echo "=== Checking if log files exist ==="
-          ls -la collector-logs/
-
           echo "=== Validating collector internal logs ==="
           # Check collector's own operational logs (internal telemetry)
           if [ -f "collector-logs/collector-logs.json" ]; then
