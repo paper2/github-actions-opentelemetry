@@ -145,21 +145,21 @@ jobs:
 
       - name: Validate Traces
         run: |
-          if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
+          diff -u collector-logs/traces-normalized.json collector-logs/traces-expected.json
+          if [ $? -eq 0 ]; then
             echo "✓ Trace structure matches expected format"
           else
             echo "✗ Trace structure differs from expected format"
-            diff -u collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
             exit 1
           fi
 
       - name: Validate Metrics
         run: |
-          if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
+          diff -u collector-logs/metrics-normalized.json collector-logs/metrics-expected.json
+          if [ $? -eq 0 ]; then
             echo "✓ Metrics structure matches expected format"
           else
             echo "✗ Metrics structure differs from expected format"
-            diff -u collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
             exit 1
           fi
 
