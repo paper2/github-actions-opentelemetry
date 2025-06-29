@@ -34,7 +34,7 @@
                     "attributes": [
                       {
                         "key": "workflow.name",
-                        "value": { "stringValue": "Continuous Integration" }
+                        "value": { "stringValue": "Integration Tests" }
                       },
                       {
                         "key": "repository",
@@ -43,9 +43,9 @@
                         }
                       }
                     ],
-                    "startTimeUnixNano": "1751157342557000000",
-                    "timeUnixNano": "1751157342562000000",
-                    "asDouble": 41
+                    "startTimeUnixNano": "1751160195793000000",
+                    "timeUnixNano": "1751160195797000000",
+                    "asDouble": 36
                   }
                 ]
               }
@@ -59,7 +59,7 @@
                     "attributes": [
                       {
                         "key": "workflow.name",
-                        "value": { "stringValue": "Continuous Integration" }
+                        "value": { "stringValue": "Integration Tests" }
                       },
                       {
                         "key": "repository",
@@ -76,9 +76,9 @@
                         "value": { "stringValue": "success" }
                       }
                     ],
-                    "startTimeUnixNano": "1751157342557000000",
-                    "timeUnixNano": "1751157342562000000",
-                    "asDouble": 36
+                    "startTimeUnixNano": "1751160195793000000",
+                    "timeUnixNano": "1751160195797000000",
+                    "asDouble": 31
                   }
                 ]
               }
@@ -92,7 +92,7 @@
                     "attributes": [
                       {
                         "key": "workflow.name",
-                        "value": { "stringValue": "Continuous Integration" }
+                        "value": { "stringValue": "Integration Tests" }
                       },
                       {
                         "key": "repository",
@@ -109,9 +109,9 @@
                         "value": { "stringValue": "success" }
                       }
                     ],
-                    "startTimeUnixNano": "1751157342557000000",
-                    "timeUnixNano": "1751157342562000000",
-                    "asDouble": 5
+                    "startTimeUnixNano": "1751160195794000000",
+                    "timeUnixNano": "1751160195797000000",
+                    "asDouble": 4
                   }
                 ]
               }
