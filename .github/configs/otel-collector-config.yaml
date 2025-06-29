@@ -1,5 +1,4 @@
 # OpenTelemetry Collector Configuration for CI Testing
-# This configuration enables JSON logging output for validating telemetry data in GitHub CI
 receivers:
   # OTLP receiver accepts metrics and traces via gRPC and HTTP protocols
   otlp:
@@ -12,9 +11,15 @@ exporters:
     verbosity: detailed
     sampling_initial: 2
     sampling_thereafter: 500
-  # File exporter writes received telemetry data to JSON file for validation
-  file:
-    path: /collector-logs/otel-logs.json
+
+  # File exporter for traces only
+  file/traces:
+    path: /collector-logs/traces.json
+    format: json
+
+  # File exporter for metrics only
+  file/metrics:
+    path: /collector-logs/metrics.json
     format: json
 
 extensions:
@@ -35,13 +40,11 @@ service:
 
   # Processing pipelines define data flow from receivers through processors to exporters
   pipelines:
-    # Traces pipeline: receives OpenTelemetry traces and exports them for validation
     traces:
       receivers: [otlp]
       processors: []
-      exporters: [debug, file]
-    # Metrics pipeline: receives OpenTelemetry metrics and exports them for validation
+      exporters: [debug, file/traces]
     metrics:
       receivers: [otlp]
       processors: []
-      exporters: [debug, file]
+      exporters: [debug, file/metrics]

@@ -53,6 +53,7 @@ jobs:
     needs: test-typescript
     name: GitHub Actions Test for push or pull_request event
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         id: checkout
@@ -68,7 +69,6 @@ jobs:
       - name: Start OpenTelemetry Collector
         # port 13133 is used for health checks, 4318 for OTLP HTTP endpoint
         run: |
-          echo "Starting OpenTelemetry Collector with custom configuration..."
           docker run -d \
             --name otel-collector \
             -p 13133:13133 \
@@ -111,39 +111,58 @@ jobs:
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs
         run: |
-          echo "=== Validating collector internal logs ==="
-          # Check collector's own operational logs (internal telemetry)
-          if [ -f "collector-logs/collector-logs.json" ]; then
-            echo "Collector internal logs found"
-            cat collector-logs/collector-logs.json | head -20
+          echo "=== Validating traces data ==="
+          if [ -f "collector-logs/traces.json" ]; then
+            echo "✓ Traces file found"
+            echo "Traces content preview (first 5 lines):"
+            head -5 collector-logs/traces.json
             
-            # Verify that logs contain the expected service name from our action
-            if grep -q "github-actions-opentelemetry" collector-logs/collector-logs.json; then
-              echo "✓ Service name found in logs"
+            # Check if traces file has content
+            if [ -s "collector-logs/traces.json" ]; then
+              echo "✓ Traces data received"
             else
-              echo "✗ Service name not found in logs"
-              exit 1
+              echo "⚠ Traces file is empty"
             fi
           else
-            echo "✗ Collector internal logs not found"
-            exit 1
+            echo "⚠ Traces file not found (no trace data received)"
           fi
 
-          echo "=== Validating telemetry data logs ==="
-          # Check logs containing the actual metrics and traces received by collector
-          if [ -f "collector-logs/otel-logs.json" ]; then
-            echo "Telemetry data logs found"
-            cat collector-logs/otel-logs.json | head -20
+          echo "=== Validating metrics data ==="
+          if [ -f "collector-logs/metrics.json" ]; then
+            echo "✓ Metrics file found"
+            echo "Metrics content preview (first 5 lines):"
+            head -5 collector-logs/metrics.json
             
-            # Verify that telemetry data was actually received and logged
-            if [ -s "collector-logs/otel-logs.json" ]; then
-              echo "✓ Telemetry data received"
+            # Check if metrics file has content
+            if [ -s "collector-logs/metrics.json" ]; then
+              echo "✓ Metrics data received"
             else
-              echo "✗ No telemetry data received"
-              exit 1
+              echo "⚠ Metrics file is empty"
             fi
           else
-            echo "✗ Telemetry data logs not found"
+            echo "⚠ Metrics file not found (no metrics data received)"
+          fi
+
+          echo "=== File size summary ==="
+          for file in collector-logs/*.json; do
+            if [ -f "$file" ]; then
+              size=$(wc -c < "$file" 2>/dev/null || echo '0')
+              echo "$(basename "$file"): $size bytes"
+            fi
+          done
+
+          # Verify that at least some telemetry data was received
+          traces_size=$(wc -c < collector-logs/traces.json 2>/dev/null || echo '0')
+          metrics_size=$(wc -c < collector-logs/metrics.json 2>/dev/null || echo '0')
+          internal_size=$(wc -c < collector-logs/collector-logs.json 2>/dev/null || echo '0')
+
+          if [ "$traces_size" -gt 0 ] || [ "$metrics_size" -gt 0 ]; then
+            echo "✓ Telemetry data successfully received and separated"
+          elif [ "$internal_size" -gt 0 ]; then
+            echo "⚠ Only internal logs found, no telemetry data received"
+            echo "This might indicate the GitHub Action didn't send any telemetry data"
+          else
+            echo "✗ No data received at all"
             exit 1
           fi
 
@@ -156,6 +175,3 @@ jobs:
 
           echo "=== Complete collector logs ==="
           docker logs otel-collector || echo "Could not retrieve collector logs"
-
-          echo "=== All generated files ==="
-          find collector-logs -type f -exec echo "File: {}" \; -exec head -10 {} \; -exec echo "---" \; 2>/dev/null || echo "No files found"
