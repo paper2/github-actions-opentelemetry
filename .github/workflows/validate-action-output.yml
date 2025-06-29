@@ -106,11 +106,9 @@ jobs:
 
           # JQ filter for metrics normalization
           cat > /tmp/normalize-metrics.jq << 'EOF'
-          .resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]? |= (
-            .startTimeUnixNano = "0000000000000000000" |
-            .timeUnixNano = "0000000000000000000" |
-            .asDouble = 0
-          )
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) |
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) |
+          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble)
           EOF
 
       # Upload collector logs as GitHub artifact for debugging
