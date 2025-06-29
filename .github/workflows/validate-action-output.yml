@@ -145,58 +145,22 @@ jobs:
 
       - name: Validate Traces
         run: |
-          echo "=== Validating traces data ==="
-          if [ -f "collector-logs/traces.json" ]; then
-            echo "✓ Traces file found"
-            head -5 collector-logs/traces.json
-            
-            if [ -s "collector-logs/traces.json" ]; then
-              echo "✓ Traces data received"
-              
-              if [ -f "collector-logs/traces-expected.json" ]; then
-                if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
-                  echo "✓ Trace structure matches expected format"
-                else
-                  echo "✗ Trace structure differs from expected format"
-                  diff collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
-                  exit 1
-                fi
-              else
-                echo "⚠ Test data file not found, skipping structure validation"
-              fi
-            else
-              echo "⚠ Traces file is empty"
-            fi
+          if diff collector-logs/traces-normalized.json collector-logs/traces-expected.json > /dev/null; then
+            echo "✓ Trace structure matches expected format"
           else
-            echo "⚠ Traces file not found (no trace data received)"
+            echo "✗ Trace structure differs from expected format"
+            diff -u collector-logs/traces-normalized.json collector-logs/traces-expected.json || true
+            exit 1
           fi
 
-      - name: Validate metrics
+      - name: Validate Metrics
         run: |
-          echo "=== Validating metrics data ==="
-          if [ -f "collector-logs/metrics.json" ]; then
-            echo "✓ Metrics file found"
-            head -5 collector-logs/metrics.json
-            
-            if [ -s "collector-logs/metrics.json" ]; then
-              echo "✓ Metrics data received"
-              
-              if [ -f "collector-logs/metrics-expected.json" ]; then
-                if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
-                  echo "✓ Metrics structure matches expected format"
-                else
-                  echo "✗ Metrics structure differs from expected format"
-                  diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
-                  exit 1
-                fi
-              else
-                echo "⚠ Test data file not found, skipping structure validation"
-              fi
-            else
-              echo "⚠ Metrics file is empty"
-            fi
+          if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
+            echo "✓ Metrics structure matches expected format"
           else
-            echo "⚠ Metrics file not found (no metrics data received)"
+            echo "✗ Metrics structure differs from expected format"
+            diff -u collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
+            exit 1
           fi
 
       # Show final collector status and logs for debugging
