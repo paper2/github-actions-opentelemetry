@@ -48,6 +48,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run test
 
+  # This job tests the GitHub Action by running it against the collector and validating the output.
+  # It compares the collected telemetry data with expected test data to ensure consistent structure.
+  #
+  # To update test data (.github/test-data/traces.json and metrics.json):
+  # 1. Run this workflow by pushing changes or creating a PR
+  # 2. After workflow completion, download the 'collector-logs' artifact from the GitHub Actions run page
+  # 3. Extract the artifact and copy traces.json and metrics.json to .github/test-data/ directory
+  # 4. Commit and push the updated test data files
   test-action:
     # This job should be last job in the workflow.
     needs: test-typescript
