@@ -114,13 +114,13 @@ jobs:
         run: |
           # Create normalized files from collector output
           if [ -f "collector-logs/traces.json" ]; then
-            jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-normalized.json
-            echo "✓ Created normalized traces file"
+            jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-actual.json
+            echo "✓ Created actual traces file"
           fi
 
           if [ -f "collector-logs/metrics.json" ]; then
-            jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
-            echo "✓ Created normalized metrics file"
+            jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-actual.json
+            echo "✓ Created actual metrics file"
           fi
 
           # Create expected normalized files for comparison
@@ -145,7 +145,7 @@ jobs:
 
       - name: Validate Traces
         run: |
-          diff -u collector-logs/traces-normalized.json collector-logs/traces-expected.json
+          diff -u collector-logs/traces-actual.json collector-logs/traces-expected.json
           if [ $? -eq 0 ]; then
             echo "✓ Trace structure matches expected format"
           else
@@ -155,7 +155,7 @@ jobs:
 
       - name: Validate Metrics
         run: |
-          diff -u collector-logs/metrics-normalized.json collector-logs/metrics-expected.json
+          diff -u collector-logs/metrics-actual.json collector-logs/metrics-expected.json
           if [ $? -eq 0 ]; then
             echo "✓ Metrics structure matches expected format"
           else
