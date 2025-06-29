@@ -70,8 +70,7 @@ jobs:
           echo "Collector is ready"
 
       # Execute the GitHub Action which sends telemetry data to the collector
-      - name: Test Local Action
-        id: test-action
+      - name: Execute Action
         uses: ./
         env:
           OTEL_SERVICE_NAME: github-actions-opentelemetry
@@ -85,7 +84,6 @@ jobs:
           echo "Waiting for file writes to complete..."
           sleep 5
 
-      # Setup normalization filters
       - name: Setup normalization filters
         run: |
           # Create JQ filters for normalization
@@ -111,19 +109,10 @@ jobs:
           del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble)
           EOF
 
-      # Generate normalized files
       - name: Generate normalized files
         run: |
-          # Create normalized files from collector output
-          if [ -f "collector-logs/traces.json" ]; then
-            jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-actual.json
-            echo "✓ Created actual traces file"
-          fi
-
-          if [ -f "collector-logs/metrics.json" ]; then
-            jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-actual.json
-            echo "✓ Created actual metrics file"
-          fi
+          jq -f /tmp/normalize-traces.jq collector-logs/traces.json > collector-logs/traces-actual.json
+          jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-actual.json
 
       # Upload collector logs as GitHub artifact for debugging
       - name: Upload collector logs as artifact
@@ -137,9 +126,7 @@ jobs:
       - name: Validate Traces
         run: |
           diff -u collector-logs/traces-actual.json .github/test-data/${{ inputs.test-data-directory }}/traces-expected.json
-          if [ $? -eq 0 ]; then
-            echo "✓ Trace structure matches expected format"
-          else
+          if [ $? -ne 0 ]; then
             echo "✗ Trace structure differs from expected format"
             exit 1
           fi
@@ -147,9 +134,7 @@ jobs:
       - name: Validate Metrics
         run: |
           diff -u collector-logs/metrics-actual.json .github/test-data/${{ inputs.test-data-directory }}/metrics-expected.json
-          if [ $? -eq 0 ]; then
-            echo "✓ Metrics structure matches expected format"
-          else
+          if [ $? -ne 0 ]; then
             echo "✗ Metrics structure differs from expected format"
             exit 1
           fi
