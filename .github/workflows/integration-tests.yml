@@ -108,10 +108,11 @@ jobs:
           path: collector-logs/
           retention-days: 5
 
-      # Define JQ filter for trace normalization (setting dynamic fields to fixed values)
-      - name: Set JQ filter for trace normalization
-        id: set-jq-filter
+      # Define JQ filters for normalization (setting dynamic fields to fixed values)
+      - name: Set JQ filters for normalization
+        id: set-jq-filters
         run: |
+          # JQ filter for trace normalization
           cat > /tmp/normalize-traces.jq << 'EOF'
           .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
             .traceId = "00000000000000000000000000000000" |
@@ -127,6 +128,15 @@ jobs:
             elif .key == "runner.name" then .value = {"stringValue": "GitHub Actions 0"}
             else .
             end
+          )
+          EOF
+
+          # JQ filter for metrics normalization
+          cat > /tmp/normalize-metrics.jq << 'EOF'
+          .resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]? |= (
+            .startTimeUnixNano = "0000000000000000000" |
+            .timeUnixNano = "0000000000000000000" |
+            .asDouble = 0
           )
           EOF
 
@@ -182,6 +192,28 @@ jobs:
             # Check if metrics file has content
             if [ -s "collector-logs/metrics.json" ]; then
               echo "✓ Metrics data received"
+              
+              # Validate metrics structure matches expected format by comparing with test data
+              echo "=== Validating metrics structure ==="
+              if [ -f ".github/test-data/metrics.json" ]; then
+                # Apply jq transformation to remove dynamic fields from collected metrics
+                jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-normalized.json
+                
+                # Apply same transformation to expected test data
+                jq -f /tmp/normalize-metrics.jq .github/test-data/metrics.json > collector-logs/metrics-expected.json
+                
+                # Compare normalized metrics
+                if diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json > /dev/null; then
+                  echo "✓ Metrics structure matches expected format"
+                else
+                  echo "✗ Metrics structure differs from expected format"
+                  echo "=== Differences ==="
+                  diff collector-logs/metrics-normalized.json collector-logs/metrics-expected.json || true
+                  exit 1
+                fi
+              else
+                echo "⚠ Test data file not found, skipping structure validation"
+              fi
             else
               echo "⚠ Metrics file is empty"
             fi
