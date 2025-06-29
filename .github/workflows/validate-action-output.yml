@@ -5,8 +5,10 @@ name: Validate Action Output
 # To update test data for any workflow using this reusable workflow:
 # 1. Run the calling workflow (by pushing changes, creating PR, or triggering workflow_run)
 # 2. After workflow completion, download the artifact from the GitHub Actions run page
-# 3. Extract the artifact and copy traces.json and metrics.json to the appropriate .github/test-data/ directory
-# 4. Commit and push the updated test data files
+# 3. Extract the artifact and copy traces-actual.json and metrics-actual.json to the appropriate .github/test-data/ directory
+# 4. Rename them to traces-expected.json and metrics-expected.json (removing the normalized values)
+# 5. Check the differences old vs new expected files to ensure the changes are valid
+# 6. Commit and push the updated test data files
 
 on:
   workflow_call:
@@ -121,17 +123,6 @@ jobs:
           if [ -f "collector-logs/metrics.json" ]; then
             jq -f /tmp/normalize-metrics.jq collector-logs/metrics.json > collector-logs/metrics-actual.json
             echo "✓ Created actual metrics file"
-          fi
-
-          # Create expected normalized files for comparison
-          if [ -f ".github/test-data/${{ inputs.test-data-directory }}/traces.json" ]; then
-            jq -f /tmp/normalize-traces.jq ".github/test-data/${{ inputs.test-data-directory }}/traces.json" > collector-logs/traces-expected.json
-            echo "✓ Created expected traces file"
-          fi
-
-          if [ -f ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" ]; then
-            jq -f /tmp/normalize-metrics.jq ".github/test-data/${{ inputs.test-data-directory }}/metrics.json" > collector-logs/metrics-expected.json
-            echo "✓ Created expected metrics file"
           fi
 
       # Upload collector logs as GitHub artifact for debugging
