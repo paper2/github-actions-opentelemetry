@@ -21,7 +21,8 @@
       "Bash(find:*)",
       "Bash(mkdir:*)",
       "WebFetch(domain:hub.docker.com)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   },

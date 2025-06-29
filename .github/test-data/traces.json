@@ -29,7 +29,7 @@
               "traceId": "1ad27f6da17dd5d3060ee57bafef0c11",
               "spanId": "fe6e9f7f522eeb4e",
               "parentSpanId": "",
-              "name": "Continuous Integration",
+              "name": "Integration Tests",
               "kind": 1,
               "startTimeUnixNano": "1751157255000000000",
               "endTimeUnixNano": "1751157296000000000",
