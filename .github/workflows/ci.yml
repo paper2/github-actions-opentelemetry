@@ -99,18 +99,14 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Allow time for collector to flush logs to files
-      - name: Wait for logs to be written
-        run: |
-          echo "Waiting for collector to flush logs to files..."
-          sleep 5
-
-          # Show current collector status
-          echo "=== Collector container status ==="
-          docker ps -a | grep otel-collector
-
-          echo "=== Recent collector logs ==="
-          docker logs --tail 20 otel-collector
+      # Upload collector logs as GitHub artifact for debugging
+      - name: Upload collector logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collector-logs
+          path: collector-logs/
+          retention-days: 5
 
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs
