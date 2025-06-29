@@ -108,23 +108,23 @@ jobs:
           path: collector-logs/
           retention-days: 5
 
-      # Define JQ filter for trace normalization (removing dynamic fields)
+      # Define JQ filter for trace normalization (setting dynamic fields to fixed values)
       - name: Set JQ filter for trace normalization
         id: set-jq-filter
         run: |
           cat > /tmp/normalize-traces.jq << 'EOF'
           .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
-            del(.traceId) |
-            del(.spanId) |
-            del(.parentSpanId) |
-            del(.startTimeUnixNano) |
-            del(.endTimeUnixNano)
+            .traceId = "00000000000000000000000000000000" |
+            .spanId = "0000000000000000" |
+            .parentSpanId = "0000000000000000" |
+            .startTimeUnixNano = "0000000000000000000" |
+            .endTimeUnixNano = "0000000000000000000"
           ) |
           .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
-            if .key == "run_id" then del(.value)
-            elif .key == "job.id" then del(.value)
-            elif .key == "url" then del(.value)
-            elif .key == "runner.name" then del(.value)
+            if .key == "run_id" then .value = {"intValue": "0"}
+            elif .key == "job.id" then .value = {"intValue": "0"}
+            elif .key == "url" then .value = {"stringValue": "https://example.com/actions/runs/0"}
+            elif .key == "runner.name" then .value = {"stringValue": "GitHub Actions 0"}
             else .
             end
           )
