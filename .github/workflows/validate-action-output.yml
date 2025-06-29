@@ -83,28 +83,17 @@ jobs:
           echo "Waiting for file writes to complete..."
           sleep 5
 
-      # Upload collector logs as GitHub artifact for debugging
-      - name: Upload collector logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact-name }}
-          path: collector-logs/
-          retention-days: ${{ inputs.retention-days }}
-
       # Define JQ filters for normalization (setting dynamic fields to fixed values)
       - name: Set JQ filters for normalization
         id: set-jq-filters
         run: |
           # JQ filter for trace normalization
           cat > /tmp/normalize-traces.jq << 'EOF'
-          .resourceSpans[]?.scopeSpans[]?.spans[]? |= (
-            .traceId = "00000000000000000000000000000000" |
-            .spanId = "0000000000000000" |
-            .parentSpanId = "0000000000000000" |
-            .startTimeUnixNano = "0000000000000000000" |
-            .endTimeUnixNano = "0000000000000000000"
-          ) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.parentSpanId) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.startTimeUnixNano) |
+          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.endTimeUnixNano) |
           .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
             if .key == "run_id" then .value = {"intValue": "0"}
             elif .key == "job.id" then .value = {"intValue": "0"}
@@ -123,6 +112,15 @@ jobs:
             .asDouble = 0
           )
           EOF
+
+      # Upload collector logs as GitHub artifact for debugging
+      - name: Upload collector logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: collector-logs/
+          retention-days: ${{ inputs.retention-days }}
 
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs (Traces)
