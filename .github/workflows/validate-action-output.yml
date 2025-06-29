@@ -67,6 +67,31 @@ jobs:
           timeout 60s bash -c 'until docker ps | grep -q "healthy.*otel-collector"; do sleep 2; echo "Waiting for collector health check..."; done'
           echo "Collector is ready"
 
+      # Execute the GitHub Action which sends telemetry data to the collector
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        env:
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
+          # Point to local collector service (not external endpoint)
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for file system operations
+        run: |
+          echo "Waiting for file writes to complete..."
+          sleep 5
+
+      # Upload collector logs as GitHub artifact for debugging
+      - name: Upload collector logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: collector-logs/
+          retention-days: ${{ inputs.retention-days }}
+
       # Define JQ filters for normalization (setting dynamic fields to fixed values)
       - name: Set JQ filters for normalization
         id: set-jq-filters
@@ -98,26 +123,6 @@ jobs:
             .asDouble = 0
           )
           EOF
-
-      # Execute the GitHub Action which sends telemetry data to the collector
-      - name: Test Local Action
-        id: test-action
-        uses: ./
-        env:
-          OTEL_SERVICE_NAME: github-actions-opentelemetry
-          # Point to local collector service (not external endpoint)
-          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Upload collector logs as GitHub artifact for debugging
-      - name: Upload collector logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact-name }}
-          path: collector-logs/
-          retention-days: ${{ inputs.retention-days }}
 
       # Validate that collector generated the expected JSON log files with correct content
       - name: Validate collector logs (Traces)

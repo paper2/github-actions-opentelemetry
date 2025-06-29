@@ -50,7 +50,7 @@ jobs:
   # Test the action for push/pull_request events using the reusable workflow
   test-action:
     needs: test-typescript
-    name: Test Action (Push/PR Events)
+    name: Test Action (Push Event)
     uses: ./.github/workflows/validate-action-output.yml
     with:
       test-data-directory: push-event-tests
