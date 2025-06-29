@@ -73,7 +73,7 @@ jobs:
             -p 13133:13133 \
             -p 4318:4318 \
             -v ${{ github.workspace }}/.github/configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro \
-            -v ${{ github.workspace }}/collector-logs:/tmp \
+            -v ${{ github.workspace }}/collector-logs:/collector-logs \
             --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:13133/ || exit 1" \
             --health-interval 10s \
             --health-timeout 5s \

@@ -14,7 +14,7 @@ exporters:
     sampling_thereafter: 500
   # File exporter writes received telemetry data to JSON file for validation
   file:
-    path: /tmp/otel-logs.json
+    path: /collector-logs/otel-logs.json
     format: json
 
 extensions:
@@ -28,7 +28,7 @@ service:
     logs:
       level: debug
       encoding: json
-      output_paths: ['/tmp/collector-logs.json']
+      output_paths: ['/collector-logs/collector-logs.json']
 
   # Enable extensions
   extensions: [health_check]
