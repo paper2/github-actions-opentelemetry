@@ -22,8 +22,8 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:hub.docker.com)",
       "Bash(ls:*)",
-      "Bash(rm:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
