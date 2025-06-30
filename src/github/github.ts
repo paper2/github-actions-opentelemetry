@@ -15,6 +15,8 @@ import * as core from '@actions/core'
 import { isTooManyTries, retryAsync } from 'ts-retry'
 import { WorkflowRunEvent } from '@octokit/webhooks-types'
 
+// TODO: Refactor to make testing easier.
+// Make octokit and workflowContext injectable from outside so this function can use mocks.
 export const fetchWorkflowResults = async (
   delayMs = 1000,
   maxTry = 10
@@ -92,6 +94,7 @@ const fetchWorkflowJobs = async (
   return res.data.jobs
 }
 
+// TODO: Extract settings branching logic into separate functions to make testing easier
 const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
   const owner = settings.owner ?? context.repo.owner
   const repo = settings.repository ?? context.repo.repo
