@@ -18,6 +18,6 @@ export const createSettings = (env: typeof process.env) => ({
 })
 
 export const settings = createSettings(process.env)
-export type Settings = ReturnType<typeof createSettings>
+export type ApplicationSettings = ReturnType<typeof createSettings>
 
 export default settings

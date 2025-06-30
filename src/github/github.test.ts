@@ -1,13 +1,24 @@
 import { describe, test, expect } from 'vitest'
-import { fetchWorkflowResults, getLatestCompletedAt } from './github.js'
+import * as github from '@actions/github'
+import {
+  fetchWorkflowResults,
+  getLatestCompletedAt,
+  getWorkflowContext,
+  createOctokitClient
+} from './github.js'
 import { toWorkflowJob, toWorkflowRun, WorkflowJob, Workflow } from './types.js'
+import { settings } from '../settings.js'
 
 describe('fetchWorkflowResults', () => {
   // Tips: If API limit exceed, authenticate by using below command
   //       $ export GITHUB_TOKEN=`gh auth token`
   test('should fetch results using real api', async () => {
     // not test retry because it needs mock of checkCompleted but it affects correct test case.
-    await expect(fetchWorkflowResults(0, 1)).resolves.not.toThrow()
+    const octokit = createOctokitClient()
+    const workflowContext = getWorkflowContext(github.context, settings)
+    await expect(
+      fetchWorkflowResults(octokit, workflowContext, 0, 1)
+    ).resolves.not.toThrow()
   })
 })
 

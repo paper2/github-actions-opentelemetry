@@ -1,8 +1,14 @@
 import * as core from '@actions/core'
-import { fetchWorkflowResults } from './github/index.js'
+import * as github from '@actions/github'
+import {
+  fetchWorkflowResults,
+  getWorkflowContext,
+  createOctokitClient
+} from './github/index.js'
 import { createMetrics } from './metrics/index.js'
 import { createTrace } from './traces/index.js'
 import { forceFlush, initialize, shutdown } from './instrumentation/index.js'
+import { settings } from './settings.js'
 
 /**
  * The main function for the action.
@@ -17,7 +23,11 @@ export async function run(): Promise<void> {
   let exitCode = 0
 
   try {
-    const results = await fetchWorkflowResults()
+    // Create Octokit client and workflow context
+    const octokit = createOctokitClient()
+    const workflowContext = getWorkflowContext(github.context, settings)
+
+    const results = await fetchWorkflowResults(octokit, workflowContext)
     await createMetrics(results)
     await createTrace(results)
   } catch (error) {

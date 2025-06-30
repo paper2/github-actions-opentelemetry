@@ -1,6 +1,5 @@
 import { Octokit } from '@octokit/rest'
-import * as github from '@actions/github'
-import { Settings, settings as importedSettings } from '../settings.js'
+import { ApplicationSettings } from '../settings.js'
 import {
   WorkflowContext,
   WorkflowResults,
@@ -15,7 +14,7 @@ import * as core from '@actions/core'
 import { isTooManyTries, retryAsync } from 'ts-retry'
 import { WorkflowRunEvent } from '@octokit/webhooks-types'
 
-const createOctokitClient = (): Octokit => {
+export const createOctokitClient = (): Octokit => {
   const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN // read environment variable for testing
   return new Octokit({
     baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
@@ -23,14 +22,12 @@ const createOctokitClient = (): Octokit => {
   })
 }
 
-// TODO: Refactor to make testing easier.
-// Make octokit and workflowContext injectable from outside so this function can use mocks.
 export const fetchWorkflowResults = async (
+  octokit: Octokit,
+  workflowContext: WorkflowContext,
   delayMs = 1000,
   maxTry = 10
 ): Promise<WorkflowResults> => {
-  const octokit = createOctokitClient()
-  const workflowContext = getWorkflowContext(github.context, importedSettings)
   try {
     // A workflow sometime has not completed in spite of trigger of workflow completed event.
     // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
@@ -98,9 +95,9 @@ const fetchWorkflowJobs = async (
   return res.data.jobs
 }
 
-const getWorkflowContext = (
+export const getWorkflowContext = (
   context: GitHubContext,
-  settings: Settings
+  settings: ApplicationSettings
 ): WorkflowContext => {
   const owner = settings.owner ?? context.repo.owner
   const repo = settings.repository ?? context.repo.repo
