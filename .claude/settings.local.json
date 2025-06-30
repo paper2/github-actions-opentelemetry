@@ -25,7 +25,9 @@
       "Bash(mv:*)",
       "Bash(grep:*)",
       "Bash(gh pr:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run coverage:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

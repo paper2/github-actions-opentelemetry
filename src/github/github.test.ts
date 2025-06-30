@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import * as github from '@actions/github'
+import { Octokit } from '@octokit/rest'
 import {
   fetchWorkflowResults,
   getLatestCompletedAt,
@@ -7,7 +8,8 @@ import {
   createOctokitClient
 } from './github.js'
 import { toWorkflowJob, toWorkflowRun, WorkflowJob, Workflow } from './types.js'
-import { settings } from '../settings.js'
+import { ApplicationSettings, settings } from '../settings.js'
+import { App } from '@octokit/webhooks-types'
 
 describe('fetchWorkflowResults', () => {
   // Tips: If API limit exceed, authenticate by using below command
@@ -19,6 +21,168 @@ describe('fetchWorkflowResults', () => {
     await expect(
       fetchWorkflowResults(octokit, workflowContext, 0, 1)
     ).resolves.not.toThrow()
+  })
+
+  test('should handle fetchWorkflowResults error and retry', async () => {
+    // Create a mock Octokit that fails
+    const mockOctokit = {
+      rest: {
+        actions: {
+          getWorkflowRunAttempt: async () => {
+            throw new Error('API Error')
+          },
+          listJobsForWorkflowRun: async () => {
+            throw new Error('API Error')
+          }
+        }
+      }
+    } as unknown as Octokit
+
+    const workflowContext = getWorkflowContext(github.context, settings)
+
+    await expect(
+      fetchWorkflowResults(mockOctokit, workflowContext, 0, 3)
+    ).rejects.toThrow('API Error')
+  })
+
+  test('should handle no completed jobs found error', async () => {
+    // Create a mock Octokit that returns workflow but no completed jobs
+    const mockOctokit = {
+      rest: {
+        actions: {
+          getWorkflowRunAttempt: async () => ({
+            data: {
+              id: 12345,
+              name: 'Test Workflow',
+              status: 'completed',
+              conclusion: 'success',
+              created_at: '2023-01-01T00:00:00Z',
+              run_attempt: 1,
+              html_url: 'https://github.com/test/repo/actions/runs/12345',
+              repository: {
+                full_name: 'test-owner/test-repo'
+              },
+              event: 'push'
+            }
+          }),
+          listJobsForWorkflowRun: async () => ({
+            data: {
+              jobs: [
+                // Return jobs that will be filtered out (not completed)
+                {
+                  id: 1,
+                  name: 'test-job',
+                  status: 'in_progress',
+                  conclusion: null,
+                  created_at: '2023-01-01T00:00:00Z',
+                  started_at: '2023-01-01T00:01:00Z',
+                  completed_at: null,
+                  workflow_name: 'Test Workflow',
+                  run_id: 12345,
+                  steps: []
+                }
+              ]
+            }
+          })
+        }
+      }
+    } as unknown as Octokit
+
+    const workflowContext = getWorkflowContext(github.context, settings)
+
+    await expect(
+      fetchWorkflowResults(mockOctokit, workflowContext, 0, 1)
+    ).rejects.toThrow('no completed jobs found for workflow run.')
+  })
+})
+
+describe('getWorkflowContext', () => {
+  test('should handle workflow_run event with payload', () => {
+    const mockContext = {
+      eventName: 'workflow_run',
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo'
+      },
+      payload: {
+        workflow_run: {
+          id: 67890,
+          run_attempt: 3
+        }
+      }
+    }
+
+    const mockSettings = {
+      owner: null,
+      repository: null,
+      workflowRunId: null
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result).toEqual({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      attempt_number: 3,
+      runId: 67890
+    })
+  })
+
+  test('should handle workflow_run event with missing run_attempt', () => {
+    const mockContext = {
+      eventName: 'workflow_run',
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo'
+      },
+      payload: {
+        workflow_run: {
+          id: 67890,
+          run_attempt: undefined
+        }
+      }
+    }
+
+    const mockSettings = {
+      owner: null,
+      repository: null,
+      workflowRunId: null
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result.attempt_number).toBe(1)
+  })
+
+  test('should handle workflow_run event with settings override', () => {
+    const mockContext = {
+      eventName: 'workflow_run',
+      repo: {
+        owner: 'original-owner',
+        repo: 'original-repo'
+      },
+      payload: {
+        workflow_run: {
+          id: 67890,
+          run_attempt: 2
+        }
+      }
+    }
+
+    const mockSettings = {
+      owner: 'override-owner',
+      repository: 'override-repo',
+      workflowRunId: 99999
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result).toEqual({
+      owner: 'override-owner',
+      repo: 'override-repo',
+      attempt_number: 2,
+      runId: 99999
+    })
   })
 })
 
