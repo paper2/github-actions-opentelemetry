@@ -31,16 +31,39 @@
       },
       "scopeMetrics": [
         {
-          "scope": {
-            "name": "github-actions-metrics"
-          },
           "metrics": [
             {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Example Workflow 01"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  }
+                ]
+              },
               "name": "github.workflow.duration",
-              "unit": "s",
+              "unit": "s"
+            },
+            {
               "gauge": {
                 "dataPoints": [
                   {
+                    "asDouble": 0,
                     "attributes": [
                       {
                         "key": "workflow.name",
@@ -53,138 +76,95 @@
                         "value": {
                           "stringValue": "paper2/github-actions-opentelemetry"
                         }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
                       }
-                    ]
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Example Workflow 01"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Example Workflow 01"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
                   }
                 ]
-              }
-            },
-            {
+              },
               "name": "github.job.duration",
-              "unit": "s",
-              "gauge": {
-                "dataPoints": [
-                  {
-                    "attributes": [
-                      {
-                        "key": "workflow.name",
-                        "value": {
-                          "stringValue": "Example Workflow 01"
-                        }
-                      },
-                      {
-                        "key": "repository",
-                        "value": {
-                          "stringValue": "paper2/github-actions-opentelemetry"
-                        }
-                      },
-                      {
-                        "key": "job.name",
-                        "value": {
-                          "stringValue": "Example Application Pipeline / Test Application"
-                        }
-                      },
-                      {
-                        "key": "job.conclusion",
-                        "value": {
-                          "stringValue": "success"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "attributes": [
-                      {
-                        "key": "workflow.name",
-                        "value": {
-                          "stringValue": "Example Workflow 01"
-                        }
-                      },
-                      {
-                        "key": "repository",
-                        "value": {
-                          "stringValue": "paper2/github-actions-opentelemetry"
-                        }
-                      },
-                      {
-                        "key": "job.name",
-                        "value": {
-                          "stringValue": "Example Application Pipeline / Build Application"
-                        }
-                      },
-                      {
-                        "key": "job.conclusion",
-                        "value": {
-                          "stringValue": "success"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "attributes": [
-                      {
-                        "key": "workflow.name",
-                        "value": {
-                          "stringValue": "Example Workflow 01"
-                        }
-                      },
-                      {
-                        "key": "repository",
-                        "value": {
-                          "stringValue": "paper2/github-actions-opentelemetry"
-                        }
-                      },
-                      {
-                        "key": "job.name",
-                        "value": {
-                          "stringValue": "Example Application Pipeline / Deploy Application"
-                        }
-                      },
-                      {
-                        "key": "job.conclusion",
-                        "value": {
-                          "stringValue": "success"
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
+              "unit": "s"
             },
             {
-              "name": "github.job.queued_duration",
-              "unit": "s",
               "gauge": {
                 "dataPoints": [
                   {
-                    "attributes": [
-                      {
-                        "key": "workflow.name",
-                        "value": {
-                          "stringValue": "Example Workflow 01"
-                        }
-                      },
-                      {
-                        "key": "repository",
-                        "value": {
-                          "stringValue": "paper2/github-actions-opentelemetry"
-                        }
-                      },
-                      {
-                        "key": "job.name",
-                        "value": {
-                          "stringValue": "Example Application Pipeline / Test Application"
-                        }
-                      },
-                      {
-                        "key": "job.conclusion",
-                        "value": {
-                          "stringValue": "success"
-                        }
-                      }
-                    ]
-                  },
-                  {
+                    "asDouble": 0,
                     "attributes": [
                       {
                         "key": "workflow.name",
@@ -210,9 +190,43 @@
                           "stringValue": "success"
                         }
                       }
-                    ]
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
                   },
                   {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Example Workflow 01"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
                     "attributes": [
                       {
                         "key": "workflow.name",
@@ -238,12 +252,19 @@
                           "stringValue": "success"
                         }
                       }
-                    ]
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
                   }
                 ]
-              }
+              },
+              "name": "github.job.queued_duration",
+              "unit": "s"
             }
-          ]
+          ],
+          "scope": {
+            "name": "github-actions-metrics"
+          }
         }
       ]
     }
