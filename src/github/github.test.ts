@@ -9,7 +9,6 @@ import {
 } from './github.js'
 import { toWorkflowJob, toWorkflowRun, WorkflowJob, Workflow } from './types.js'
 import { ApplicationSettings, settings } from '../settings.js'
-import { App } from '@octokit/webhooks-types'
 
 describe('fetchWorkflowResults', () => {
   // Tips: If API limit exceed, authenticate by using below command
@@ -93,6 +92,91 @@ describe('fetchWorkflowResults', () => {
     await expect(
       fetchWorkflowResults(mockOctokit, workflowContext, 0, 1)
     ).rejects.toThrow('no completed jobs found for workflow run.')
+  })
+
+  test('should filter incomplete jobs and process completed ones for non-workflow_run events', async () => {
+    // Create a mock Octokit that returns workflow with mixed job statuses
+    const mockOctokit = {
+      rest: {
+        actions: {
+          getWorkflowRunAttempt: async () => ({
+            data: {
+              id: 12345,
+              name: 'Test Workflow',
+              status: 'in_progress',
+              conclusion: null,
+              created_at: '2023-01-01T00:00:00Z',
+              run_attempt: 1,
+              html_url: 'https://github.com/test/repo/actions/runs/12345',
+              repository: {
+                full_name: 'test-owner/test-repo'
+              },
+              event: 'push'
+            }
+          }),
+          listJobsForWorkflowRun: async () => ({
+            data: {
+              jobs: [
+                // Completed job - should be included
+                {
+                  id: 1,
+                  name: 'completed-job',
+                  status: 'completed',
+                  conclusion: 'success',
+                  created_at: '2023-01-01T00:00:00Z',
+                  started_at: '2023-01-01T00:01:00Z',
+                  completed_at: '2023-01-01T00:05:00Z',
+                  workflow_name: 'Test Workflow',
+                  run_id: 12345,
+                  steps: []
+                },
+                // In-progress job - should be filtered out
+                {
+                  id: 2,
+                  name: 'in-progress-job',
+                  status: 'in_progress',
+                  conclusion: null,
+                  created_at: '2023-01-01T00:00:00Z',
+                  started_at: '2023-01-01T00:01:00Z',
+                  completed_at: null,
+                  workflow_name: 'Test Workflow',
+                  run_id: 12345,
+                  steps: []
+                },
+                // Queued job - should be filtered out
+                {
+                  id: 3,
+                  name: 'queued-job',
+                  status: 'queued',
+                  conclusion: null,
+                  created_at: '2023-01-01T00:00:00Z',
+                  started_at: null,
+                  completed_at: null,
+                  workflow_name: 'Test Workflow',
+                  run_id: 12345,
+                  steps: []
+                }
+              ]
+            }
+          })
+        }
+      }
+    } as unknown as Octokit
+
+    const workflowContext = getWorkflowContext(github.context, settings)
+
+    const result = await fetchWorkflowResults(
+      mockOctokit,
+      workflowContext,
+      0,
+      1
+    )
+
+    // Should only include the completed job
+    expect(result.workflowJobs).toHaveLength(1)
+    expect(result.workflowJobs[0].name).toBe('completed-job')
+    expect(result.workflowJobs[0].status).toBe('completed')
+    expect(result.workflow.name).toBe('Test Workflow')
   })
 })
 
@@ -181,6 +265,109 @@ describe('getWorkflowContext', () => {
       owner: 'override-owner',
       repo: 'override-repo',
       attempt_number: 2,
+      runId: 99999
+    })
+  })
+
+  test('should handle push event', () => {
+    const mockContext = {
+      eventName: 'push',
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo'
+      },
+      runId: 12345,
+      runAttempt: 2
+    }
+
+    const mockSettings = {
+      owner: null,
+      repository: null,
+      workflowRunId: null
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result).toEqual({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      attempt_number: 2,
+      runId: 12345
+    })
+  })
+
+  test('should handle pull_request event', () => {
+    const mockContext = {
+      eventName: 'pull_request',
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo'
+      },
+      runId: 54321,
+      runAttempt: 3
+    }
+
+    const mockSettings = {
+      owner: null,
+      repository: null,
+      workflowRunId: null
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result).toEqual({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      attempt_number: 3,
+      runId: 54321
+    })
+  })
+
+  test('should use default attempt_number for non-workflow_run events when runAttempt is missing', () => {
+    const mockContext = {
+      eventName: 'push',
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo'
+      },
+      runId: 12345,
+      runAttempt: undefined
+    }
+
+    const mockSettings = {
+      owner: null,
+      repository: null,
+      workflowRunId: null
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result.attempt_number).toBe(1)
+  })
+
+  test('should handle settings override for non-workflow_run events', () => {
+    const mockContext = {
+      eventName: 'push',
+      repo: {
+        owner: 'original-owner',
+        repo: 'original-repo'
+      },
+      runId: 12345,
+      runAttempt: 1
+    }
+
+    const mockSettings = {
+      owner: 'override-owner',
+      repository: 'override-repo',
+      workflowRunId: 99999
+    } as unknown as ApplicationSettings
+
+    const result = getWorkflowContext(mockContext as never, mockSettings)
+
+    expect(result).toEqual({
+      owner: 'override-owner',
+      repo: 'override-repo',
+      attempt_number: 1,
       runId: 99999
     })
   })
@@ -324,6 +511,58 @@ describe('Type converters', () => {
         expect(result.runner_group_name).toBeNull()
       }
     })
+
+    test('should skip incomplete jobs for push events', () => {
+      const incompleteJob = {
+        ...mockJobResponse,
+        status: 'in_progress',
+        conclusion: null,
+        completed_at: null
+      }
+
+      const result = toWorkflowJob(incompleteJob as never, 'push')
+      expect(result).toBeNull()
+    })
+
+    test('should skip incomplete jobs for pull_request events', () => {
+      const incompleteJob = {
+        ...mockJobResponse,
+        status: 'queued',
+        conclusion: null,
+        completed_at: null
+      }
+
+      const result = toWorkflowJob(incompleteJob as never, 'pull_request')
+      expect(result).toBeNull()
+    })
+
+    test('should log warning for skipped incomplete jobs', () => {
+      const consoleLogSpy = vi
+        .spyOn(console, 'log')
+        .mockImplementation(() => {})
+
+      const incompleteJob = {
+        ...mockJobResponse,
+        status: 'in_progress',
+        conclusion: null,
+        completed_at: null
+      }
+
+      const result = toWorkflowJob(incompleteJob as never, 'push')
+
+      expect(result).toBeNull()
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'Skipping incomplete job: test-job (status: in_progress)'
+      )
+
+      consoleLogSpy.mockRestore()
+    })
+
+    test('should process completed jobs for non-workflow_run events', () => {
+      const result = toWorkflowJob(mockJobResponse as never, 'push')
+      expect(result).not.toBeNull()
+      expect(result).toEqual(mockJobResponse)
+    })
   })
 
   describe('toWorkflowRun', () => {
@@ -373,6 +612,49 @@ describe('Type converters', () => {
       expect(() => toWorkflowRun(workflowWithoutAttempt as never)).toThrow(
         'Workflow run attempt is required'
       )
+    })
+
+    test('should handle in-progress workflows for non-workflow_run events', () => {
+      const consoleLogSpy = vi
+        .spyOn(console, 'log')
+        .mockImplementation(() => {})
+
+      const inProgressWorkflow = {
+        ...mockWorkflowResponse,
+        status: 'in_progress',
+        event: 'push'
+      }
+
+      const result = toWorkflowRun(inProgressWorkflow as never)
+
+      expect(result).toEqual(expectedWorkflowBase)
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'Processing in-progress workflow: 12345'
+      )
+
+      consoleLogSpy.mockRestore()
+    })
+
+    test('should throw error for in-progress workflow_run events', () => {
+      const inProgressWorkflowRun = {
+        ...mockWorkflowResponse,
+        status: 'in_progress',
+        event: 'workflow_run'
+      }
+
+      expect(() => toWorkflowRun(inProgressWorkflowRun as never)).toThrow(
+        'workflow status must be completed on workflow_run event'
+      )
+    })
+
+    test('should handle completed workflows for non-workflow_run events', () => {
+      const pushWorkflow = {
+        ...mockWorkflowResponse,
+        event: 'push'
+      }
+
+      const result = toWorkflowRun(pushWorkflow as never)
+      expect(result).toEqual(expectedWorkflowBase)
     })
   })
 })
