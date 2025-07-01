@@ -36,8 +36,6 @@
           },
           "spans": [
             {
-              "name": "Push Event Tests",
-              "kind": 1,
               "attributes": [
                 {
                   "key": "repository",
@@ -64,11 +62,54 @@
                   }
                 }
               ],
-              "status": {}
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Push Event Tests",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {},
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "TypeScript Tests with time of waiting runner",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
               "attributes": [
                 {
                   "key": "job.id",
@@ -95,13 +136,18 @@
                   }
                 }
               ],
-              "status": {
-                "code": 1
-              }
-            },
-            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "waiting runner for TypeScript Tests",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
               "attributes": [
                 {
                   "key": "job.id",
@@ -128,126 +174,160 @@
                   }
                 }
               ],
-              "status": {
-                "code": 1
-              }
-            },
-            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "TypeScript Tests",
-              "kind": 1,
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Set up job",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Initialize containers",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Checkout",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Setup Node.js",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Install Dependencies",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Check Format",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Lint",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Test",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Post Setup Node.js",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Post Checkout",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
+              "endTimeUnixNano": "0",
+              "kind": 1,
               "name": "Stop containers",
-              "kind": 1,
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             },
             {
-              "name": "Complete job",
+              "endTimeUnixNano": "0",
               "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
               "status": {
                 "code": 1
-              }
+              },
+              "traceId": "00000000000000000000000000000000"
             }
           ]
         }
