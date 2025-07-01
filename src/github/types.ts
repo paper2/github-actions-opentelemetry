@@ -126,7 +126,7 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
   // Special handling remains for backward compatibility as the initial specification retried until workflow_run events reached completed status.
   if (
     workflowRun.event === 'workflow_run' &&
-    workflowRun.status !== 'completed'
+    (workflowRun.status !== 'completed' || !workflowRun.conclusion)
   )
     throw new Error('workflow status must be completed on workflow_run event')
 

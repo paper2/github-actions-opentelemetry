@@ -656,5 +656,17 @@ describe('Type converters', () => {
       const result = toWorkflowRun(pushWorkflow as never)
       expect(result).toEqual(expectedWorkflowBase)
     })
+
+    test('should throw error when conclusion is null', () => {
+      const workflowWithoutConclusion = {
+        ...mockWorkflowResponse,
+        conclusion: null,
+        event: 'workflow_run'
+      }
+
+      expect(() => toWorkflowRun(workflowWithoutConclusion as never)).toThrow(
+        `workflow status must be completed on workflow_run event`
+      )
+    })
   })
 })
