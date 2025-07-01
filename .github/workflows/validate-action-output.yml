@@ -88,11 +88,11 @@ jobs:
         run: |
           # Create JQ filters for normalization
           cat > /tmp/normalize-traces.jq << 'EOF'
-          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) |
-          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) |
-          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.parentSpanId) |
-          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.startTimeUnixNano) |
-          del(.resourceSpans[]?.scopeSpans[]?.spans[]?.endTimeUnixNano) |
+          (.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) = "00000000000000000000000000000000" |
+          (.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) = "0000000000000000" |
+          (.resourceSpans[]?.scopeSpans[]?.spans[]?.parentSpanId) = "0000000000000000" |
+          (.resourceSpans[]?.scopeSpans[]?.spans[]?.startTimeUnixNano) = "0" |
+          (.resourceSpans[]?.scopeSpans[]?.spans[]?.endTimeUnixNano) = "0" |
           .resourceSpans[]?.scopeSpans[]?.spans[]?.attributes[]? |= (
             if .key == "run_id" then .value = {"intValue": "0"}
             elif .key == "job.id" then .value = {"intValue": "0"}
@@ -104,9 +104,9 @@ jobs:
           EOF
 
           cat > /tmp/normalize-metrics.jq << 'EOF'
-          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) |
-          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) |
-          del(.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble)
+          (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) = "0" |
+          (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) = "0" |
+          (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble) = 0
           EOF
 
       - name: Generate normalized files
