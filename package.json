@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.6.0",
+  "version": "v0.7.0",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -39,7 +39,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.0",
+    "@actions/github": "^6.0.1",
     "@octokit/rest": "^21.1.0",
     "@octokit/webhooks-types": "^7.6.1",
     "@opentelemetry/api": "^1.9.0",

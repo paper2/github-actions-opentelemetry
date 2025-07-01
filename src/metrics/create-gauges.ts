@@ -25,7 +25,7 @@ const createMetricsAttributes = (
   workflow: WorkflowRun,
   job?: WorkflowJob
 ): opentelemetry.Attributes => ({
-  [ak.WORKFLOW_NAME]: workflow.name || undefined,
+  [ak.WORKFLOW_NAME]: workflow.name,
   [ak.REPOSITORY]: workflow.repository.full_name,
   ...(job && { [ak.JOB_NAME]: job.name }),
   ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }) // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
@@ -36,6 +36,7 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
+  // workflow run context has no end time, so use the latest job's completed_at
   const jobCompletedAtMax = new Date(getLatestCompletedAt(workflowRunJobs))
   createGauge(
     dn.WORKFLOW_DURATION,
@@ -50,10 +51,6 @@ export const createJobGauges = (
   workflowRunJobs: WorkflowJobs
 ): void => {
   for (const job of workflowRunJobs) {
-    if (!job.completed_at) {
-      continue
-    }
-
     const jobMetricsAttributes = createMetricsAttributes(workflow, job)
     createGauge(
       dn.JOB_DURATION,

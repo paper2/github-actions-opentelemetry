@@ -45,9 +45,8 @@ export type WorkflowJobs = WorkflowJob[]
 export type Workflow = {
   readonly id: number
   readonly name: string
-  readonly status: 'completed'
   // TODO: use union type for conclusion
-  readonly conclusion: string
+  readonly conclusion: string | null
   // TODO: use Date type
   readonly created_at: string
   readonly run_attempt: number
@@ -81,13 +80,33 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
     completed_at: step.completed_at
   }
 }
-export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
-  if (job.status !== 'completed')
-    throw new Error(`This job is not completed. id: ${job.id}`)
-  if (!job.conclusion) throw new Error('Job conclusion is required')
-  // FIXME: should exit immediately because it is not recoverable empirically.
-  if (!job.completed_at) throw new Error('Job completed_at is required')
-  if (!job.workflow_name) throw new Error('Job workflow_name is required')
+export const toWorkflowJob = (
+  job: WorkflowJobResponse,
+  eventName: string
+): WorkflowJob | null => {
+  if (eventName === 'workflow_run' && job.status !== 'completed') {
+    // This error is for backward compatibility.
+    throw new Error('job.status must be completed on workflow_run event')
+  } else if (job.status !== 'completed') {
+    // TODO: use union type for status
+    // Skip incomplete jobs for push, pull_request, etc.
+    console.log(`Skipping incomplete job: ${job.name} (status: ${job.status})`)
+    return null
+  }
+
+  if (!job.conclusion)
+    throw new Error(
+      `Job conclusion is required for job: ${job.name} (id: ${job.id})`
+    )
+  // TODO: Handle this case because sometimes this property is not set eternally.
+  if (!job.completed_at)
+    throw new Error(
+      `Job completed_at is required for job: ${job.name} (id: ${job.id})`
+    )
+  if (!job.workflow_name)
+    throw new Error(
+      `Job workflow_name is required for job: ${job.name} (id: ${job.id})`
+    )
 
   return {
     id: job.id,
@@ -105,18 +124,26 @@ export const toWorkflowJob = (job: WorkflowJobResponse): WorkflowJob => {
   }
 }
 export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
-  if (workflowRun.status !== 'completed')
-    throw new Error(`This workflow is not completed. id: ${workflowRun.id}`)
+  // Special handling remains for backward compatibility as the initial specification retried until workflow_run events reached completed status.
+  if (
+    workflowRun.event === 'workflow_run' &&
+    (workflowRun.status !== 'completed' || !workflowRun.conclusion)
+  )
+    throw new Error('workflow status must be completed on workflow_run event')
+
+  // Output support inquiry log when enabled to work beyond workflow_run events
+  if (workflowRun.status === 'in_progress') {
+    console.log(`Processing in-progress workflow: ${workflowRun.id}`)
+  }
+
   if (!workflowRun.name) throw new Error('Workflow run name is required')
-  if (!workflowRun.conclusion)
-    throw new Error('Workflow run conclusion is required')
+
   if (!workflowRun.run_attempt)
     throw new Error('Workflow run attempt is required')
 
   return {
     id: workflowRun.id,
     name: workflowRun.name,
-    status: workflowRun.status,
     conclusion: workflowRun.conclusion,
     created_at: workflowRun.created_at,
     run_attempt: workflowRun.run_attempt,

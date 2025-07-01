@@ -1,7 +1,5 @@
 import { Octokit } from '@octokit/rest'
-import * as github from '@actions/github'
-import { EventPayloadMap } from '@octokit/webhooks-types'
-import settings from '../settings.js'
+import { ApplicationSettings } from '../settings.js'
 import {
   WorkflowContext,
   WorkflowResults,
@@ -13,19 +11,24 @@ import {
   WorkflowJobsResponse
 } from './types.js'
 import * as core from '@actions/core'
-import { fail } from 'assert'
 import { isTooManyTries, retryAsync } from 'ts-retry'
+import { WorkflowRunEvent } from '@octokit/webhooks-types'
 
-export const fetchWorkflowResults = async (
-  delayMs = 1000,
-  maxTry = 10
-): Promise<WorkflowResults> => {
-  const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN // read environment variable for testing
-  const octokit = new Octokit({
+export const createOctokitClient = (): Octokit => {
+  // process.env.GITHUB_TOKEN is used for GitHub Enterprise Server.
+  const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN
+  return new Octokit({
     baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
     auth: token
   })
-  const workflowContext = getWorkflowContext(github.context)
+}
+
+export const fetchWorkflowResults = async (
+  octokit: Octokit,
+  workflowContext: WorkflowContext,
+  delayMs = 1000,
+  maxTry = 10
+): Promise<WorkflowResults> => {
   try {
     // A workflow sometime has not completed in spite of trigger of workflow completed event.
     // FYI: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
@@ -36,9 +39,15 @@ export const fetchWorkflowResults = async (
           octokit,
           workflowContext
         )
+        const workflowJobs = workflowJobsRes
+          .map(job => toWorkflowJob(job, workflowRes.event))
+          .filter((job): job is WorkflowJob => job !== null)
+        if (workflowJobs.length === 0) {
+          throw new Error(`no completed jobs found for workflow run.`)
+        }
         return {
           workflow: toWorkflow(workflowRes),
-          workflowJobs: workflowJobsRes.map(toWorkflowJob)
+          workflowJobs
         }
       },
       {
@@ -51,9 +60,7 @@ export const fetchWorkflowResults = async (
     return results
   } catch (err) {
     core.error('failed to get results of workflow run')
-    if (isTooManyTries(err)) {
-      console.error('retry count exceeded maxTry')
-    }
+    if (isTooManyTries(err)) console.error('retry count exceeded maxTry')
     console.error(err)
     throw err
   }
@@ -87,25 +94,35 @@ const fetchWorkflowJobs = async (
   return res.data.jobs
 }
 
-const getWorkflowContext = (context: GitHubContext): WorkflowContext => {
-  // If this workflow is trigged on `workflow_run`, set runId it's id.
+export const getWorkflowContext = (
+  context: GitHubContext,
+  settings: ApplicationSettings
+): WorkflowContext => {
+  const owner = settings.owner ?? context.repo.owner
+  const repo = settings.repository ?? context.repo.repo
+
+  if (context.eventName !== 'workflow_run')
+    return {
+      owner,
+      repo,
+      attempt_number: context.runAttempt || 1, // 1 is for testing.
+      runId: settings.workflowRunId ?? context.runId
+    }
+
+  // If this workflow is trigged on `workflow_run`, set runId targeted workflow's id.
   // Detail of `workflow_run` event: https://docs.github.com/ja/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_run
-  const workflowRunEvent = context.payload as
-    | EventPayloadMap['workflow_run']
-    | undefined
-
-  const runId = settings.workflowRunId ?? workflowRunEvent?.workflow_run?.id
-  if (!runId) fail('Workflow run id should be defined.')
-
+  const workflowRunEvent = context.payload as WorkflowRunEvent
   return {
-    owner: settings.owner ?? context.repo.owner,
-    repo: settings.repository ?? context.repo.repo,
-    attempt_number: workflowRunEvent?.workflow_run?.run_attempt || 1,
-    runId
+    owner,
+    repo,
+    attempt_number: workflowRunEvent.workflow_run.run_attempt || 1, // 1 is for testing.
+    runId: settings.workflowRunId ?? workflowRunEvent.workflow_run.id
   }
 }
 
 export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
+  if (jobs.length === 0)
+    throw new Error('no jobs found to get latest completed_at date.')
   const jobCompletedAtDates = jobs.map(job => new Date(job.completed_at))
   const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
   return new Date(maxDateNumber).toISOString()

@@ -1,0 +1,257 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "github-actions-opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "nodejs"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.30.1"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "github-actions-opentelemetry"
+          },
+          "spans": [
+            {
+              "name": "Push Event Tests",
+              "kind": 1,
+              "attributes": [
+                {
+                  "key": "repository",
+                  "value": {
+                    "stringValue": "paper2/github-actions-opentelemetry"
+                  }
+                },
+                {
+                  "key": "run_id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "run_attempt",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "url",
+                  "value": {
+                    "stringValue": "https://example.com/actions/runs/0"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "name": "TypeScript Tests with time of waiting runner",
+              "kind": 1,
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "waiting runner for TypeScript Tests",
+              "kind": 1,
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "TypeScript Tests",
+              "kind": 1,
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Set up job",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Initialize containers",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Checkout",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Setup Node.js",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Install Dependencies",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Check Format",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Lint",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Test",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Post Setup Node.js",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Post Checkout",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Stop containers",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "name": "Complete job",
+              "kind": 1,
+              "status": {
+                "code": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

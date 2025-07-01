@@ -2,6 +2,9 @@ name: Example Workflow 01
 
 on:
   push:
+    branches:
+      - main
+      - getting-started
 
 jobs:
   example-app:

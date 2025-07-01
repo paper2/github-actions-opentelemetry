@@ -5,7 +5,6 @@ import {
   getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { fail } from 'assert'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
 import { Workflow } from 'src/github/types.js'
@@ -14,13 +13,12 @@ export const createWorkflowTrace = (
   workflow: Workflow,
   workflowJobs: WorkflowJobs
 ): Context => {
-  if (!workflow.name) fail()
   const span = createSpan(
     ROOT_CONTEXT,
     workflow.name,
     workflow.created_at,
     getLatestCompletedAt(workflowJobs),
-    workflow.conclusion,
+    workflow.conclusion || '', // '' is converted to UNSET status. we should not use ''.
     { ...buildWorkflowAttributes(workflow) }
   )
 
@@ -31,7 +29,12 @@ export const createWorkflowJobSpan = (
   ctx: Context,
   job: WorkflowJob
 ): Context => {
-  if (!job.completed_at || job.steps === undefined) fail()
+  if (!job.completed_at) {
+    throw new Error(
+      `Job completed_at is required for span creation: ${job.name} (id: ${job.id})`
+    )
+  }
+
   const spanWithWaiting = createSpan(
     ctx,
     `${job.name} with time of waiting runner`,
@@ -78,9 +81,13 @@ export const createWorkflowRunStepSpan = (
   ctx: Context,
   job: WorkflowJob
 ): void => {
-  if (job.steps === undefined) fail()
-  job.steps.map(step => {
-    if (step.started_at == null || step.completed_at == null) fail()
+  job.steps.forEach(step => {
+    if (step.started_at == null || step.completed_at == null) {
+      console.warn(
+        `Step ${step.name} in job ${job.name} has null timestamps, skipping span creation`
+      )
+      return
+    }
     createSpan(
       ctx,
       step.name,
@@ -97,6 +104,7 @@ const createSpan = (
   name: string,
   startAt: string,
   endAt: string,
+  // TODO: use user defined type instead of string
   conclusion: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
@@ -114,7 +122,7 @@ const createSpan = (
 // The type of `conclusion` for a job is defined, but for step and workflow, it is just a string.
 // At the very least, we know that `conclusion` for step, job, and workflow can take the values `success` and `failure`,
 // so I have summarized the definitions accordingly.
-const getSpanStatusFromConclusion = (
+export const getSpanStatusFromConclusion = (
   status: string
 ): opentelemetry.SpanStatus => {
   switch (status) {

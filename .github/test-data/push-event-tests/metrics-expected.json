@@ -1,0 +1,139 @@
+{
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "github-actions-opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "nodejs"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.29.0"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "scope": {
+            "name": "github-actions-metrics"
+          },
+          "metrics": [
+            {
+              "name": "github.workflow.duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "github.job.duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "TypeScript Tests"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "github.job.queued_duration",
+              "unit": "s",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "TypeScript Tests"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
