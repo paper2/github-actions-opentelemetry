@@ -5,7 +5,6 @@ import {
   getLatestCompletedAt
 } from '../github/index.js'
 import * as opentelemetry from '@opentelemetry/api'
-import { fail } from 'assert'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
 import { Workflow } from 'src/github/types.js'
@@ -14,7 +13,6 @@ export const createWorkflowTrace = (
   workflow: Workflow,
   workflowJobs: WorkflowJobs
 ): Context => {
-  if (!workflow.name) fail()
   const span = createSpan(
     ROOT_CONTEXT,
     workflow.name,
@@ -136,7 +134,7 @@ const createSpan = (
 // The type of `conclusion` for a job is defined, but for step and workflow, it is just a string.
 // At the very least, we know that `conclusion` for step, job, and workflow can take the values `success` and `failure`,
 // so I have summarized the definitions accordingly.
-const getSpanStatusFromConclusion = (
+export const getSpanStatusFromConclusion = (
   status: string
 ): opentelemetry.SpanStatus => {
   switch (status) {
@@ -145,8 +143,6 @@ const getSpanStatusFromConclusion = (
     case 'failure':
     case 'timed_out':
       return { code: opentelemetry.SpanStatusCode.ERROR }
-    case 'in_progress':
-      return { code: opentelemetry.SpanStatusCode.UNSET }
     default:
       return { code: opentelemetry.SpanStatusCode.UNSET }
   }

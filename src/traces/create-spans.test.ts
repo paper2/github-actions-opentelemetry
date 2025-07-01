@@ -1,10 +1,11 @@
 import { describe, test, expect, vi } from 'vitest'
 import {
   createWorkflowJobSpan,
-  createWorkflowRunStepSpan
+  createWorkflowRunStepSpan,
+  getSpanStatusFromConclusion
 } from './create-spans.js'
 import { WorkflowJob } from '../github/types.js'
-import { ROOT_CONTEXT } from '@opentelemetry/api'
+import { ROOT_CONTEXT, SpanStatusCode } from '@opentelemetry/api'
 
 // Mock console methods to avoid noise in test output
 vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -123,29 +124,34 @@ describe('createWorkflowRunStepSpan', () => {
   })
 })
 
-describe('span status mapping', () => {
-  // We can't directly test getSpanStatusFromConclusion since it's not exported,
-  // but we can test it indirectly through span creation
-  test('should handle in_progress status in workflow spans', () => {
-    const mockWorkflow = {
-      id: 12345,
-      name: 'Test Workflow',
-      status: 'in_progress' as const,
-      conclusion: null,
-      created_at: '2023-01-01T00:00:00Z',
-      run_attempt: 1,
-      html_url: 'https://github.com/test/repo/actions/runs/12345',
-      repository: {
-        full_name: 'test-owner/test-repo'
-      }
-    }
+describe('getSpanStatusFromConclusion', () => {
+  test('should return OK status for success conclusion', () => {
+    const result = getSpanStatusFromConclusion('success')
+    expect(result).toEqual({ code: SpanStatusCode.OK })
+  })
 
-    // Should not throw when creating spans for in_progress workflow
-    expect(() => {
-      // This simulates the workflow span creation with in_progress status
-      const conclusion = mockWorkflow.conclusion || 'in_progress'
-      // Should handle 'in_progress' without error
-      expect(conclusion).toBe('in_progress')
-    }).not.toThrow()
+  test('should return ERROR status for failure conclusion', () => {
+    const result = getSpanStatusFromConclusion('failure')
+    expect(result).toEqual({ code: SpanStatusCode.ERROR })
+  })
+
+  test('should return ERROR status for timed_out conclusion', () => {
+    const result = getSpanStatusFromConclusion('timed_out')
+    expect(result).toEqual({ code: SpanStatusCode.ERROR })
+  })
+
+  test('should return UNSET status for unknown conclusion (default case)', () => {
+    const result = getSpanStatusFromConclusion('unknown_status')
+    expect(result).toEqual({ code: SpanStatusCode.UNSET })
+  })
+
+  test('should return UNSET status for in_progress conclusion (default case)', () => {
+    const result = getSpanStatusFromConclusion('in_progress')
+    expect(result).toEqual({ code: SpanStatusCode.UNSET })
+  })
+
+  test('should return UNSET status for cancelled conclusion (default case)', () => {
+    const result = getSpanStatusFromConclusion('cancelled')
+    expect(result).toEqual({ code: SpanStatusCode.UNSET })
   })
 })
