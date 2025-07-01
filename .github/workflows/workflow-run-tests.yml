@@ -6,8 +6,6 @@ on:
   workflow_run:
     workflows:
       - Example Workflow 01
-      - Example Workflow 02
-      - Example Workflow 03
     types:
       - completed
 
