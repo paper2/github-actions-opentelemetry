@@ -88,6 +88,7 @@ export const toWorkflowJob = (
     // This error is for backward compatibility.
     throw new Error('job.status must be completed on workflow_run event')
   } else if (job.status !== 'completed') {
+    // TODO: use union type for status
     // Skip incomplete jobs for push, pull_request, etc.
     console.log(`Skipping incomplete job: ${job.name} (status: ${job.status})`)
     return null
@@ -97,7 +98,7 @@ export const toWorkflowJob = (
     throw new Error(
       `Job conclusion is required for job: ${job.name} (id: ${job.id})`
     )
-  // FIXME: should exit immediately because it is not recoverable empirically.
+  // TODO: Handle this case because sometimes this property is not set eternally.
   if (!job.completed_at)
     throw new Error(
       `Job completed_at is required for job: ${job.name} (id: ${job.id})`

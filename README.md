@@ -96,7 +96,7 @@ sequenceDiagram
 
 ### GitHub Actions Examples
 
-#### Option 1: Monitor Other Workflows (Original)
+#### Option 1: Monitor Other Workflows
 
 Monitor completed workflows triggered by `workflow_run` events:
 
@@ -137,12 +137,13 @@ jobs:
           # Basic Authentication: Authorization=Basic <base64-encoded value of userid:password>
           OTEL_EXPORTER_OTLP_HEADERS:
             api-key=${ secrets.API_KEY },other-config-value=value
+          OTEL_RESOURCE_ATTRIBUTES: 'environment=ci,team=backend'
         with:
           # Required for collecting workflow data
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-#### Option 2: Monitor Current Workflow (New)
+#### Option 2: Monitor Current Workflow (Experimental)
 
 Monitor the current workflow by running this action as the last step:
 
@@ -179,8 +180,15 @@ jobs:
       - name: Send Telemetry
         uses: paper2/github-actions-opentelemetry@main
         env:
-          OTEL_SERVICE_NAME: my-project-ci
+          OTEL_SERVICE_NAME: github-actions-opentelemetry
           OTEL_EXPORTER_OTLP_ENDPOINT: https://collector-example.com
+          # Additional OTLP headers. Useful for OTLP authentication.
+          # e.g.
+          # New Relic: api-key=YOUR_NEWRELIC_API_KEY
+          # Google Cloud Run: Authorization=Bearer <value of $(gcloud auth print-identity-token)>
+          # Basic Authentication: Authorization=Basic <base64-encoded value of userid:password>
+          OTEL_EXPORTER_OTLP_HEADERS:
+            api-key=${ secrets.API_KEY },other-config-value=value
           OTEL_RESOURCE_ATTRIBUTES: 'environment=ci,team=backend'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
