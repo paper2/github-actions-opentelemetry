@@ -15,7 +15,8 @@ import { isTooManyTries, retryAsync } from 'ts-retry'
 import { WorkflowRunEvent } from '@octokit/webhooks-types'
 
 export const createOctokitClient = (): Octokit => {
-  const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN // read environment variable for testing
+  // process.env.GITHUB_TOKEN is used for GitHub Enterprise Server.
+  const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN
   return new Octokit({
     baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
     auth: token
