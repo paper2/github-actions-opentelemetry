@@ -59,9 +59,7 @@ export const fetchWorkflowResults = async (
     return results
   } catch (err) {
     core.error('failed to get results of workflow run')
-    if (isTooManyTries(err)) {
-      console.error('retry count exceeded maxTry')
-    }
+    if (isTooManyTries(err)) console.error('retry count exceeded maxTry')
     console.error(err)
     throw err
   }
