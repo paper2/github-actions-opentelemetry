@@ -18,7 +18,7 @@ export const createWorkflowTrace = (
     workflow.name,
     workflow.created_at,
     getLatestCompletedAt(workflowJobs),
-    workflow.conclusion || 'in_progress',
+    workflow.conclusion || '', // '' is converted to UNSET status. we should not use ''.
     { ...buildWorkflowAttributes(workflow) }
   )
 
@@ -32,12 +32,6 @@ export const createWorkflowJobSpan = (
   if (!job.completed_at) {
     throw new Error(
       `Job completed_at is required for span creation: ${job.name} (id: ${job.id})`
-    )
-  }
-
-  if (job.steps === undefined) {
-    console.warn(
-      `Job ${job.name} (id: ${job.id}) has no steps, skipping step processing`
     )
   }
 
@@ -87,13 +81,6 @@ export const createWorkflowRunStepSpan = (
   ctx: Context,
   job: WorkflowJob
 ): void => {
-  if (job.steps === undefined) {
-    console.warn(
-      `Job ${job.name} (id: ${job.id}) has no steps, skipping step span creation`
-    )
-    return
-  }
-
   job.steps.forEach(step => {
     if (step.started_at == null || step.completed_at == null) {
       console.warn(
@@ -117,6 +104,7 @@ const createSpan = (
   name: string,
   startAt: string,
   endAt: string,
+  // TODO: use user defined type instead of string
   conclusion: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
