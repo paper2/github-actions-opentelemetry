@@ -7,7 +7,13 @@ import {
   getWorkflowContext,
   createOctokitClient
 } from './github.js'
-import { toWorkflowJob, toWorkflowRun, WorkflowJob, Workflow } from './types.js'
+import {
+  toWorkflowJob,
+  toWorkflowRun,
+  toWorkflowStep,
+  WorkflowJob,
+  Workflow
+} from './types.js'
 import { ApplicationSettings, settings } from '../settings.js'
 
 describe('fetchWorkflowResults', () => {
@@ -393,6 +399,14 @@ describe('getLatestCompletedAt', () => {
     const result = getLatestCompletedAt(jobs as never)
     expect(result).toBe('2023-01-01T00:05:00.000Z')
   })
+
+  test('should throw error when jobs array is empty', () => {
+    const emptyJobs: never[] = []
+
+    expect(() => getLatestCompletedAt(emptyJobs)).toThrow(
+      'no jobs found to get latest completed_at date.'
+    )
+  })
 })
 
 describe('Type converters', () => {
@@ -666,6 +680,50 @@ describe('Type converters', () => {
 
       expect(() => toWorkflowRun(workflowWithoutConclusion as never)).toThrow(
         `workflow status must be completed on workflow_run event`
+      )
+    })
+  })
+
+  describe('toWorkflowStep', () => {
+    const mockStepResponse = {
+      name: 'test-step',
+      conclusion: 'success',
+      started_at: '2023-01-01T00:01:00Z',
+      completed_at: '2023-01-01T00:02:00Z'
+    }
+
+    test('should convert valid step response', () => {
+      const result = toWorkflowStep(mockStepResponse as never)
+
+      expect(result).toEqual({
+        name: 'test-step',
+        conclusion: 'success',
+        started_at: '2023-01-01T00:01:00Z',
+        completed_at: '2023-01-01T00:02:00Z'
+      })
+    })
+
+    test('should throw error when conclusion is missing', () => {
+      const stepWithoutConclusion = { ...mockStepResponse, conclusion: null }
+
+      expect(() => toWorkflowStep(stepWithoutConclusion as never)).toThrow(
+        'Step conclusion is required'
+      )
+    })
+
+    test('should throw error when started_at is missing', () => {
+      const stepWithoutStartedAt = { ...mockStepResponse, started_at: null }
+
+      expect(() => toWorkflowStep(stepWithoutStartedAt as never)).toThrow(
+        'Step started_at is required'
+      )
+    })
+
+    test('should throw error when completed_at is missing', () => {
+      const stepWithoutCompletedAt = { ...mockStepResponse, completed_at: null }
+
+      expect(() => toWorkflowStep(stepWithoutCompletedAt as never)).toThrow(
+        'Step completed_at is required'
       )
     })
   })
