@@ -5,7 +5,7 @@ name: Workflow Run Tests
 on:
   workflow_run:
     workflows:
-      - Push Event Tests
+      - Test Workflow for Workflow Run Event Tests
     types:
       - completed
 
