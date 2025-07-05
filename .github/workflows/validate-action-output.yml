@@ -118,6 +118,12 @@ jobs:
           # sort metrics array by name to ensure stable output
           (.resourceMetrics[]?.scopeMetrics[]?.metrics) |= sort_by(.name) |
 
+          # sort gauge data points by attributes for many data points
+          (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints) |= sort_by(
+            .attributes | map(select(.key == "job.name") | .value.stringValue) | .[0] // "",
+            .attributes | map(select(.key == "workflow.name") | .value.stringValue) | .[0] // ""
+          )
+
           # sort all entries in objects to ensure stable output
           walk(if type == "object" then to_entries | sort_by(.key) | from_entries else . end)
           EOF
