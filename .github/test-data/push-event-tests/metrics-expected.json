@@ -49,19 +49,23 @@
                         "value": {
                           "stringValue": "paper2/github-actions-opentelemetry"
                         }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "TypeScript Tests"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
                       }
                     ],
                     "startTimeUnixNano": "0",
                     "timeUnixNano": "0"
-                  }
-                ]
-              },
-              "name": "github.workflow.duration",
-              "unit": "s"
-            },
-            {
-              "gauge": {
-                "dataPoints": [
+                  },
                   {
                     "asDouble": 0,
                     "attributes": [
@@ -80,7 +84,348 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "TypeScript Tests"
+                          "stringValue": "Example Application Pipeline (1, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Deploy Application"
                         }
                       },
                       {
@@ -131,10 +476,409 @@
                     ],
                     "startTimeUnixNano": "0",
                     "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
                   }
                 ]
               },
               "name": "github.job.queued_duration",
+              "unit": "s"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Push Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  }
+                ]
+              },
+              "name": "github.workflow.duration",
               "unit": "s"
             }
           ],
