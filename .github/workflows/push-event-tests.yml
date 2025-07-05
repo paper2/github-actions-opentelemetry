@@ -51,8 +51,8 @@ jobs:
     name: Example Application Pipeline
     strategy:
       matrix:
-        fixed-sleep: [1, 2, 3]
-        random-sleep: [1, 2, 3]
+        fixed-sleep: [1, 2]
+        random-sleep: [1, 2]
     uses: ./.github/workflows/example-app-workflow.yml
     with:
       fixed-sleep: ${{ matrix.fixed-sleep }}
