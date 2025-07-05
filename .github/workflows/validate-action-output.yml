@@ -84,12 +84,9 @@ jobs:
           echo "Waiting for file writes to complete..."
           sleep 5
 
-      - name: Setup normalization filters
+      - name: Setup enhanced normalization filters
         run: |
-          # Create JQ filters for normalization
-          # Replace dynamic values with fixed ones to enable deterministic testing
-          # and ensure missing fields are detected (fields will appear with fixed values)
-
+          # replace dynamic values with fixed values
           cat > /tmp/normalize-traces.jq << 'EOF'
           (.resourceSpans[]?.scopeSpans[]?.spans[]?.traceId) = "00000000000000000000000000000000" |
           (.resourceSpans[]?.scopeSpans[]?.spans[]?.spanId) = "0000000000000000" |
@@ -103,14 +100,25 @@ jobs:
             elif .key == "runner.name" then .value = {"stringValue": "GitHub Actions 0"}
             else .
             end
-          ) | 
+          ) |
+
+          # sort spans by name because they can be in different order
+          (.resourceSpans[]?.scopeSpans[]?.spans) |= sort_by(.name) |
+
+          # sort all entries in objects to ensure stable output
           walk(if type == "object" then to_entries | sort_by(.key) | from_entries else . end)
           EOF
 
+          # replace dynamic values with fixed values
           cat > /tmp/normalize-metrics.jq << 'EOF'
           (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.startTimeUnixNano) = "0" |
           (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.timeUnixNano) = "0" |
           (.resourceMetrics[]?.scopeMetrics[]?.metrics[]?.gauge?.dataPoints[]?.asDouble) = 0 |
+
+          # sort metrics array by name to ensure stable output
+          (.resourceMetrics[]?.scopeMetrics[]?.metrics) |= sort_by(.name) |
+
+          # sort all entries in objects to ensure stable output
           walk(if type == "object" then to_entries | sort_by(.key) | from_entries else . end)
           EOF
 
