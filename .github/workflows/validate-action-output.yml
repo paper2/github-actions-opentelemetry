@@ -82,7 +82,7 @@ jobs:
       - name: Wait for file system operations
         run: |
           echo "Waiting for file writes to complete..."
-          sleep 5
+          sleep 15
 
       - name: Setup normalization filters
         run: |
