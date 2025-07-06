@@ -47,9 +47,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run test
 
+  example-app:
+    name: Example Application Pipeline
+    strategy:
+      matrix:
+        fixed-sleep: [1, 2]
+        random-sleep: [1, 2]
+    uses: ./.github/workflows/example-app-workflow.yml
+    with:
+      fixed-sleep: ${{ matrix.fixed-sleep }}
+      random-sleep: ${{ matrix.random-sleep }}
+
   # Test the action for push/pull_request events using the reusable workflow
   test-action:
-    needs: test-typescript
+    needs:
+      - test-typescript
+      - example-app
     name: Test Action (Push Event)
     uses: ./.github/workflows/validate-action-output.yml
     with:

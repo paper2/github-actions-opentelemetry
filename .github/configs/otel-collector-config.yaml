@@ -14,12 +14,12 @@ exporters:
 
   # File exporter for traces only
   file/traces:
-    path: /collector-logs/traces.json
+    path: /collector-logs/traces-exported-original.json
     format: json
 
   # File exporter for metrics only
   file/metrics:
-    path: /collector-logs/metrics.json
+    path: /collector-logs/metrics-exported-original.json
     format: json
 
 extensions:
