@@ -36,197 +36,9 @@
           },
           "spans": [
             {
-              "attributes": [
-                {
-                  "key": "repository",
-                  "value": {
-                    "stringValue": "paper2/github-actions-opentelemetry"
-                  }
-                },
-                {
-                  "key": "run_id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "run_attempt",
-                  "value": {
-                    "intValue": "1"
-                  }
-                },
-                {
-                  "key": "url",
-                  "value": {
-                    "stringValue": "https://example.com/actions/runs/0"
-                  }
-                }
-              ],
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Example Workflow 01",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Example Application Pipeline / Build Application with time of waiting runner",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "waiting runner for Example Application Pipeline / Build Application",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Example Application Pipeline / Build Application",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Set up job",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Checkout",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Setup",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Install Dependencies",
+              "name": "Build",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -250,121 +62,7 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Complete job",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Example Application Pipeline / Test Application with time of waiting runner",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "waiting runner for Example Application Pipeline / Test Application",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Example Application Pipeline / Test Application",
+              "name": "Build",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -376,7 +74,7 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Set up job",
+              "name": "Build",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -400,7 +98,1267 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Setup",
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Checkout",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Complete job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Deploy",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Deploy",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Deploy",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Deploy",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Build Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Deploy Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 1) / Test Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Build Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Deploy Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (1, 2) / Test Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Build Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Deploy Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 1) / Test Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Build Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Deploy Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Example Application Pipeline (2, 2) / Test Application with time of waiting runner",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Install Dependencies",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -436,7 +1394,7 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Test",
+              "name": "Lint",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -448,7 +1406,7 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Complete job",
+              "name": "Lint",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -458,111 +1416,9 @@
               "traceId": "00000000000000000000000000000000"
             },
             {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Example Application Pipeline / Deploy Application with time of waiting runner",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "waiting runner for Example Application Pipeline / Deploy Application",
-              "parentSpanId": "0000000000000000",
-              "spanId": "0000000000000000",
-              "startTimeUnixNano": "0",
-              "status": {
-                "code": 1
-              },
-              "traceId": "00000000000000000000000000000000"
-            },
-            {
-              "attributes": [
-                {
-                  "key": "job.id",
-                  "value": {
-                    "intValue": "0"
-                  }
-                },
-                {
-                  "key": "job.conclusion",
-                  "value": {
-                    "stringValue": "success"
-                  }
-                },
-                {
-                  "key": "runner.name",
-                  "value": {
-                    "stringValue": "GitHub Actions 0"
-                  }
-                },
-                {
-                  "key": "runner.group",
-                  "value": {
-                    "stringValue": "GitHub Actions"
-                  }
-                }
-              ],
-              "endTimeUnixNano": "0",
-              "kind": 1,
-              "name": "Example Application Pipeline / Deploy Application",
+              "name": "Lint",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -586,7 +1442,7 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Deploy",
+              "name": "Set up job",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
@@ -598,7 +1454,753 @@
             {
               "endTimeUnixNano": "0",
               "kind": 1,
-              "name": "Complete job",
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Set up job",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Setup",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Test",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Test",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Test",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Test",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "repository",
+                  "value": {
+                    "stringValue": "paper2/github-actions-opentelemetry"
+                  }
+                },
+                {
+                  "key": "run_id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "run_attempt",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "url",
+                  "value": {
+                    "stringValue": "https://example.com/actions/runs/0"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "Test Workflow for Workflow Run Event Tests",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 1) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 1) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 1) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 2) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 2) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (1, 2) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 1) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 1) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 1) / Test Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 2) / Build Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 2) / Deploy Application",
+              "parentSpanId": "0000000000000000",
+              "spanId": "0000000000000000",
+              "startTimeUnixNano": "0",
+              "status": {
+                "code": 1
+              },
+              "traceId": "00000000000000000000000000000000"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "job.id",
+                  "value": {
+                    "intValue": "0"
+                  }
+                },
+                {
+                  "key": "job.conclusion",
+                  "value": {
+                    "stringValue": "success"
+                  }
+                },
+                {
+                  "key": "runner.name",
+                  "value": {
+                    "stringValue": "GitHub Actions 0"
+                  }
+                },
+                {
+                  "key": "runner.group",
+                  "value": {
+                    "stringValue": "GitHub Actions"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "0",
+              "kind": 1,
+              "name": "waiting runner for Example Application Pipeline (2, 2) / Test Application",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",

@@ -41,34 +41,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
-                        }
-                      },
-                      {
-                        "key": "repository",
-                        "value": {
-                          "stringValue": "paper2/github-actions-opentelemetry"
-                        }
-                      }
-                    ],
-                    "startTimeUnixNano": "0",
-                    "timeUnixNano": "0"
-                  }
-                ]
-              },
-              "name": "github.workflow.duration",
-              "unit": "s"
-            },
-            {
-              "gauge": {
-                "dataPoints": [
-                  {
-                    "asDouble": 0,
-                    "attributes": [
-                      {
-                        "key": "workflow.name",
-                        "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -80,7 +53,7 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Build Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Build Application"
                         }
                       },
                       {
@@ -99,7 +72,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -111,7 +84,7 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Test Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Deploy Application"
                         }
                       },
                       {
@@ -130,7 +103,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -142,7 +115,286 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Deploy Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Test Application"
                         }
                       },
                       {
@@ -169,7 +421,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -181,7 +433,7 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Build Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Build Application"
                         }
                       },
                       {
@@ -200,7 +452,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -212,7 +464,7 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Test Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Deploy Application"
                         }
                       },
                       {
@@ -231,7 +483,7 @@
                       {
                         "key": "workflow.name",
                         "value": {
-                          "stringValue": "Example Workflow 01"
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
                         }
                       },
                       {
@@ -243,7 +495,286 @@
                       {
                         "key": "job.name",
                         "value": {
-                          "stringValue": "Example Application Pipeline / Deploy Application"
+                          "stringValue": "Example Application Pipeline (1, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (1, 2) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 1) / Test Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Build Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Deploy Application"
+                        }
+                      },
+                      {
+                        "key": "job.conclusion",
+                        "value": {
+                          "stringValue": "success"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  },
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      },
+                      {
+                        "key": "job.name",
+                        "value": {
+                          "stringValue": "Example Application Pipeline (2, 2) / Test Application"
                         }
                       },
                       {
@@ -259,6 +790,33 @@
                 ]
               },
               "name": "github.job.queued_duration",
+              "unit": "s"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0,
+                    "attributes": [
+                      {
+                        "key": "workflow.name",
+                        "value": {
+                          "stringValue": "Test Workflow for Workflow Run Event Tests"
+                        }
+                      },
+                      {
+                        "key": "repository",
+                        "value": {
+                          "stringValue": "paper2/github-actions-opentelemetry"
+                        }
+                      }
+                    ],
+                    "startTimeUnixNano": "0",
+                    "timeUnixNano": "0"
+                  }
+                ]
+              },
+              "name": "github.workflow.duration",
               "unit": "s"
             }
           ],
