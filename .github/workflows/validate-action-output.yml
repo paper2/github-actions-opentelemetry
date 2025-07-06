@@ -84,7 +84,7 @@ jobs:
           echo "Waiting for file writes to complete..."
           sleep 5
 
-      - name: Setup enhanced normalization filters
+      - name: Setup normalization filters
         run: |
           # replace dynamic values with fixed values
           cat > /tmp/normalize-traces.jq << 'EOF'
@@ -100,7 +100,7 @@ jobs:
             elif .key == "runner.name" then .value = {"stringValue": "GitHub Actions 0"}
             else .
             end
-          ) |
+          ) | 
 
           # sort spans by name because they can be in different order
           (.resourceSpans[]?.scopeSpans[]?.spans) |= sort_by(.name) |
