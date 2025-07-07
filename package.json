@@ -29,7 +29,7 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "lint": "npx eslint . -c eslint.config.mjs",
+    "lint": "npx eslint . -c eslint.config.mjs && npx tsc --noEmit --strict",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "vitest --coverage",

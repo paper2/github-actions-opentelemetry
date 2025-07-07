@@ -17,9 +17,9 @@ describe('createWorkflowJobSpan', () => {
     name: 'test-job',
     status: 'completed',
     conclusion: 'success',
-    created_at: '2023-01-01T00:00:00Z',
-    started_at: '2023-01-01T00:01:00Z',
-    completed_at: '2023-01-01T00:05:00Z',
+    created_at: new Date('2023-01-01T00:00:00Z'),
+    started_at: new Date('2023-01-01T00:01:00Z'),
+    completed_at: new Date('2023-01-01T00:05:00Z'),
     workflow_name: 'Test Workflow',
     run_id: 12345,
     runner_name: 'test-runner',
@@ -28,8 +28,8 @@ describe('createWorkflowJobSpan', () => {
       {
         name: 'test-step',
         conclusion: 'success',
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: '2023-01-01T00:02:00Z'
+        started_at: new Date('2023-01-01T00:01:00Z'),
+        completed_at: new Date('2023-01-01T00:02:00Z')
       }
     ]
   }
@@ -37,7 +37,7 @@ describe('createWorkflowJobSpan', () => {
   test('should handle job without completed_at', () => {
     const jobWithoutCompletedAt = {
       ...mockJob,
-      completed_at: null as unknown as string
+      completed_at: null as unknown as Date
     }
 
     expect(() =>
@@ -59,9 +59,9 @@ describe('createWorkflowRunStepSpan', () => {
     name: 'test-job',
     status: 'completed',
     conclusion: 'success',
-    created_at: '2023-01-01T00:00:00Z',
-    started_at: '2023-01-01T00:01:00Z',
-    completed_at: '2023-01-01T00:05:00Z',
+    created_at: new Date('2023-01-01T00:00:00Z'),
+    started_at: new Date('2023-01-01T00:01:00Z'),
+    completed_at: new Date('2023-01-01T00:05:00Z'),
     workflow_name: 'Test Workflow',
     run_id: 12345,
     runner_name: 'test-runner',
@@ -70,14 +70,14 @@ describe('createWorkflowRunStepSpan', () => {
       {
         name: 'valid-step',
         conclusion: 'success' as const,
-        started_at: '2023-01-01T00:01:00Z',
-        completed_at: '2023-01-01T00:02:00Z'
+        started_at: new Date('2023-01-01T00:01:00Z'),
+        completed_at: new Date('2023-01-01T00:02:00Z')
       },
       {
         name: 'step-with-null-timestamps',
         conclusion: 'success' as const,
-        started_at: null as unknown as string,
-        completed_at: null as unknown as string
+        started_at: null as unknown as Date,
+        completed_at: null as unknown as Date
       }
     ]
   }
@@ -99,8 +99,8 @@ describe('createWorkflowRunStepSpan', () => {
         {
           name: 'valid-step',
           conclusion: 'success' as const,
-          started_at: '2023-01-01T00:01:00Z',
-          completed_at: '2023-01-01T00:02:00Z'
+          started_at: new Date('2023-01-01T00:01:00Z'),
+          completed_at: new Date('2023-01-01T00:02:00Z')
         }
       ]
     }

@@ -25,18 +25,13 @@ export const isStepConclusion = (value: unknown): value is StepConclusion => {
 export type WorkflowStep = {
   readonly name: string
   readonly conclusion: StepConclusion
-  // TODO: use Date type
-  readonly started_at: string
-  // TODO: use Date type
-  readonly completed_at: string
+  readonly started_at: Date
+  readonly completed_at: Date
 }
 export type WorkflowJob = {
-  // TODO: use Date type
-  readonly created_at: string
-  // TODO: use Date type
-  readonly started_at: string
-  // TODO: use Date type
-  readonly completed_at: string
+  readonly created_at: Date
+  readonly started_at: Date
+  readonly completed_at: Date
   readonly id: number
   readonly name: string
   readonly run_id: number
@@ -56,8 +51,7 @@ export type Workflow = {
   readonly name: string
   // TODO: use union type for conclusion
   readonly conclusion: string | null
-  // TODO: use Date type
-  readonly created_at: string
+  readonly created_at: Date
   readonly run_attempt: number
   readonly html_url: string
   readonly repository: {
@@ -87,8 +81,8 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
   return {
     name: step.name,
     conclusion: step.conclusion,
-    started_at: step.started_at,
-    completed_at: step.completed_at
+    started_at: new Date(step.started_at),
+    completed_at: new Date(step.completed_at)
   }
 }
 export const toWorkflowJob = (
@@ -124,9 +118,9 @@ export const toWorkflowJob = (
     name: job.name,
     status: job.status,
     conclusion: job.conclusion,
-    created_at: job.created_at,
-    started_at: job.started_at,
-    completed_at: job.completed_at,
+    created_at: new Date(job.created_at),
+    started_at: new Date(job.started_at),
+    completed_at: new Date(job.completed_at),
     workflow_name: job.workflow_name,
     run_id: job.run_id,
     steps: job.steps?.map(toWorkflowStep) || [],
@@ -156,7 +150,7 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
     id: workflowRun.id,
     name: workflowRun.name,
     conclusion: workflowRun.conclusion,
-    created_at: workflowRun.created_at,
+    created_at: new Date(workflowRun.created_at),
     run_attempt: workflowRun.run_attempt,
     html_url: workflowRun.html_url,
     repository: {
