@@ -426,7 +426,7 @@ describe('Type converters', () => {
       steps: [
         {
           name: 'test-step',
-          conclusion: 'success',
+          conclusion: 'success' as const,
           started_at: '2023-01-01T00:01:00Z',
           completed_at: '2023-01-01T00:02:00Z'
         }

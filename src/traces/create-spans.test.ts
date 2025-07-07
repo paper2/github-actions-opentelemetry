@@ -69,13 +69,13 @@ describe('createWorkflowRunStepSpan', () => {
     steps: [
       {
         name: 'valid-step',
-        conclusion: 'success',
+        conclusion: 'success' as const,
         started_at: '2023-01-01T00:01:00Z',
         completed_at: '2023-01-01T00:02:00Z'
       },
       {
         name: 'step-with-null-timestamps',
-        conclusion: 'success',
+        conclusion: 'success' as const,
         started_at: null as unknown as string,
         completed_at: null as unknown as string
       }
@@ -98,7 +98,7 @@ describe('createWorkflowRunStepSpan', () => {
       steps: [
         {
           name: 'valid-step',
-          conclusion: 'success',
+          conclusion: 'success' as const,
           started_at: '2023-01-01T00:01:00Z',
           completed_at: '2023-01-01T00:02:00Z'
         }
