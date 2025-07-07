@@ -105,6 +105,7 @@ The action is configured via OpenTelemetry standard environment variables:
   workflow modes work correctly
 - New features should gracefully handle incomplete jobs (return null) to
   maintain backward compatibility
+- Must run `npm run all` after changing any code
 
 ## Coding Standards
 
