@@ -11,11 +11,20 @@ export type WorkflowStepResponse = NonNullable<
   WorkflowJobResponse['steps']
 >[number]
 
+const STEP_CONCLUSION_VALUES = ['success', 'failure', 'timed_out'] as const
+export type StepConclusion = (typeof STEP_CONCLUSION_VALUES)[number]
+
+export const isStepConclusion = (value: unknown): value is StepConclusion => {
+  return (
+    typeof value === 'string' &&
+    STEP_CONCLUSION_VALUES.includes(value as StepConclusion)
+  )
+}
+
 // Define types for the models used in the application
 export type WorkflowStep = {
   readonly name: string
-  // TODO: use union type for conclusion
-  readonly conclusion: string
+  readonly conclusion: StepConclusion
   // TODO: use Date type
   readonly started_at: string
   // TODO: use Date type
@@ -70,6 +79,8 @@ export type GitHubContext = typeof context
 // Map GitHub Actions API responses to application models
 export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
   if (!step.conclusion) throw new Error('Step conclusion is required')
+  if (!isStepConclusion(step.conclusion))
+    throw new Error(`Invalid step conclusion: ${step.conclusion}`)
   if (!step.started_at) throw new Error('Step started_at is required')
   if (!step.completed_at) throw new Error('Step completed_at is required')
 

@@ -105,3 +105,7 @@ The action is configured via OpenTelemetry standard environment variables:
   workflow modes work correctly
 - New features should gracefully handle incomplete jobs (return null) to
   maintain backward compatibility
+
+## Coding Standards
+
+- Never use `as` type casting outside of test code.
