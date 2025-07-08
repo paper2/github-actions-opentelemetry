@@ -435,7 +435,7 @@ describe('Type converters', () => {
 
     test('should convert valid job response', () => {
       const result = toWorkflowJob(mockJobResponse as never, 'workflow_run')
-      const expected: WorkflowJob = { ...mockJobResponse }
+      const expected: WorkflowJob = { ...mockJobResponse, conclusion: 'success' as const }
 
       expect(result).toEqual(expected)
     })

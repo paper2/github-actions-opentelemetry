@@ -21,6 +21,24 @@ export const isStepConclusion = (value: unknown): value is StepConclusion => {
   )
 }
 
+const JOB_CONCLUSION_VALUES = [
+  'success',
+  'failure',
+  'neutral',
+  'cancelled',
+  'skipped',
+  'timed_out',
+  'action_required'
+] as const
+export type JobConclusion = (typeof JOB_CONCLUSION_VALUES)[number]
+
+export const isJobConclusion = (value: unknown): value is JobConclusion => {
+  return (
+    typeof value === 'string' &&
+    JOB_CONCLUSION_VALUES.includes(value as JobConclusion)
+  )
+}
+
 // Define types for the models used in the application
 export type WorkflowStep = {
   readonly name: string
@@ -41,8 +59,7 @@ export type WorkflowJob = {
   readonly name: string
   readonly run_id: number
   readonly status: 'completed'
-  // TODO: use union type for conclusion
-  readonly conclusion: string
+  readonly conclusion: JobConclusion
   // runner_name is optional field, so we allow it to be null
   readonly runner_name: string | null
   // runner_group_name is optional field, so we allow it to be null
@@ -109,6 +126,8 @@ export const toWorkflowJob = (
     throw new Error(
       `Job conclusion is required for job: ${job.name} (id: ${job.id})`
     )
+  if (!isJobConclusion(job.conclusion))
+    throw new Error(`Invalid job conclusion: ${job.conclusion}`)
   // TODO: Handle this case because sometimes this property is not set eternally.
   if (!job.completed_at)
     throw new Error(
