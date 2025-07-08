@@ -385,17 +385,14 @@ describe('getLatestCompletedAt', () => {
       { completed_at: new Date('2023-01-01T00:05:00Z') },
       { completed_at: new Date('2023-01-01T00:03:00Z') },
       { completed_at: new Date('2023-01-01T00:07:00Z') }
-    ] as { completed_at: Date }[]
+    ]
 
     const result = getLatestCompletedAt(jobs as never)
     expect(result).toEqual(new Date('2023-01-01T00:07:00Z'))
   })
 
   test('should handle single job', () => {
-    const jobs = [{ completed_at: new Date('2023-01-01T00:05:00Z') }] as {
-      completed_at: Date
-    }[]
-
+    const jobs = [{ completed_at: new Date('2023-01-01T00:05:00Z') }]
     const result = getLatestCompletedAt(jobs as never)
     expect(result).toEqual(new Date('2023-01-01T00:05:00Z'))
   })
