@@ -120,10 +120,10 @@ export const getWorkflowContext = (
   }
 }
 
-export const getLatestCompletedAt = (jobs: WorkflowJob[]): string => {
+export const getLatestCompletedAt = (jobs: WorkflowJob[]): Date => {
   if (jobs.length === 0)
     throw new Error('no jobs found to get latest completed_at date.')
-  const jobCompletedAtDates = jobs.map(job => new Date(job.completed_at))
+  const jobCompletedAtDates = jobs.map(job => job.completed_at)
   const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
-  return new Date(maxDateNumber).toISOString()
+  return new Date(maxDateNumber)
 }

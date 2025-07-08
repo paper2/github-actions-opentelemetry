@@ -80,7 +80,7 @@ describe('createJobGauges', () => {
     id: 123,
     name: 'Test Workflow',
     conclusion: 'success',
-    created_at: '2023-01-01T00:00:00Z',
+    created_at: new Date('2023-01-01T00:00:00Z'),
     run_attempt: 1,
     html_url: 'https://github.com/test/repo/actions/runs/123',
     repository: {
@@ -100,9 +100,9 @@ describe('createJobGauges', () => {
       name: 'Test Job',
       status: 'completed',
       conclusion: 'success',
-      created_at: '2023-01-01T00:05:00Z', // Later time
-      started_at: '2023-01-01T00:01:00Z', // Earlier time - causes negative duration
-      completed_at: '2023-01-01T00:10:00Z',
+      created_at: new Date('2023-01-01T00:05:00Z'), // Later time
+      started_at: new Date('2023-01-01T00:01:00Z'), // Earlier time - causes negative duration
+      completed_at: new Date('2023-01-01T00:10:00Z'),
       workflow_name: 'Test Workflow',
       run_id: 123,
       runner_name: null,
