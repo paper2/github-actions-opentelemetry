@@ -50,7 +50,8 @@ npm run test-local     # Quick local test for development
 # Local Testing (outside dev container)
 # IMPORTANT: Always run this export command before npm run test when outside dev container
 export DEV_CONTAINER=false  # Required when testing outside dev container
-npm run test                # Run tests with localhost endpoints
+npm run test -- --run      # Run tests once and exit (no watch mode)
+# OR use npm run all for full CI pipeline (format, lint, test, coverage, package)
 
 # Build artifacts
 npm run bundle         # Format + package
