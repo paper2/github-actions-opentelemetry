@@ -24,7 +24,7 @@
           {
             "key": "telemetry.sdk.version",
             "value": {
-              "stringValue": "1.29.0"
+              "stringValue": "2.0.1"
             }
           }
         ]
