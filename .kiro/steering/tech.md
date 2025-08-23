@@ -11,7 +11,7 @@
 
 - **GitHub Actions**: `@actions/core`, `@actions/github`
 - **GitHub API**: `@octokit/rest`, `@octokit/webhooks-types`
-- **OpenTelemetry**: 
+- **OpenTelemetry**:
   - `@opentelemetry/api`
   - `@opentelemetry/exporter-metrics-otlp-proto`
   - `@opentelemetry/exporter-trace-otlp-proto`
@@ -54,9 +54,11 @@ npm run coverage       # Generate coverage badge
 
 ## Development Environment
 
-- **Dev Container**: Configured with Jaeger (port 16686) and Prometheus (port 9090)
+- **Dev Container**: Configured with Jaeger (port 16686) and Prometheus
+  (port 9090)
 - **GitHub CLI**: Recommended for authentication during testing
-- **Required Artifacts**: `/dist` directory must be committed (GitHub Actions requirement)
+- **Required Artifacts**: `/dist` directory must be committed (GitHub Actions
+  requirement)
 
 ## Code Quality Standards
 

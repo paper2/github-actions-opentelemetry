@@ -17,11 +17,13 @@
 ## Source Code Architecture (`src/`)
 
 ### Core Entry Points
+
 - `index.ts` - Main entry point that calls `run()` from `main.ts`
 - `main.ts` - Primary application logic and orchestration
 - `settings.ts` - Configuration management from environment variables
 
 ### Feature Modules
+
 ```
 src/
 ├── github/                 # GitHub API integration
