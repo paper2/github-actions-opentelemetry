@@ -77,7 +77,7 @@ const workflowRunResults: WorkflowResults = {
         {
           name: 'step2_2',
           started_at: '2024-09-01T00:15:30Z',
-          completed_at: '2024-09-01T00:15:35',
+          completed_at: '2024-09-01T00:15:35Z',
           conclusion: 'success'
         },
         {
