@@ -1,4 +1,4 @@
-import { detectResourcesSync, envDetector } from '@opentelemetry/resources'
+import { detectResources, envDetector } from '@opentelemetry/resources'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import {
   MeterProvider,
@@ -41,7 +41,7 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
           exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
         })
       ],
-      resource: detectResourcesSync({ detectors: [envDetector] })
+      resource: detectResources({ detectors: [envDetector] })
     })
   } else {
     meterProvider = new MeterProvider()
@@ -57,7 +57,7 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 const initializeTracer = (exporter?: SpanExporter): void => {
   if (settings.FeatureFlagTrace) {
     traceProvider = new BasicTracerProvider({
-      resource: detectResourcesSync({ detectors: [envDetector] }),
+      resource: detectResources({ detectors: [envDetector] }),
       spanProcessors: [
         new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))
       ]
