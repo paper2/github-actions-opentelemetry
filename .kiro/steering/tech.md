@@ -47,6 +47,10 @@ npm run package:watch  # Bundle in watch mode
 npm run test           # Full test suite with coverage
 npm run test-local     # Quick local test for development
 
+# Local Testing (outside dev container)
+export DEV_CONTAINER=false  # Required when testing outside dev container
+npm run test                # Run tests with localhost endpoints
+
 # Build artifacts
 npm run bundle         # Format + package
 npm run coverage       # Generate coverage badge
