@@ -12,8 +12,8 @@ const defaultEnv = {
   FEATURE_METRICS: 'true',
   FEATURE_TRACE: 'true',
   OTEL_EXPORTER_OTLP_METRICS_ENDPOINT:
-    'http://prometheus:9090/api/v1/otlp/v1/metrics',
-  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://jaeger:4318/v1/traces',
+    'http://localhost:9090/api/v1/otlp/v1/metrics',
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://localhost:4318/v1/traces',
   OTEL_SERVICE_NAME: 'github-actions-opentelemetry',
   // OTEL_RESOURCE_ATTRIBUTES: Used to test custom resource attributes functionality
   // These test attributes are verified in create-trace.test.ts and create-metrics.test.ts
