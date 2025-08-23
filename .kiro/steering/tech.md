@@ -22,7 +22,7 @@
 ## Build System & Tools
 
 - **Bundler**: Vercel ncc for creating single-file distributions
-- **Testing**: 
+- **Testing**:
   - **Unit Tests**: Vitest with V8 coverage
   - **Integration Tests**: GitHub Actions workflows with real GitHub API
 - **Linting**: ESLint with TypeScript plugin and strict rules
