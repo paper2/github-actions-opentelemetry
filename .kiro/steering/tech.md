@@ -48,6 +48,7 @@ npm run test           # Full test suite with coverage
 npm run test-local     # Quick local test for development
 
 # Local Testing (outside dev container)
+# IMPORTANT: Always run this export command before npm run test when outside dev container
 export DEV_CONTAINER=false  # Required when testing outside dev container
 npm run test                # Run tests with localhost endpoints
 
