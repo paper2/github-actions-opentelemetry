@@ -22,7 +22,9 @@
 ## Build System & Tools
 
 - **Bundler**: Vercel ncc for creating single-file distributions
-- **Testing**: Vitest with V8 coverage
+- **Testing**: 
+  - **Unit Tests**: Vitest with V8 coverage
+  - **Integration Tests**: GitHub Actions workflows with real GitHub API
 - **Linting**: ESLint with TypeScript plugin and strict rules
 - **Formatting**: Prettier with specific configuration
 - **Type Checking**: TypeScript compiler with strict settings
@@ -53,6 +55,11 @@ export DEV_CONTAINER=false  # Required when testing outside dev container
 npm run test -- --run      # Run tests once and exit (no watch mode)
 # OR use npm run all for full CI pipeline (format, lint, test, coverage, package)
 
+# Integration Testing
+# Integration tests run automatically via GitHub Actions workflows
+# Test data expectations are stored in .github/test-data/ directory
+# Tests validate actual OpenTelemetry output against expected JSON files
+
 # Build artifacts
 npm run bundle         # Format + package
 npm run coverage       # Generate coverage badge
@@ -65,6 +72,8 @@ npm run coverage       # Generate coverage badge
 - **GitHub CLI**: Recommended for authentication during testing
 - **Required Artifacts**: `/dist` directory must be committed (GitHub Actions
   requirement)
+- **Integration Test Data**: Expected outputs stored in `.github/test-data/`
+  directory for GitHub Actions workflow validation
 
 ## Code Quality Standards
 
