@@ -13,7 +13,7 @@ import { SpanStatusCode } from '@opentelemetry/api'
 
 const workflowRunResults: WorkflowResults = {
   workflow: {
-    created_at: '2024-09-01T00:00:00Z',
+    created_at: new Date('2024-09-01T00:00:00Z'),
     id: 10000000000,
     name: 'Test Run',
     run_attempt: 14,
@@ -25,9 +25,9 @@ const workflowRunResults: WorkflowResults = {
   },
   workflowJobs: [
     {
-      created_at: '2024-09-01T00:02:00Z',
-      started_at: '2024-09-01T00:05:00Z',
-      completed_at: '2024-09-01T00:10:00Z',
+      created_at: new Date('2024-09-01T00:02:00Z'),
+      started_at: new Date('2024-09-01T00:05:00Z'),
+      completed_at: new Date('2024-09-01T00:10:00Z'),
       id: 30000000000,
       name: 'job1',
       run_id: 10000000000,
@@ -37,20 +37,20 @@ const workflowRunResults: WorkflowResults = {
       steps: [
         {
           name: 'step1_1',
-          started_at: '2024-09-01T00:05:10Z',
-          completed_at: '2024-09-01T00:05:20Z',
+          started_at: new Date('2024-09-01T00:05:10Z'),
+          completed_at: new Date('2024-09-01T00:05:20Z'),
           conclusion: 'success'
         },
         {
           name: 'step1_2',
-          started_at: '2024-09-01T00:05:30Z',
-          completed_at: '2024-09-01T00:05:35Z',
+          started_at: new Date('2024-09-01T00:05:30Z'),
+          completed_at: new Date('2024-09-01T00:05:35Z'),
           conclusion: 'success'
         },
         {
           name: 'step1_3',
-          started_at: '2024-09-01T00:05:40Z',
-          completed_at: '2024-09-01T00:05:50Z',
+          started_at: new Date('2024-09-01T00:05:40Z'),
+          completed_at: new Date('2024-09-01T00:05:50Z'),
           conclusion: 'success'
         }
       ],
@@ -58,9 +58,9 @@ const workflowRunResults: WorkflowResults = {
       runner_group_name: null
     },
     {
-      created_at: '2024-09-01T00:12:00Z',
-      started_at: '2024-09-01T00:15:00Z',
-      completed_at: '2024-09-01T00:20:00Z',
+      created_at: new Date('2024-09-01T00:12:00Z'),
+      started_at: new Date('2024-09-01T00:15:00Z'),
+      completed_at: new Date('2024-09-01T00:20:00Z'),
       id: 30000000001,
       name: 'job2',
       run_id: 10000000000,
@@ -70,20 +70,20 @@ const workflowRunResults: WorkflowResults = {
       steps: [
         {
           name: 'step2_1',
-          started_at: '2024-09-01T00:15:10Z',
-          completed_at: '2024-09-01T00:15:20Z',
+          started_at: new Date('2024-09-01T00:15:10Z'),
+          completed_at: new Date('2024-09-01T00:15:20Z'),
           conclusion: 'success'
         },
         {
           name: 'step2_2',
-          started_at: '2024-09-01T00:15:30Z',
-          completed_at: '2024-09-01T00:15:35Z',
+          started_at: new Date('2024-09-01T00:15:30Z'),
+          completed_at: new Date('2024-09-01T00:15:35Z'),
           conclusion: 'success'
         },
         {
           name: 'step2_3',
-          started_at: '2024-09-01T00:15:40',
-          completed_at: '2024-09-01T00:15:50',
+          started_at: new Date('2024-09-01T00:15:40Z'),
+          completed_at: new Date('2024-09-01T00:15:50Z'),
           conclusion: 'failure'
         }
       ],
@@ -294,8 +294,8 @@ describe('should export expected spans', () => {
   })
 })
 
-const toEpochSec = (date: string): number => {
-  return Math.floor(new Date(date).getTime() / 1000)
+const toEpochSec = (date: Date): number => {
+  return Math.floor(date.getTime() / 1000)
 }
 
 const findSpanByName = (spans: ReadableSpan[], name: string): ReadableSpan => {

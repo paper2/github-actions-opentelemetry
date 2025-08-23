@@ -15,7 +15,7 @@ import settings from '../settings.js'
 
 const workflowRunResults: WorkflowResults = {
   workflow: {
-    created_at: '2024-09-01T00:00:00Z',
+    created_at: new Date('2024-09-01T00:00:00Z'),
     id: 10000000000,
     name: 'Test Run',
     run_attempt: 14,
@@ -27,9 +27,9 @@ const workflowRunResults: WorkflowResults = {
   },
   workflowJobs: [
     {
-      created_at: '2024-09-01T00:02:00Z',
-      started_at: '2024-09-01T00:05:00Z',
-      completed_at: '2024-09-01T00:10:00Z',
+      created_at: new Date('2024-09-01T00:02:00Z'),
+      started_at: new Date('2024-09-01T00:05:00Z'),
+      completed_at: new Date('2024-09-01T00:10:00Z'),
       conclusion: 'success',
       id: 30000000000,
       name: 'job1',
@@ -39,20 +39,20 @@ const workflowRunResults: WorkflowResults = {
       steps: [
         {
           name: 'step1_1',
-          started_at: '2024-09-01T00:05:10Z',
-          completed_at: '2024-09-01T00:05:20Z',
+          started_at: new Date('2024-09-01T00:05:10Z'),
+          completed_at: new Date('2024-09-01T00:05:20Z'),
           conclusion: 'success'
         },
         {
           name: 'step1_2',
-          started_at: '2024-09-01T00:05:30Z',
-          completed_at: '2024-09-01T00:05:35',
+          started_at: new Date('2024-09-01T00:05:30Z'),
+          completed_at: new Date('2024-09-01T00:05:35Z'),
           conclusion: 'success'
         },
         {
           name: 'step1_3',
-          started_at: '2024-09-01T00:05:40',
-          completed_at: '2024-09-01T00:05:50',
+          started_at: new Date('2024-09-01T00:05:40Z'),
+          completed_at: new Date('2024-09-01T00:05:50Z'),
           conclusion: 'success'
         }
       ],
@@ -60,9 +60,9 @@ const workflowRunResults: WorkflowResults = {
       runner_group_name: null
     },
     {
-      created_at: '2024-09-01T00:12:00Z',
-      started_at: '2024-09-01T00:15:00Z',
-      completed_at: '2024-09-01T00:20:00Z',
+      created_at: new Date('2024-09-01T00:12:00Z'),
+      started_at: new Date('2024-09-01T00:15:00Z'),
+      completed_at: new Date('2024-09-01T00:20:00Z'),
       conclusion: 'failure',
       id: 30000000001,
       name: 'job2',
@@ -72,20 +72,20 @@ const workflowRunResults: WorkflowResults = {
       steps: [
         {
           name: 'step2_1',
-          started_at: '2024-09-01T00:15:10Z',
-          completed_at: '2024-09-01T00:15:20Z',
+          started_at: new Date('2024-09-01T00:15:10Z'),
+          completed_at: new Date('2024-09-01T00:15:20Z'),
           conclusion: 'success'
         },
         {
           name: 'step2_2',
-          started_at: '2024-09-01T00:15:30Z',
-          completed_at: '2024-09-01T00:15:35',
+          started_at: new Date('2024-09-01T00:15:30Z'),
+          completed_at: new Date('2024-09-01T00:15:35Z'),
           conclusion: 'success'
         },
         {
           name: 'step2_3',
-          started_at: '2024-09-01T00:15:40',
-          completed_at: '2024-09-01T00:15:50',
+          started_at: new Date('2024-09-01T00:15:40Z'),
+          completed_at: new Date('2024-09-01T00:15:50Z'),
           conclusion: 'failure'
         }
       ],
@@ -123,7 +123,7 @@ describe('should export expected metrics', () => {
       if (!job.completed_at) fail()
       expect(dataPoints).toContainEqual({
         taskName: job.name,
-        value: calcDiffSec(new Date(job.started_at), new Date(job.completed_at))
+        value: calcDiffSec(job.started_at, job.completed_at)
       })
     }
   })
@@ -137,8 +137,8 @@ describe('should export expected metrics', () => {
     if (!workflowRunJobs[1].completed_at) fail()
     expect(metric.dataPoints[0].value).toEqual(
       calcDiffSec(
-        new Date(workflowRun.created_at),
-        new Date(workflowRunJobs[1].completed_at) // last job's complete_at
+        workflowRun.created_at,
+        workflowRunJobs[1].completed_at // last job's complete_at
       )
     )
   })

@@ -46,10 +46,7 @@ export const createWorkflowJobSpan = (
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
   const waitingSpanName = `waiting runner for ${job.name}`
-  const jobQueuedDuration = calcDiffSec(
-    new Date(job.created_at),
-    new Date(job.started_at)
-  )
+  const jobQueuedDuration = calcDiffSec(job.created_at, job.started_at)
   if (jobQueuedDuration >= 0) {
     createSpan(
       ctxWithWaiting,
@@ -102,18 +99,16 @@ export const createWorkflowRunStepSpan = (
 const createSpan = (
   ctx: Context,
   name: string,
-  startAt: string,
-  endAt: string,
+  startAt: Date,
+  endAt: Date,
   // TODO: use user defined type instead of string
   conclusion: string,
   attributes: opentelemetry.Attributes
 ): opentelemetry.Span => {
   const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
-  const startTime = new Date(startAt)
-  const endTime = new Date(endAt)
-  const span = tracer.startSpan(name, { startTime, attributes }, ctx)
+  const span = tracer.startSpan(name, { startTime: startAt, attributes }, ctx)
   span.setStatus(getSpanStatusFromConclusion(conclusion))
-  span.end(endTime)
+  span.end(endAt)
   return span
 }
 
