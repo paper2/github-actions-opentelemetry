@@ -6,6 +6,7 @@ const isCI = process.env.CI === 'true'
 // Usually, devcontainer environment is used for local test.
 // But, if you want to test in local environment without devcontainer,
 // you can set DEV_CONTAINER=false in your shell environment.
+// This option is for Kiro because https://github.com/kirodotdev/Kiro/issues/164
 const isDevContainer = process.env.DEV_CONTAINER !== 'false'
 
 if (!isCI) {
