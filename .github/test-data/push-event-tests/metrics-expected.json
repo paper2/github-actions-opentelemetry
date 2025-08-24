@@ -13,6 +13,9 @@
       },
       "scopeMetrics": [
         {
+          "scope": {
+            "name": "github-actions-metrics"
+          },
           "metrics": [
             {
               "gauge": {
