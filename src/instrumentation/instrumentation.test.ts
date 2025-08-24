@@ -42,7 +42,7 @@ describe('initialize', () => {
       expect(() => initialize(metricsExporter, undefined)).not.toThrow()
       const meter = opentelemetry.metrics.getMeter('test')
       const counter = meter.createCounter('test')
-      counter.add(1) // Actually record a value
+      counter.add(1)
       await expect(forceFlush()).resolves.not.toThrow()
       expect(metricsExporter.getMetrics()).toHaveLength(1)
     })
