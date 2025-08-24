@@ -102,7 +102,6 @@ describe('should export expected metrics', () => {
 
   beforeEach(() => {
     exporter.reset()
-    settings.FeatureFlagMetrics = true
     initialize(exporter)
   })
 
@@ -153,7 +152,6 @@ describe('should export expected metrics', () => {
   })
 
   test(`should throw error when createMetrics fails`, async () => {
-    settings.FeatureFlagMetrics = true
     const brokenResults = {} as WorkflowResults
     await expect(createMetrics(brokenResults)).rejects.toThrow()
   })
@@ -164,7 +162,6 @@ describe('should export expected attributes', () => {
 
   beforeEach(() => {
     exporter.reset()
-    settings.FeatureFlagMetrics = true
     initialize(exporter)
   })
 
