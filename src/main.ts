@@ -7,7 +7,7 @@ import {
 } from './github/index.js'
 import { createMetrics } from './metrics/index.js'
 import { createTrace } from './traces/index.js'
-import { initialize, shutdown } from './instrumentation/index.js'
+import { forceFlush, initialize, shutdown } from './instrumentation/index.js'
 import { settings } from './settings.js'
 
 /**
@@ -37,7 +37,8 @@ export async function run(): Promise<void> {
   }
 
   try {
-    // OpenTelemetry v2.0+ automatically calls forceFlush during shutdown
+    await forceFlush()
+    console.log('Providers force flush successfully.')
     await shutdown()
     console.log('Providers shutdown successfully.')
   } catch (error) {

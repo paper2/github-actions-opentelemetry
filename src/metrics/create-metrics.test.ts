@@ -5,7 +5,10 @@ import {
   AggregationTemporality,
   MetricData
 } from '@opentelemetry/sdk-metrics'
-import { initialize, forceFlush } from '../instrumentation/index.js'
+import {
+  initialize,
+  _forceFlushMeterProvider
+} from '../instrumentation/index.js'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import { createMetrics } from './create-metrics.js'
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
@@ -111,7 +114,7 @@ describe('should export expected metrics', () => {
 
   test(`should verify ${dn.JOB_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
     const dataPoints = metric.dataPoints.map(dataPoint => ({
       taskName: dataPoint.attributes[ak.JOB_NAME],
@@ -130,7 +133,7 @@ describe('should export expected metrics', () => {
 
   test(`should verify ${dn.WORKFLOW_DURATION}`, async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
@@ -146,7 +149,7 @@ describe('should export expected metrics', () => {
   test('should not export metrics when disable FeatureFlagMetrics', async () => {
     settings.FeatureFlagMetrics = false
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     expect(exporter.getMetrics()).toHaveLength(0)
     settings.FeatureFlagMetrics = true
   })
@@ -171,7 +174,7 @@ describe('should export expected attributes', () => {
 
   test('should export workflow name', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metricWorkflow = findMetricByDescriptorName(
       exporter,
       dn.WORKFLOW_DURATION
@@ -190,7 +193,7 @@ describe('should export expected attributes', () => {
 
   test('should export repository name', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metricWorkflow = findMetricByDescriptorName(
       exporter,
       dn.WORKFLOW_DURATION
@@ -211,7 +214,7 @@ describe('should export expected attributes', () => {
 
   test('should export job name in job metrics', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
 
     expect(metric.dataPoints).toHaveLength(2)
@@ -222,7 +225,7 @@ describe('should export expected attributes', () => {
 
   test('should not export job name in workflow metrics', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
@@ -231,7 +234,7 @@ describe('should export expected attributes', () => {
 
   test('should export job conclusion in job metrics', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.JOB_DURATION)
 
     expect(metric.dataPoints).toHaveLength(2)
@@ -245,7 +248,7 @@ describe('should export expected attributes', () => {
 
   test('should not export job conclusion in workflow metrics', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
     const metric = findMetricByDescriptorName(exporter, dn.WORKFLOW_DURATION)
 
     expect(metric.dataPoints).toHaveLength(1)
@@ -254,7 +257,7 @@ describe('should export expected attributes', () => {
 
   test('should verify resource attributes', async () => {
     await createMetrics(workflowRunResults)
-    await forceFlush()
+    await _forceFlushMeterProvider()
 
     const metrics = exporter.getMetrics()
     expect(metrics).toHaveLength(1)

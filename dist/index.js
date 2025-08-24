@@ -73905,8 +73905,18 @@ const initializeTracer = (exporter) => {
     }
 };
 const forceFlush = async () => {
-    await meterProvider.forceFlush();
     await traceProvider.forceFlush();
+};
+// Note: The _forceFlushMeterProvider function below is specifically for testing purposes.
+// This is necessary because in-memory exporters cannot be used properly after shutdown,
+// so during testing we need to call forceFlush instead of shutdown.
+// In production, this is not needed as metrics are exported when shutdown is called at the end.
+// FYI: https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md#rocket-enhancement-1
+const _forceFlushMeterProvider = async () => {
+    if (process.env.NODE_ENV !== 'test') {
+        throw new Error('This method is only available in test environment');
+    }
+    await meterProvider.forceFlush();
 };
 const shutdown = async () => {
     await meterProvider.shutdown();
