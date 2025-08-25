@@ -14,30 +14,27 @@ This feature adds the ability to display trace IDs in GitHub Actions summary aft
 
 1. WHEN the OpenTelemetry action completes successfully THEN the system SHALL display the single workflow trace ID in the GitHub Actions summary
 2. WHEN the trace is created during workflow execution THEN the system SHALL display the trace ID with a clear descriptive label
-3. WHEN the action runs in a workflow THEN the trace ID SHALL be formatted as a clickable link if an observability endpoint URL is provided
+3. WHEN displaying the trace ID THEN the system SHALL format it as copyable plain text for easy use in monitoring systems
 4. IF no trace is created THEN the system SHALL display an appropriate message indicating no trace was generated
 
 ### Requirement 2
 
-**User Story:** As a developer, I want the trace ID to be clearly labeled and formatted in the summary, so that I can easily identify and access the workflow trace in my monitoring system.
+**User Story:** As a developer, I want the trace ID to be clearly labeled in the summary, so that I can easily identify and access the workflow trace in my monitoring system.
 
 #### Acceptance Criteria
 
 1. WHEN displaying the trace ID THEN the system SHALL include a descriptive label (e.g., "Workflow Trace")
-2. WHEN displaying trace information THEN the system SHALL include the trace creation timestamp
-3. WHEN displaying trace information THEN the system SHALL include the total trace duration
-4. IF the trace contains multiple spans THEN the system SHALL display the span count in the summary
 
 ### Requirement 3
 
-**User Story:** As a platform engineer, I want to configure the trace ID display format and destination URLs, so that I can customize the summary to work with my organization's specific monitoring infrastructure.
+**User Story:** As a platform engineer, I want the trace ID to be displayed in a consistent, readable format, so that I can easily copy it and use it in my organization's monitoring infrastructure.
 
 #### Acceptance Criteria
 
-1. WHEN configuring the action THEN the system SHALL accept an optional observability endpoint URL parameter
-2. IF an endpoint URL is provided THEN the system SHALL format the trace ID as a clickable link to the monitoring system
-3. WHEN no endpoint URL is configured THEN the system SHALL display the trace ID as plain text
-4. IF custom trace ID formatting is needed THEN the system SHALL support configurable display templates
+1. WHEN displaying the trace ID THEN the system SHALL use a consistent format that is easy to copy
+2. WHEN displaying the trace ID THEN the system SHALL include the full trace ID without truncation
+3. WHEN displaying trace information THEN the system SHALL use clear, readable formatting in the GitHub Actions summary
+4. IF the trace ID is displayed THEN the system SHALL ensure it is selectable text for easy copying
 
 ### Requirement 4
 
