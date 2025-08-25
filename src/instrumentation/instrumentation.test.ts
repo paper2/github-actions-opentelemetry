@@ -1,5 +1,10 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest'
-import { initialize, forceFlush, shutdown } from './instrumentation.js'
+import {
+  initialize,
+  forceFlush,
+  shutdown,
+  _forceFlushMeterProvider
+} from './instrumentation.js'
 import { opentelemetryAllDisable } from '../utils/opentelemetry-all-disable.js'
 import * as opentelemetry from '@opentelemetry/api'
 import settings from '../settings.js'
@@ -41,8 +46,9 @@ describe('initialize', () => {
     test('should export metrics', async () => {
       expect(() => initialize(metricsExporter, undefined)).not.toThrow()
       const meter = opentelemetry.metrics.getMeter('test')
-      meter.createCounter('test')
-      await expect(forceFlush()).resolves.not.toThrow()
+      const counter = meter.createCounter('test')
+      counter.add(1)
+      await expect(_forceFlushMeterProvider()).resolves.not.toThrow()
       expect(metricsExporter.getMetrics()).toHaveLength(1)
     })
     test('should not export metrics when disable FeatureFlagMetrics', async () => {

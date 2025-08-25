@@ -183,7 +183,7 @@ describe('should export expected spans', () => {
     await forceFlush()
 
     const spans = exporter.getFinishedSpans().map(span => ({
-      parentSpanId: span.parentSpanId
+      parentSpanId: span.parentSpanContext?.spanId
     }))
 
     const rootSpanCount = spans.filter(v => {
@@ -308,6 +308,6 @@ const assertParentChildRelationship = (
   parent: ReadableSpan,
   child: ReadableSpan
 ): void => {
-  expect(child.parentSpanId).toBe(parent.spanContext().spanId)
+  expect(child.parentSpanContext?.spanId).toBe(parent.spanContext().spanId)
   expect(child.spanContext().traceId).toBe(parent.spanContext().traceId)
 }
