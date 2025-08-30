@@ -1,5 +1,4 @@
 import { summary, info, warning } from '@actions/core'
-import type { TraceResult } from '../traces/create-trace.js'
 
 /**
  * Options for writing trace ID summary
@@ -36,30 +35,30 @@ export async function writeSummary(options: SummaryOptions): Promise<void> {
 /**
  * Conditionally writes trace ID summary with graceful error handling
  *
- * @param traceResult - Result from trace creation containing trace ID and success status
+ * @param traceId - Trace ID string from trace creation (empty string if no trace available)
  */
-export async function writeSummaryIfNeeded(traceResult: TraceResult): Promise<void> {
-  if (traceResult.success && traceResult.traceId) {
+export async function writeSummaryIfNeeded(traceId: string): Promise<void> {
+  if (traceId === '') {
+    // Handle case where no trace ID is available
     try {
-      await writeSummary({ traceId: traceResult.traceId })
-      console.log('Trace ID summary written successfully.')
+      await writeSummary({ traceId: 'No trace ID was generated' })
     } catch (error) {
-      // Fallback: log trace ID to action output if summary writing fails
-      info(`Trace ID: ${traceResult.traceId}`)
+      info('No trace ID was generated')
       warning(
         `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`
       )
     }
-  } else if (traceResult.success && !traceResult.traceId) {
-    // Handle case where trace creation succeeded but no trace ID was captured
+  } else {
+    // Handle case where trace ID is available
     try {
-      await writeSummary({ traceId: 'No trace generated' })
+      await writeSummary({ traceId })
+      console.log('Trace ID summary written successfully.')
     } catch (error) {
-      info('No trace was generated for this workflow.')
+      // Fallback: log trace ID to action output if summary writing fails
+      info(`Trace ID: ${traceId}`)
       warning(
         `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`
       )
     }
   }
-  // If traceResult.success is false, we don't write anything (trace creation failed)
 }

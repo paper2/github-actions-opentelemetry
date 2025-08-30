@@ -7,17 +7,12 @@ import {
 } from './create-spans.js'
 import * as opentelemetry from '@opentelemetry/api'
 
-export interface TraceResult {
-  traceId: string
-  success: boolean
-}
-
 export const createTrace = async (
   results: WorkflowResults
-): Promise<TraceResult> => {
+): Promise<string> => {
   if (!settings.FeatureFlagTrace) {
     console.log('trace feature is disabled.')
-    return { traceId: '', success: true }
+    return ''
   }
 
   try {
@@ -31,14 +26,14 @@ export const createTrace = async (
     const traceId = opentelemetry.trace.getSpanContext(rootCtx)?.traceId
     if (!traceId) {
       console.log('Failed to capture trace ID')
-      return { traceId: '', success: false }
+      return ''
     }
 
     // TODO: actions output traceID.
     console.log(`TraceID: ${traceId}`)
-    return { traceId, success: true }
+    return traceId
   } catch (error) {
     console.error('Error creating trace:', error)
-    return { traceId: '', success: false }
+    return ''
   }
 }

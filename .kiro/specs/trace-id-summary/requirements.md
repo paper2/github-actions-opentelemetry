@@ -85,5 +85,5 @@ how to use it and what to expect in my workflow summaries.
 2. WHEN documenting the feature THEN the system SHALL include examples of what
    the trace ID summary looks like in GitHub Actions
 3. WHEN documenting the feature THEN the system SHALL explain how users can use
-   the displayed trace ID with their monitoring systems
-   available configuration parameters
+   the displayed trace ID with their monitoring systems available configuration
+   parameters

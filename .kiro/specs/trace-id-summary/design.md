@@ -45,7 +45,10 @@ Actions summary using the GitHub Actions API.
 export async function createTrace(settings: Settings): Promise<string>
 ```
 
-**Rationale**: Modify existing trace creation to return the trace ID directly as a string. If trace creation fails or no trace ID is available, return an empty string. This simplifies the interface and removes the need for complex result objects.
+**Rationale**: Modify existing trace creation to return the trace ID directly as
+a string. If trace creation fails or no trace ID is available, return an empty
+string. This simplifies the interface and removes the need for complex result
+objects.
 
 #### 2. Summary Writer Module
 
@@ -71,7 +74,9 @@ the interface. The base `writeSummary` function handles the core functionality.
 export async function writeSummaryIfNeeded(traceId: string): Promise<void>
 ```
 
-**Rationale**: Create a high-level function that handles all summary logic including error handling and fallback logging. If traceId is empty, displays "No trace ID was generated" message. Otherwise, displays the trace ID normally.
+**Rationale**: Create a high-level function that handles all summary logic
+including error handling and fallback logging. If traceId is empty, displays "No
+trace ID was generated" message. Otherwise, displays the trace ID normally.
 
 ### Data Flow
 
@@ -99,7 +104,10 @@ interface SummaryOptions {
 }
 ```
 
-**Rationale**: Simplified data model that only captures the trace ID. Empty string indicates no trace was created, which triggers a specific message display. The TraceResult interface has been removed to simplify the architecture.
+**Rationale**: Simplified data model that only captures the trace ID. Empty
+string indicates no trace was created, which triggers a specific message
+display. The TraceResult interface has been removed to simplify the
+architecture.
 
 ## Error Handling
 
@@ -114,8 +122,10 @@ interface SummaryOptions {
 
 ### Trace ID Unavailability
 
-- **No Trace Created**: When trace ID is empty string, display "No trace ID was generated" message in summary
-- **Valid Trace ID**: When trace ID is not empty, display the trace ID normally with "Workflow Trace" label
+- **No Trace Created**: When trace ID is empty string, display "No trace ID was
+  generated" message in summary
+- **Valid Trace ID**: When trace ID is not empty, display the trace ID normally
+  with "Workflow Trace" label
 
 ### Implementation Strategy
 
@@ -139,7 +149,9 @@ try {
 }
 ```
 
-**Rationale**: Simplified error handling that checks for empty trace ID and displays appropriate messages. Removes the need for complex result objects while maintaining clear user feedback when no trace ID is available.
+**Rationale**: Simplified error handling that checks for empty trace ID and
+displays appropriate messages. Removes the need for complex result objects while
+maintaining clear user feedback when no trace ID is available.
 
 ## Testing Strategy
 
@@ -192,19 +204,23 @@ maintenance costs reasonable for this non-core feature.
 The main README.md will be enhanced to include:
 
 - **Feature Overview**: Clear explanation of the trace ID summary functionality
-- **Visual Examples**: Screenshots or code blocks showing what the summary looks like in GitHub Actions
+- **Visual Examples**: Screenshots or code blocks showing what the summary looks
+  like in GitHub Actions
 - **Usage Instructions**: How to interpret and use the displayed trace ID
-- **Integration Guide**: How to correlate trace IDs with monitoring systems like Jaeger, Grafana, etc.
+- **Integration Guide**: How to correlate trace IDs with monitoring systems like
+  Jaeger, Grafana, etc.
 
 ### Documentation Structure
 
 ```markdown
 ## Trace ID Summary
 
-After the action completes, you'll see the workflow trace ID in the GitHub Actions summary:
-
+After the action completes, you'll see the workflow trace ID in the GitHub
+Actions summary:
 ```
+
 Workflow Trace: 1234567890abcdef1234567890abcdef
+
 ```
 
 Use this trace ID to search for the corresponding trace in your monitoring system.
@@ -212,5 +228,5 @@ Use this trace ID to search for the corresponding trace in your monitoring syste
 
 **Rationale**: Design prioritizes simplicity and non-intrusiveness to ensure the
 feature enhances observability without impacting existing functionality or
-requiring additional configuration. Comprehensive documentation ensures users can
-effectively leverage the trace ID summary feature.
+requiring additional configuration. Comprehensive documentation ensures users
+can effectively leverage the trace ID summary feature.

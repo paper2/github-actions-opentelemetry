@@ -10,7 +10,6 @@ import { createTrace } from './create-trace.js'
 import { fail } from 'assert'
 import settings from '../settings.js'
 import { SpanStatusCode } from '@opentelemetry/api'
-import * as opentelemetry from '@opentelemetry/api'
 
 const workflowRunResults: WorkflowResults = {
   workflow: {
@@ -109,10 +108,9 @@ describe('should export expected spans', () => {
   })
 
   test('should verify startTime and endTime', async () => {
-    const result = await createTrace(workflowRunResults)
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
-    expect(typeof result.traceId).toBe('string')
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+    expect(typeof traceId).toBe('string')
     await forceFlush()
     const spans = exporter.getFinishedSpans().map(span => ({
       name: span.name,
@@ -183,9 +181,8 @@ describe('should export expected spans', () => {
   })
 
   test('should export only one root span', async () => {
-    const result = await createTrace(workflowRunResults)
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
     await forceFlush()
 
     const spans = exporter.getFinishedSpans().map(span => ({
@@ -200,9 +197,8 @@ describe('should export expected spans', () => {
   })
 
   test('should verify resource attributes', async () => {
-    const result = await createTrace(workflowRunResults)
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
     await forceFlush()
 
     const spans = exporter.getFinishedSpans().map(span => ({
@@ -221,19 +217,17 @@ describe('should export expected spans', () => {
 
   test('should not export when disable FeatureFlagTrace', async () => {
     settings.FeatureFlagTrace = false
-    const result = await createTrace(workflowRunResults)
+    const traceId = await createTrace(workflowRunResults)
     await forceFlush()
 
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBe('')
+    expect(traceId).toBe('')
     expect(exporter.getFinishedSpans()).toHaveLength(0)
     settings.FeatureFlagTrace = true
   })
 
   test('should verify span status', async () => {
-    const result = await createTrace(workflowRunResults)
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
     await forceFlush()
 
     const spans = exporter.getFinishedSpans()
@@ -260,9 +254,8 @@ describe('should export expected spans', () => {
   })
 
   test('should verify span hierarchy', async () => {
-    const result = await createTrace(workflowRunResults)
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
     await forceFlush()
 
     const spans = exporter.getFinishedSpans()
@@ -314,33 +307,29 @@ describe('should export expected spans', () => {
       workflowJobs: []
     } as unknown as WorkflowResults
 
-    const result = await createTrace(invalidResults)
-    expect(result.success).toBe(false)
-    expect(result.traceId).toBe('')
+    const traceId = await createTrace(invalidResults)
+    expect(traceId).toBe('')
   })
 
   test('should capture and return valid trace ID', async () => {
-    const result = await createTrace(workflowRunResults)
+    const traceId = await createTrace(workflowRunResults)
     await forceFlush()
 
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBeTruthy()
-    expect(typeof result.traceId).toBe('string')
-    expect(result.traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+    expect(typeof traceId).toBe('string')
 
     // Verify the trace ID matches the actual span trace ID
     const spans = exporter.getFinishedSpans()
     const rootSpan = findSpanByName(spans, workflowRun.name)
-    expect(result.traceId).toBe(rootSpan.spanContext().traceId)
+    expect(traceId).toBe(rootSpan.spanContext().traceId)
   })
 
   test('should return empty trace ID when trace feature is disabled', async () => {
     settings.FeatureFlagTrace = false
-    const result = await createTrace(workflowRunResults)
+    const traceId = await createTrace(workflowRunResults)
     await forceFlush()
 
-    expect(result.success).toBe(true)
-    expect(result.traceId).toBe('')
+    expect(traceId).toBe('')
     expect(exporter.getFinishedSpans()).toHaveLength(0)
 
     // Reset for other tests
@@ -348,19 +337,17 @@ describe('should export expected spans', () => {
   })
 
   test('should return consistent trace ID across multiple calls with same data', async () => {
-    const result1 = await createTrace(workflowRunResults)
+    const traceId1 = await createTrace(workflowRunResults)
     await forceFlush()
     exporter.reset()
 
-    const result2 = await createTrace(workflowRunResults)
+    const traceId2 = await createTrace(workflowRunResults)
     await forceFlush()
 
-    expect(result1.success).toBe(true)
-    expect(result2.success).toBe(true)
-    expect(result1.traceId).toBeTruthy()
-    expect(result2.traceId).toBeTruthy()
+    expect(traceId1).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+    expect(traceId2).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
     // Note: Each call creates a new trace, so IDs should be different
-    expect(result1.traceId).not.toBe(result2.traceId)
+    expect(traceId1).not.toBe(traceId2)
   })
 })
 
