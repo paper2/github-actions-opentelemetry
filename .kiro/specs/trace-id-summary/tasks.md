@@ -1,7 +1,8 @@
 # Implementation Plan
 
-- [ ] 1. Update GitHub summary module to remove arbitrary label feature
-  - Remove `label` parameter from `SummaryOptions` interface in `src/github/summary.ts`
+- [x] 1. Update GitHub summary module to remove arbitrary label feature
+  - Remove `label` parameter from `SummaryOptions` interface in
+    `src/github/summary.ts`
   - Update `writeSummary` function to use fixed "Workflow Trace" label
   - Simplify the interface to only require `traceId` parameter
   - _Requirements: 2.1, 3.1, 3.3_
@@ -25,7 +26,8 @@
   - _Requirements: 1.4_
 
 - [ ] 5. Integrate summary writing into main workflow
-  - Update `src/main.ts` to call summary writing after trace creation with simplified interface
+  - Update `src/main.ts` to call summary writing after trace creation with
+    simplified interface
   - Implement graceful error handling with fallback logging
   - Ensure action never fails due to summary writing issues
   - _Requirements: 4.1, 4.2, 4.3, 4.4_

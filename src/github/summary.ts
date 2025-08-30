@@ -5,7 +5,6 @@ import { summary } from '@actions/core'
  */
 export interface SummaryOptions {
   readonly traceId: string
-  readonly label?: string
 }
 
 /**
@@ -15,7 +14,7 @@ export interface SummaryOptions {
  * @throws Error if summary writing fails
  */
 export async function writeSummary(options: SummaryOptions): Promise<void> {
-  const { traceId, label = 'Workflow Trace' } = options
+  const { traceId } = options
 
   if (!traceId || traceId.trim() === '') {
     throw new Error('Trace ID is required and cannot be empty')
@@ -24,7 +23,7 @@ export async function writeSummary(options: SummaryOptions): Promise<void> {
   try {
     await summary
       .addHeading('OpenTelemetry Trace Information', 3)
-      .addRaw(`**${label}:** \`${traceId}\``)
+      .addRaw(`**Workflow Trace:** \`${traceId}\``)
       .write()
   } catch (error) {
     throw new Error(
