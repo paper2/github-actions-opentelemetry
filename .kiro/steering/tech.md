@@ -82,3 +82,22 @@ npm run coverage       # Generate coverage badge
 - Prettier formatting with single quotes, no semicolons, LF line endings
 - 100% test coverage expectation
 - All async operations must be properly handled
+
+## Mandatory Development Workflow for Kiro
+
+**CRITICAL REQUIREMENT**: Kiro must ALWAYS run `npm run all` before making any code changes, commits, or file modifications in this project.
+
+### What `npm run all` Does
+
+- **Format**: Applies Prettier formatting to all code
+- **Lint**: Validates code with ESLint rules
+- **Test**: Runs complete test suite with coverage validation
+- **Package**: Bundles code with ncc for GitHub Actions distribution
+- **Artifacts**: Generates required `/dist` directory contents
+
+### Enforcement
+
+- This is a non-negotiable requirement for this project
+- The `/dist` directory artifacts are required for GitHub Actions to function
+- Missing or outdated artifacts will cause production failures
+- All quality gates must pass before any code changes are considered complete
