@@ -125,7 +125,7 @@ architecture.
 - **No Trace Created**: When trace ID is empty string, display "No trace ID was
   generated" message in summary
 - **Valid Trace ID**: When trace ID is not empty, display the trace ID normally
-  with "Workflow Trace" label
+  with "Workflow Trace ID" label
 
 ### Implementation Strategy
 
