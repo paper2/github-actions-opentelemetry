@@ -85,7 +85,8 @@ npm run coverage       # Generate coverage badge
 
 ## Mandatory Development Workflow for Kiro
 
-**CRITICAL REQUIREMENT**: Kiro must ALWAYS run `npm run all` before making any code changes, commits, or file modifications in this project.
+**CRITICAL REQUIREMENT**: Kiro must ALWAYS run `npm run all` before making any
+code changes, commits, or file modifications in this project.
 
 ### What `npm run all` Does
 

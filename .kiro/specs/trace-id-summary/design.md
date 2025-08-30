@@ -219,7 +219,7 @@ After the action completes, you'll see the workflow trace ID in the GitHub
 Actions summary:
 ```
 
-Workflow Trace: 1234567890abcdef1234567890abcdef
+Workflow Trace ID: 1234567890abcdef1234567890abcdef
 
 ```
 

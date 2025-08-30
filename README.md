@@ -65,6 +65,13 @@ telemetry data.
 
 ![search-trace-run-id](./img/search-trace-run-id.png)
 
+## Trace ID Summary
+
+After the action completes, you'll see the workflow trace ID displayed in the
+GitHub Actions summary for easy access:
+
+![Trace ID Summary](./img/trace-id-summary.png)
+
 ## How it works
 
 This action creates metrics and traces of GitHub Actions workflows and sends
