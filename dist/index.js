@@ -73657,31 +73657,31 @@ async function writeSummary(options) {
 /**
  * Conditionally writes trace ID summary with graceful error handling
  *
- * @param traceResult - Result from trace creation containing trace ID and success status
+ * @param traceId - Trace ID string from trace creation (empty string if no trace available)
  */
-async function writeSummaryIfNeeded(traceResult) {
-    if (traceResult.success && traceResult.traceId) {
+async function writeSummaryIfNeeded(traceId) {
+    if (traceId === '') {
+        // Handle case where no trace ID is available
         try {
-            await writeSummary({ traceId: traceResult.traceId });
+            await writeSummary({ traceId: 'No trace ID was generated' });
+        }
+        catch (error) {
+            (0,core.info)('No trace ID was generated');
+            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    else {
+        // Handle case where trace ID is available
+        try {
+            await writeSummary({ traceId });
             console.log('Trace ID summary written successfully.');
         }
         catch (error) {
             // Fallback: log trace ID to action output if summary writing fails
-            (0,core.info)(`Trace ID: ${traceResult.traceId}`);
+            (0,core.info)(`Trace ID: ${traceId}`);
             (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
-    else if (traceResult.success && !traceResult.traceId) {
-        // Handle case where trace creation succeeded but no trace ID was captured
-        try {
-            await writeSummary({ traceId: 'No trace generated' });
-        }
-        catch (error) {
-            (0,core.info)('No trace was generated for this workflow.');
-            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
-    // If traceResult.success is false, we don't write anything (trace creation failed)
 }
 
 ;// CONCATENATED MODULE: ./src/github/index.ts
@@ -73876,7 +73876,7 @@ const buildWorkflowJobAttributes = (job) => ({
 const createTrace = async (results) => {
     if (!src_settings.FeatureFlagTrace) {
         console.log('trace feature is disabled.');
-        return { traceId: '', success: true };
+        return '';
     }
     try {
         const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results;
@@ -73888,15 +73888,15 @@ const createTrace = async (results) => {
         const traceId = src.trace.getSpanContext(rootCtx)?.traceId;
         if (!traceId) {
             console.log('Failed to capture trace ID');
-            return { traceId: '', success: false };
+            return '';
         }
         // TODO: actions output traceID.
         console.log(`TraceID: ${traceId}`);
-        return { traceId, success: true };
+        return traceId;
     }
     catch (error) {
         console.error('Error creating trace:', error);
-        return { traceId: '', success: false };
+        return '';
     }
 };
 
@@ -74014,8 +74014,8 @@ async function run() {
         const workflowContext = getWorkflowContext(github.context, settings);
         const results = await fetchWorkflowResults(octokit, workflowContext);
         await createMetrics(results);
-        const traceResult = await createTrace(results);
-        await writeSummaryIfNeeded(traceResult);
+        const traceId = await createTrace(results);
+        await writeSummaryIfNeeded(traceId);
     }
     catch (error) {
         if (error instanceof Error)
