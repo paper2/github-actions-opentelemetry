@@ -71,3 +71,19 @@ observability doesn't break my CI/CD pipeline.
    the action output as fallback
 4. WHEN the action completes THEN the trace ID summary SHALL be the last step
    before action completion
+
+### Requirement 5
+
+**User Story:** As a user of the GitHub Actions OpenTelemetry action, I want
+clear documentation about the trace ID summary feature, so that I can understand
+how to use it and what to expect in my workflow summaries.
+
+#### Acceptance Criteria
+
+1. WHEN the trace ID summary feature is implemented THEN the system SHALL
+   include updated README documentation explaining the feature
+2. WHEN documenting the feature THEN the system SHALL include examples of what
+   the trace ID summary looks like in GitHub Actions
+3. WHEN documenting the feature THEN the system SHALL explain how users can use
+   the displayed trace ID with their monitoring systems
+   available configuration parameters

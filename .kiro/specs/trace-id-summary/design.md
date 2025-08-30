@@ -199,6 +199,32 @@ maintenance costs reasonable for this non-core feature.
 - **Environment Variables**: Leverages existing GitHub Actions environment for
   API access
 
+## Documentation Strategy
+
+### README Updates
+
+The main README.md will be enhanced to include:
+
+- **Feature Overview**: Clear explanation of the trace ID summary functionality
+- **Visual Examples**: Screenshots or code blocks showing what the summary looks like in GitHub Actions
+- **Usage Instructions**: How to interpret and use the displayed trace ID
+- **Integration Guide**: How to correlate trace IDs with monitoring systems like Jaeger, Grafana, etc.
+
+### Documentation Structure
+
+```markdown
+## Trace ID Summary
+
+After the action completes, you'll see the workflow trace ID in the GitHub Actions summary:
+
+```
+Workflow Trace: 1234567890abcdef1234567890abcdef
+```
+
+Use this trace ID to search for the corresponding trace in your monitoring system.
+```
+
 **Rationale**: Design prioritizes simplicity and non-intrusiveness to ensure the
 feature enhances observability without impacting existing functionality or
-requiring additional configuration.
+requiring additional configuration. Comprehensive documentation ensures users can
+effectively leverage the trace ID summary feature.

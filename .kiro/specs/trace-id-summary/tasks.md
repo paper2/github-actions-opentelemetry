@@ -42,3 +42,15 @@
   - Add summary module to `src/github/index.ts` exports
   - Ensure clean module interface for summary functionality
   - _Requirements: 3.1_
+
+- [ ] 8. Update README documentation with trace ID summary feature
+  - Add new section explaining the trace ID summary feature in README.md
+  - Include visual examples of what the summary looks like in GitHub Actions
+  - Document how users can use the trace ID with monitoring systems like Jaeger
+  - _Requirements: 5.1, 5.2, 5.3, 5.5_
+
+- [ ] 9. Add configuration documentation if needed
+  - Document any configuration parameters related to trace ID summary
+  - Update existing configuration sections to mention trace ID display
+  - Ensure documentation is consistent with existing format and style
+  - _Requirements: 5.4_
