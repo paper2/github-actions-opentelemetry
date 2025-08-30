@@ -1,9 +1,9 @@
 # Implementation Plan
 
-- [x] 1. Create GitHub summary module with core functionality
-  - Create `src/github/summary.ts` with `writeSummary` function
-  - Implement summary formatting with trace ID and descriptive label
-  - Add proper TypeScript interfaces for summary options
+- [ ] 1. Update GitHub summary module to remove arbitrary label feature
+  - Remove `label` parameter from `SummaryOptions` interface in `src/github/summary.ts`
+  - Update `writeSummary` function to use fixed "Workflow Trace" label
+  - Simplify the interface to only require `traceId` parameter
   - _Requirements: 2.1, 3.1, 3.3_
 
 - [ ] 2. Add unit tests for summary module
@@ -25,7 +25,7 @@
   - _Requirements: 1.4_
 
 - [ ] 5. Integrate summary writing into main workflow
-  - Update `src/main.ts` to call summary writing after trace creation
+  - Update `src/main.ts` to call summary writing after trace creation with simplified interface
   - Implement graceful error handling with fallback logging
   - Ensure action never fails due to summary writing issues
   - _Requirements: 4.1, 4.2, 4.3, 4.4_

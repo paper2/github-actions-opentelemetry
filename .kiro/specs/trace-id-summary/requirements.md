@@ -35,8 +35,8 @@ monitoring system.
 
 #### Acceptance Criteria
 
-1. WHEN displaying the trace ID THEN the system SHALL include a descriptive
-   label (e.g., "Workflow Trace")
+1. WHEN displaying the trace ID THEN the system SHALL include a fixed
+   descriptive label "Workflow Trace"
 
 ### Requirement 3
 

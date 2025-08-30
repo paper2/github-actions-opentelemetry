@@ -61,14 +61,14 @@ access.
 ```typescript
 interface SummaryOptions {
   traceId: string
-  label?: string
 }
 
 export async function writeSummary(options: SummaryOptions): Promise<void>
 ```
 
 **Rationale**: Create a dedicated module for summary operations to maintain
-separation of concerns and enable easy testing.
+separation of concerns and enable easy testing. Uses a fixed label to simplify
+the interface.
 
 #### 3. Main Orchestration Update
 
@@ -109,14 +109,13 @@ interface TraceResult {
 ```typescript
 interface SummaryConfig {
   traceId: string // Required trace ID to display
-  label: string // Display label (default: "Workflow Trace")
   fallbackToLog: boolean // Whether to log on summary failure (default: true)
 }
 ```
 
 **Rationale**: Simple, focused data models that capture only the essential
-information needed for trace ID display while providing configuration
-flexibility.
+information needed for trace ID display. Uses a fixed "Workflow Trace" label to
+keep the interface minimal.
 
 ## Error Handling
 
@@ -140,7 +139,7 @@ flexibility.
 
 ```typescript
 try {
-  await writeSummary({ traceId, label: 'Workflow Trace' })
+  await writeSummary({ traceId })
 } catch (error) {
   core.info(`Trace ID: ${traceId}`)
   core.warning(`Failed to write summary: ${error.message}`)
