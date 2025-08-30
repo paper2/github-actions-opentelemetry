@@ -13,7 +13,7 @@
   - Test summary formatting, error handling, and edge cases
   - _Requirements: 4.1, 4.3_
 
-- [ ] 3. Enhance trace creation to return trace ID
+- [x] 3. Enhance trace creation to return trace ID
   - Modify `src/traces/create-trace.ts` to capture and return trace ID
   - Update return type to include trace ID alongside success status
   - Ensure backward compatibility with existing trace creation flow

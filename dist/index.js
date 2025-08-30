@@ -73631,7 +73631,32 @@ const getLatestCompletedAt = (jobs) => {
     return new Date(maxDateNumber);
 };
 
+;// CONCATENATED MODULE: ./src/github/summary.ts
+
+/**
+ * Writes trace ID information to GitHub Actions summary
+ *
+ * @param options - Configuration for the summary content
+ * @throws Error if summary writing fails
+ */
+async function writeSummary(options) {
+    const { traceId } = options;
+    if (!traceId || traceId.trim() === '') {
+        throw new Error('Trace ID is required and cannot be empty');
+    }
+    try {
+        await summary
+            .addHeading('OpenTelemetry Trace Information', 3)
+            .addRaw(`**Workflow Trace:** \`${traceId}\``)
+            .write();
+    }
+    catch (error) {
+        throw new Error(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/github/index.ts
+
 
 
 ;// CONCATENATED MODULE: ./src/settings.ts
@@ -73822,18 +73847,28 @@ const buildWorkflowJobAttributes = (job) => ({
 const createTrace = async (results) => {
     if (!src_settings.FeatureFlagTrace) {
         console.log('trace feature is disabled.');
-        return;
+        return { traceId: '', success: true };
     }
-    const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results;
-    const rootCtx = createWorkflowTrace(workflowRun, workflowRunJobs);
-    for (const job of workflowRunJobs) {
-        const jobCtx = createWorkflowJobSpan(rootCtx, job);
-        createWorkflowRunStepSpan(jobCtx, job);
+    try {
+        const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results;
+        const rootCtx = createWorkflowTrace(workflowRun, workflowRunJobs);
+        for (const job of workflowRunJobs) {
+            const jobCtx = createWorkflowJobSpan(rootCtx, job);
+            createWorkflowRunStepSpan(jobCtx, job);
+        }
+        const traceId = src.trace.getSpanContext(rootCtx)?.traceId;
+        if (!traceId) {
+            console.log('Failed to capture trace ID');
+            return { traceId: '', success: false };
+        }
+        // TODO: actions output traceID.
+        console.log(`TraceID: ${traceId}`);
+        return { traceId, success: true };
     }
-    const traceId = src.trace.getSpanContext(rootCtx)?.traceId;
-    // TODO: actions output traceID.
-    console.log(`TraceID: ${traceId}`);
-    return traceId;
+    catch (error) {
+        console.error('Error creating trace:', error);
+        return { traceId: '', success: false };
+    }
 };
 
 ;// CONCATENATED MODULE: ./src/traces/index.ts

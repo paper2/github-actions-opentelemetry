@@ -108,7 +108,10 @@ describe('should export expected spans', () => {
   })
 
   test('should verify startTime and endTime', async () => {
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
+    expect(typeof result.traceId).toBe('string')
     await forceFlush()
     const spans = exporter.getFinishedSpans().map(span => ({
       name: span.name,
@@ -179,7 +182,9 @@ describe('should export expected spans', () => {
   })
 
   test('should export only one root span', async () => {
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
     await forceFlush()
 
     const spans = exporter.getFinishedSpans().map(span => ({
@@ -194,7 +199,9 @@ describe('should export expected spans', () => {
   })
 
   test('should verify resource attributes', async () => {
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
     await forceFlush()
 
     const spans = exporter.getFinishedSpans().map(span => ({
@@ -213,15 +220,19 @@ describe('should export expected spans', () => {
 
   test('should not export when disable FeatureFlagTrace', async () => {
     settings.FeatureFlagTrace = false
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
     await forceFlush()
 
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBe('')
     expect(exporter.getFinishedSpans()).toHaveLength(0)
     settings.FeatureFlagTrace = true
   })
 
   test('should verify span status', async () => {
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
     await forceFlush()
 
     const spans = exporter.getFinishedSpans()
@@ -248,7 +259,9 @@ describe('should export expected spans', () => {
   })
 
   test('should verify span hierarchy', async () => {
-    await createTrace(workflowRunResults)
+    const result = await createTrace(workflowRunResults)
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
     await forceFlush()
 
     const spans = exporter.getFinishedSpans()
@@ -291,6 +304,18 @@ describe('should export expected spans', () => {
       ].length + 1 // add 1 because rootSpan assertion is not existed.
 
     expect(spans).toHaveLength(assertionCount)
+  })
+
+  test('should handle errors gracefully', async () => {
+    // Create invalid workflow results that will cause an error
+    const invalidResults = {
+      workflow: null,
+      workflowJobs: []
+    } as unknown as WorkflowResults
+
+    const result = await createTrace(invalidResults)
+    expect(result.success).toBe(false)
+    expect(result.traceId).toBe('')
   })
 })
 
