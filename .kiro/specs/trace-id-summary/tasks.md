@@ -25,7 +25,7 @@
   - Test scenarios where trace creation fails and returns empty string
   - _Requirements: 1.4_
 
-- [ ] 5. Integrate summary writing into main workflow
+- [x] 5. Integrate summary writing into main workflow
   - Update `src/main.ts` to call summary writing after trace creation with trace
     ID string
   - Handle empty trace ID by displaying "No trace ID was generated" message
@@ -33,7 +33,7 @@
   - Ensure action never fails due to summary writing issues
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 6. Add unit tests for main workflow integration
+- [-] 6. Add unit tests for main workflow integration
   - Update `src/main.test.ts` to test summary integration with string trace ID
   - Test successful summary writing and fallback scenarios
   - Test empty trace ID handling and "No trace ID was generated" message
