@@ -3,7 +3,8 @@ import * as github from '@actions/github'
 import {
   fetchWorkflowResults,
   getWorkflowContext,
-  createOctokitClient
+  createOctokitClient,
+  writeSummaryIfNeeded
 } from './github/index.js'
 import { createMetrics } from './metrics/index.js'
 import { createTrace } from './traces/index.js'
@@ -29,7 +30,8 @@ export async function run(): Promise<void> {
 
     const results = await fetchWorkflowResults(octokit, workflowContext)
     await createMetrics(results)
-    await createTrace(results)
+    const traceId = await createTrace(results)
+    await writeSummaryIfNeeded(traceId)
   } catch (error) {
     if (error instanceof Error) core.error(error)
     console.error(error)
