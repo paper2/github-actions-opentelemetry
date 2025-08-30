@@ -73669,7 +73669,7 @@ async function writeSummaryIfNeeded(traceId) {
         }
         catch (error) {
             (0,core.info)('No trace ID was generated');
-            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+            (0,core.warning)(error instanceof Error ? error.message : String(error));
         }
     }
     else {
@@ -73681,7 +73681,7 @@ async function writeSummaryIfNeeded(traceId) {
         catch (error) {
             // Fallback: log trace ID to action output if summary writing fails
             (0,core.info)(`Trace ID: ${traceId}`);
-            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+            (0,core.warning)(error instanceof Error ? error.message : String(error));
         }
     }
 }

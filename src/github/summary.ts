@@ -3,7 +3,7 @@ import { summary, info, warning } from '@actions/core'
 /**
  * Options for writing trace ID summary
  */
-export interface SummaryOptions {
+interface SummaryOptions {
   readonly traceId: string
 }
 
@@ -13,7 +13,7 @@ export interface SummaryOptions {
  * @param options - Configuration for the summary content
  * @throws Error if summary writing fails
  */
-export async function writeSummary(options: SummaryOptions): Promise<void> {
+async function writeSummary(options: SummaryOptions): Promise<void> {
   const { traceId } = options
 
   if (!traceId || traceId.trim() === '') {
@@ -46,9 +46,7 @@ export async function writeSummaryIfNeeded(traceId: string): Promise<void> {
       await writeSummary({ traceId: 'No trace ID was generated' })
     } catch (error) {
       info('No trace ID was generated')
-      warning(
-        `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`
-      )
+      warning(error instanceof Error ? error.message : String(error))
     }
   } else {
     // Handle case where trace ID is available
@@ -58,9 +56,7 @@ export async function writeSummaryIfNeeded(traceId: string): Promise<void> {
     } catch (error) {
       // Fallback: log trace ID to action output if summary writing fails
       info(`Trace ID: ${traceId}`)
-      warning(
-        `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`
-      )
+      warning(error instanceof Error ? error.message : String(error))
     }
   }
 }

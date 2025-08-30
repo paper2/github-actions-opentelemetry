@@ -57,7 +57,7 @@
   - Ensure documentation is consistent with existing format and style
   - _Requirements: 5.4_
 
-- [ ] 10. Refactor summary module to make writeSummary internal-only
+- [x] 10. Refactor summary module to make writeSummary internal-only
   - Remove export from `writeSummary` function in `src/github/summary.ts`
   - Update unit tests to only test the public `writeSummaryIfNeeded` function
   - Ensure `writeSummary` remains accessible for internal use within the module
