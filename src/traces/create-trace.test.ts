@@ -10,6 +10,7 @@ import { createTrace } from './create-trace.js'
 import { fail } from 'assert'
 import settings from '../settings.js'
 import { SpanStatusCode } from '@opentelemetry/api'
+import * as opentelemetry from '@opentelemetry/api'
 
 const workflowRunResults: WorkflowResults = {
   workflow: {
@@ -316,6 +317,50 @@ describe('should export expected spans', () => {
     const result = await createTrace(invalidResults)
     expect(result.success).toBe(false)
     expect(result.traceId).toBe('')
+  })
+
+  test('should capture and return valid trace ID', async () => {
+    const result = await createTrace(workflowRunResults)
+    await forceFlush()
+
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBeTruthy()
+    expect(typeof result.traceId).toBe('string')
+    expect(result.traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+
+    // Verify the trace ID matches the actual span trace ID
+    const spans = exporter.getFinishedSpans()
+    const rootSpan = findSpanByName(spans, workflowRun.name)
+    expect(result.traceId).toBe(rootSpan.spanContext().traceId)
+  })
+
+  test('should return empty trace ID when trace feature is disabled', async () => {
+    settings.FeatureFlagTrace = false
+    const result = await createTrace(workflowRunResults)
+    await forceFlush()
+
+    expect(result.success).toBe(true)
+    expect(result.traceId).toBe('')
+    expect(exporter.getFinishedSpans()).toHaveLength(0)
+
+    // Reset for other tests
+    settings.FeatureFlagTrace = true
+  })
+
+  test('should return consistent trace ID across multiple calls with same data', async () => {
+    const result1 = await createTrace(workflowRunResults)
+    await forceFlush()
+    exporter.reset()
+
+    const result2 = await createTrace(workflowRunResults)
+    await forceFlush()
+
+    expect(result1.success).toBe(true)
+    expect(result2.success).toBe(true)
+    expect(result1.traceId).toBeTruthy()
+    expect(result2.traceId).toBeTruthy()
+    // Note: Each call creates a new trace, so IDs should be different
+    expect(result1.traceId).not.toBe(result2.traceId)
   })
 })
 

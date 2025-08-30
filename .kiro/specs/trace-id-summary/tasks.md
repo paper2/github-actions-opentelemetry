@@ -19,7 +19,7 @@
   - Ensure backward compatibility with existing trace creation flow
   - _Requirements: 1.1, 1.2_
 
-- [ ] 4. Add unit tests for enhanced trace creation
+- [x] 4. Add unit tests for enhanced trace creation
   - Update `src/traces/create-trace.test.ts` to test trace ID capture
   - Verify trace ID is properly extracted from OpenTelemetry trace
   - Test scenarios where trace creation fails or trace ID is unavailable
