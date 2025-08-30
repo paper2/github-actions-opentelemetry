@@ -40,12 +40,12 @@
   - Verify error handling doesn't affect core action functionality
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 7. Update GitHub module exports
+- [x] 7. Update GitHub module exports
   - Add summary module to `src/github/index.ts` exports
   - Ensure clean module interface for summary functionality
   - _Requirements: 3.1_
 
-- [ ] 8. Update README documentation with trace ID summary feature
+- [x] 8. Update README documentation with trace ID summary feature
   - Add new section explaining the trace ID summary feature in README.md
   - Include visual examples of what the summary looks like in GitHub Actions
   - Document how users can use the trace ID with monitoring systems like Jaeger
