@@ -73647,7 +73647,9 @@ async function writeSummary(options) {
     try {
         await core.summary
             .addHeading('OpenTelemetry Trace Information', 3)
-            .addRaw(`**Workflow Trace:** \`${traceId}\``)
+            .addTable([
+            [{ data: 'Workflow Trace ID', header: true }, { data: traceId }]
+        ])
             .write();
     }
     catch (error) {

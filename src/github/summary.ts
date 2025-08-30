@@ -24,10 +24,7 @@ export async function writeSummary(options: SummaryOptions): Promise<void> {
     await summary
       .addHeading('OpenTelemetry Trace Information', 3)
       .addTable([
-        [
-          { data: "Workflow Trace ID", header: true },
-          { data: traceId }
-        ]
+        [{ data: 'Workflow Trace ID', header: true }, { data: traceId }]
       ])
       .write()
   } catch (error) {
