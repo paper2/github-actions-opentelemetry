@@ -25,7 +25,7 @@
   - Test scenarios where trace creation fails or trace ID is unavailable
   - _Requirements: 1.4_
 
-- [ ] 5. Integrate summary writing into main workflow
+- [x] 5. Integrate summary writing into main workflow
   - Update `src/main.ts` to call summary writing after trace creation with
     simplified interface
   - Implement graceful error handling with fallback logging

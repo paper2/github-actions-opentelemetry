@@ -68,14 +68,19 @@ export async function writeSummary(options: SummaryOptions): Promise<void>
 
 **Rationale**: Create a dedicated module for summary operations to maintain
 separation of concerns and enable easy testing. Uses a fixed label to simplify
-the interface.
+the interface. The base `writeSummary` function handles the core functionality.
 
-#### 3. Main Orchestration Update
+#### 3. Conditional Summary Writer
 
-**Location**: `src/main.ts`
+**Location**: `src/github/summary.ts`
 
-Integration point that coordinates trace creation and summary writing while
-handling errors gracefully.
+```typescript
+export async function writeSummaryIfNeeded(traceResult: TraceResult): Promise<void>
+```
+
+**Rationale**: Create a high-level function that handles all summary logic
+including error handling and fallback logging, keeping the main workflow simple
+with a single function call.
 
 ### Data Flow
 

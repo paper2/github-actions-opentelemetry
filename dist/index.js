@@ -73645,7 +73645,7 @@ async function writeSummary(options) {
         throw new Error('Trace ID is required and cannot be empty');
     }
     try {
-        await summary
+        await core.summary
             .addHeading('OpenTelemetry Trace Information', 3)
             .addRaw(`**Workflow Trace:** \`${traceId}\``)
             .write();
@@ -73653,6 +73653,35 @@ async function writeSummary(options) {
     catch (error) {
         throw new Error(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
     }
+}
+/**
+ * Conditionally writes trace ID summary with graceful error handling
+ *
+ * @param traceResult - Result from trace creation containing trace ID and success status
+ */
+async function writeSummaryIfNeeded(traceResult) {
+    if (traceResult.success && traceResult.traceId) {
+        try {
+            await writeSummary({ traceId: traceResult.traceId });
+            console.log('Trace ID summary written successfully.');
+        }
+        catch (error) {
+            // Fallback: log trace ID to action output if summary writing fails
+            (0,core.info)(`Trace ID: ${traceResult.traceId}`);
+            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    else if (traceResult.success && !traceResult.traceId) {
+        // Handle case where trace creation succeeded but no trace ID was captured
+        try {
+            await writeSummary({ traceId: 'No trace generated' });
+        }
+        catch (error) {
+            (0,core.info)('No trace was generated for this workflow.');
+            (0,core.warning)(`Failed to write summary: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    // If traceResult.success is false, we don't write anything (trace creation failed)
 }
 
 ;// CONCATENATED MODULE: ./src/github/index.ts
@@ -73985,7 +74014,8 @@ async function run() {
         const workflowContext = getWorkflowContext(github.context, settings);
         const results = await fetchWorkflowResults(octokit, workflowContext);
         await createMetrics(results);
-        await createTrace(results);
+        const traceResult = await createTrace(results);
+        await writeSummaryIfNeeded(traceResult);
     }
     catch (error) {
         if (error instanceof Error)
