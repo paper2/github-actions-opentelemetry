@@ -13,28 +13,29 @@
   - Test summary formatting, error handling, and edge cases
   - _Requirements: 4.1, 4.3_
 
-- [x] 3. Enhance trace creation to return trace ID
-  - Modify `src/traces/create-trace.ts` to capture and return trace ID
-  - Update return type to include trace ID alongside success status
-  - Ensure backward compatibility with existing trace creation flow
+- [ ] 3. Enhance trace creation to return trace ID
+  - Modify `src/traces/create-trace.ts` to capture and return trace ID as string
+  - Return empty string if trace creation fails or no trace ID is available
+  - Remove TraceResult interface to simplify the implementation
   - _Requirements: 1.1, 1.2_
 
-- [x] 4. Add unit tests for enhanced trace creation
-  - Update `src/traces/create-trace.test.ts` to test trace ID capture
+- [ ] 4. Add unit tests for enhanced trace creation
+  - Update `src/traces/create-trace.test.ts` to test trace ID capture as string
   - Verify trace ID is properly extracted from OpenTelemetry trace
-  - Test scenarios where trace creation fails or trace ID is unavailable
+  - Test scenarios where trace creation fails and returns empty string
   - _Requirements: 1.4_
 
-- [x] 5. Integrate summary writing into main workflow
-  - Update `src/main.ts` to call summary writing after trace creation with
-    simplified interface
+- [ ] 5. Integrate summary writing into main workflow
+  - Update `src/main.ts` to call summary writing after trace creation with trace ID string
+  - Handle empty trace ID by displaying "No trace ID was generated" message
   - Implement graceful error handling with fallback logging
   - Ensure action never fails due to summary writing issues
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 6. Add unit tests for main workflow integration
-  - Update `src/main.test.ts` to test summary integration
+  - Update `src/main.test.ts` to test summary integration with string trace ID
   - Test successful summary writing and fallback scenarios
+  - Test empty trace ID handling and "No trace ID was generated" message
   - Verify error handling doesn't affect core action functionality
   - _Requirements: 4.1, 4.2, 4.3_
 

@@ -42,17 +42,10 @@ Actions summary using the GitHub Actions API.
 **Location**: `src/traces/create-trace.ts`
 
 ```typescript
-interface TraceResult {
-  traceId: string
-  success: boolean
-}
-
-export async function createTrace(settings: Settings): Promise<TraceResult>
+export async function createTrace(settings: Settings): Promise<string>
 ```
 
-**Rationale**: Modify existing trace creation to return the trace ID alongside
-success status, maintaining backward compatibility while enabling trace ID
-access.
+**Rationale**: Modify existing trace creation to return the trace ID directly as a string. If trace creation fails or no trace ID is available, return an empty string. This simplifies the interface and removes the need for complex result objects.
 
 #### 2. Summary Writer Module
 
@@ -75,12 +68,10 @@ the interface. The base `writeSummary` function handles the core functionality.
 **Location**: `src/github/summary.ts`
 
 ```typescript
-export async function writeSummaryIfNeeded(traceResult: TraceResult): Promise<void>
+export async function writeSummaryIfNeeded(traceId: string): Promise<void>
 ```
 
-**Rationale**: Create a high-level function that handles all summary logic
-including error handling and fallback logging, keeping the main workflow simple
-with a single function call.
+**Rationale**: Create a high-level function that handles all summary logic including error handling and fallback logging. If traceId is empty, displays "No trace ID was generated" message. Otherwise, displays the trace ID normally.
 
 ### Data Flow
 
@@ -100,27 +91,15 @@ flowchart TD
 
 ## Data Models
 
-### Trace Result Model
-
-```typescript
-interface TraceResult {
-  traceId: string // Full OpenTelemetry trace ID
-  success: boolean // Indicates if trace creation succeeded
-}
-```
-
 ### Summary Configuration
 
 ```typescript
-interface SummaryConfig {
-  traceId: string // Required trace ID to display
-  fallbackToLog: boolean // Whether to log on summary failure (default: true)
+interface SummaryOptions {
+  traceId: string // Trace ID to display (empty string if no trace available)
 }
 ```
 
-**Rationale**: Simple, focused data models that capture only the essential
-information needed for trace ID display. Uses a fixed "Workflow Trace" label to
-keep the interface minimal.
+**Rationale**: Simplified data model that only captures the trace ID. Empty string indicates no trace was created, which triggers a specific message display. The TraceResult interface has been removed to simplify the architecture.
 
 ## Error Handling
 
@@ -135,25 +114,32 @@ keep the interface minimal.
 
 ### Trace ID Unavailability
 
-- **No Trace Created**: Display informative message in summary indicating no
-  trace was generated
-- **Invalid Trace ID**: Log error and skip summary writing to prevent action
-  failure
+- **No Trace Created**: When trace ID is empty string, display "No trace ID was generated" message in summary
+- **Valid Trace ID**: When trace ID is not empty, display the trace ID normally with "Workflow Trace" label
 
 ### Implementation Strategy
 
 ```typescript
 try {
-  await writeSummary({ traceId })
+  if (traceId === '') {
+    // Display message when no trace ID is available
+    await writeSummary({ traceId: 'No trace ID was generated' })
+  } else {
+    // Display actual trace ID
+    await writeSummary({ traceId })
+  }
 } catch (error) {
-  core.info(`Trace ID: ${traceId}`)
+  // Fallback to logging
+  if (traceId !== '') {
+    core.info(`Trace ID: ${traceId}`)
+  } else {
+    core.info('No trace ID was generated')
+  }
   core.warning(`Failed to write summary: ${error.message}`)
 }
 ```
 
-**Rationale**: Non-intrusive error handling ensures the core OpenTelemetry
-functionality remains unaffected while providing multiple ways to access trace
-information.
+**Rationale**: Simplified error handling that checks for empty trace ID and displays appropriate messages. Removes the need for complex result objects while maintaining clear user feedback when no trace ID is available.
 
 ## Testing Strategy
 
