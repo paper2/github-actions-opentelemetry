@@ -29,7 +29,6 @@ export const createTrace = async (
       return ''
     }
 
-    // TODO: actions output traceID.
     console.log(`TraceID: ${traceId}`)
     return traceId
   } catch (error) {

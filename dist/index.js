@@ -73892,7 +73892,6 @@ const createTrace = async (results) => {
             console.log('Failed to capture trace ID');
             return '';
         }
-        // TODO: actions output traceID.
         console.log(`TraceID: ${traceId}`);
         return traceId;
     }

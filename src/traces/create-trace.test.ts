@@ -347,6 +347,29 @@ describe('should export expected spans', () => {
     expect(traceId).toBe('00000000000000000000000000000000')
     expect(typeof traceId).toBe('string')
   })
+
+  test('should handle errors in trace creation and return empty string', async () => {
+    // Create invalid workflow results that will cause an error in createWorkflowTrace
+    const invalidResults = {
+      workflow: {
+        created_at: 'invalid-date', // This will cause an error
+        id: 10000000000,
+        name: 'Test Run',
+        run_attempt: 14,
+        repository: {
+          full_name: 'paper2/github-actions-opentelemetry'
+        },
+        conclusion: 'failure',
+        html_url: 'http://example.com/workflow_run'
+      },
+      workflowJobs: []
+    } as unknown as WorkflowResults
+
+    const traceId = await createTrace(invalidResults)
+
+    // Should return empty string when error occurs
+    expect(traceId).toBe('')
+  })
 })
 
 const toEpochSec = (date: Date): number => {
