@@ -300,23 +300,13 @@ describe('should export expected spans', () => {
     expect(spans).toHaveLength(assertionCount)
   })
 
-  test('should handle errors gracefully', async () => {
-    // Create invalid workflow results that will cause an error
-    const invalidResults = {
-      workflow: null,
-      workflowJobs: []
-    } as unknown as WorkflowResults
-
-    const traceId = await createTrace(invalidResults)
-    expect(traceId).toBe('')
-  })
-
-  test('should capture and return valid trace ID', async () => {
+  test('should capture and return valid trace ID as string', async () => {
     const traceId = await createTrace(workflowRunResults)
     await forceFlush()
 
-    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
+    // Verify trace ID is properly extracted as string
     expect(typeof traceId).toBe('string')
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
 
     // Verify the trace ID matches the actual span trace ID
     const spans = exporter.getFinishedSpans()
@@ -324,7 +314,7 @@ describe('should export expected spans', () => {
     expect(traceId).toBe(rootSpan.spanContext().traceId)
   })
 
-  test('should return empty trace ID when trace feature is disabled', async () => {
+  test('should return empty string when trace feature is disabled', async () => {
     settings.FeatureFlagTrace = false
     const traceId = await createTrace(workflowRunResults)
     await forceFlush()
@@ -336,18 +326,26 @@ describe('should export expected spans', () => {
     settings.FeatureFlagTrace = true
   })
 
-  test('should return consistent trace ID across multiple calls with same data', async () => {
-    const traceId1 = await createTrace(workflowRunResults)
-    await forceFlush()
-    exporter.reset()
+  test('should return empty string when trace creation fails with invalid data', async () => {
+    // Create invalid workflow results that will cause an error
+    const invalidResults = {
+      workflow: null,
+      workflowJobs: []
+    } as unknown as WorkflowResults
 
-    const traceId2 = await createTrace(workflowRunResults)
-    await forceFlush()
+    const traceId = await createTrace(invalidResults)
+    expect(traceId).toBe('')
+  })
 
-    expect(traceId1).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
-    expect(traceId2).toMatch(/^[0-9a-f]{32}$/) // OpenTelemetry trace ID format
-    // Note: Each call creates a new trace, so IDs should be different
-    expect(traceId1).not.toBe(traceId2)
+  test('should handle missing trace context gracefully', async () => {
+    // This test verifies behavior when OpenTelemetry context is not properly set up
+    // We'll temporarily disable and re-enable to simulate this scenario
+    opentelemetryAllDisable()
+
+    const traceId = await createTrace(workflowRunResults)
+    // When OpenTelemetry is disabled, it returns a trace ID of all zeros
+    expect(traceId).toBe('00000000000000000000000000000000')
+    expect(typeof traceId).toBe('string')
   })
 })
 

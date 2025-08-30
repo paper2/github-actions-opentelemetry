@@ -19,7 +19,7 @@
   - Remove TraceResult interface to simplify the implementation
   - _Requirements: 1.1, 1.2_
 
-- [ ] 4. Add unit tests for enhanced trace creation
+- [x] 4. Add unit tests for enhanced trace creation
   - Update `src/traces/create-trace.test.ts` to test trace ID capture as string
   - Verify trace ID is properly extracted from OpenTelemetry trace
   - Test scenarios where trace creation fails and returns empty string
