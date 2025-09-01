@@ -70,7 +70,7 @@
     "eslint-plugin-jsonc": "^2.20.1",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-vitest": "^0.5.4",
-    "globals": "^15.14.0",
+    "globals": "^16.3.0",
     "make-coverage-badge": "^1.2.0",
     "prettier": "^3.6.2",
     "prettier-eslint": "^16.4.2",
