@@ -11,7 +11,13 @@ export type WorkflowStepResponse = NonNullable<
   WorkflowJobResponse['steps']
 >[number]
 
-const STEP_CONCLUSION_VALUES = ['success', 'failure', 'timed_out'] as const
+const STEP_CONCLUSION_VALUES = [
+  'success',
+  'failure',
+  'timed_out',
+  'skipped',
+  'neutral'
+] as const
 export type StepConclusion = (typeof STEP_CONCLUSION_VALUES)[number]
 
 export const isStepConclusion = (value: unknown): value is StepConclusion => {
