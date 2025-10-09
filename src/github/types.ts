@@ -11,7 +11,13 @@ export type WorkflowStepResponse = NonNullable<
   WorkflowJobResponse['steps']
 >[number]
 
-const STEP_CONCLUSION_VALUES = ['success', 'failure', 'timed_out'] as const
+// refer steps.<step_id>.conclusion	https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#steps-context
+const STEP_CONCLUSION_VALUES = [
+  'success',
+  'failure',
+  'cancelled',
+  'skipped'
+] as const
 export type StepConclusion = (typeof STEP_CONCLUSION_VALUES)[number]
 
 export const isStepConclusion = (value: unknown): value is StepConclusion => {
