@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Create directory with proper permissions
       - name: Create log directory with proper permissions
