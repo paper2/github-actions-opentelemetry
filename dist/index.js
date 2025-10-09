@@ -73455,7 +73455,13 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 
 
 ;// CONCATENATED MODULE: ./src/github/types.ts
-const STEP_CONCLUSION_VALUES = ['success', 'failure', 'timed_out'];
+// refer steps.<step_id>.conclusion	https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#steps-context
+const STEP_CONCLUSION_VALUES = [
+    'success',
+    'failure',
+    'cancelled',
+    'skipped'
+];
 const isStepConclusion = (value) => {
     return (typeof value === 'string' &&
         STEP_CONCLUSION_VALUES.includes(value));
