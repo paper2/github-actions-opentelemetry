@@ -136,7 +136,7 @@ jobs:
       # Upload collector logs as GitHub artifact for debugging
       - name: Upload collector logs as artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ inputs.artifact-name }}
           path: collector-logs/
