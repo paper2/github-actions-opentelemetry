@@ -575,7 +575,7 @@ describe('Type converters', () => {
       const result = toWorkflowJob(incompleteJob as never, 'push')
 
       expect(result).toBeNull()
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleLogSpy).toHaveBeenCalledExactlyOnceWith(
         'Skipping incomplete job: test-job (status: in_progress)'
       )
 
@@ -668,7 +668,7 @@ describe('Type converters', () => {
       const result = toWorkflowRun(inProgressWorkflow as never)
 
       expect(result).toEqual(expectedWorkflowBase)
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleLogSpy).toHaveBeenCalledExactlyOnceWith(
         'Processing in-progress workflow: 12345'
       )
 

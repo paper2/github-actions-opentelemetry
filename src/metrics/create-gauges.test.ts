@@ -39,7 +39,9 @@ describe('createGauge', () => {
     await provider.forceFlush()
     await provider.shutdown()
 
-    expect(mockGetMeter).toHaveBeenCalledOnce()
+    expect(mockGetMeter).toHaveBeenCalledExactlyOnceWith(
+      'github-actions-metrics'
+    )
     expect(exporter.getMetrics()).toMatchObject([
       {
         scopeMetrics: [
