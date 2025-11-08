@@ -87,7 +87,7 @@ describe('createWorkflowRunStepSpan', () => {
     expect(() =>
       createWorkflowRunStepSpan(ROOT_CONTEXT, mockJobWithSteps)
     ).not.toThrow()
-    expect(console.warn).toHaveBeenCalledWith(
+    expect(console.warn).toHaveBeenCalledExactlyOnceWith(
       'Step step-with-null-timestamps in job test-job has null timestamps, skipping span creation'
     )
   })

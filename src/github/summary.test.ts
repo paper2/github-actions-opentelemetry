@@ -32,33 +32,33 @@ describe('summary', () => {
 
       await writeSummaryIfNeeded(traceId)
 
-      expect(mockSummary.addHeading).toHaveBeenCalledWith(
+      expect(mockSummary.addHeading).toHaveBeenCalledExactlyOnceWith(
         'OpenTelemetry Trace Information',
         3
       )
-      expect(mockSummary.addTable).toHaveBeenCalledWith([
+      expect(mockSummary.addTable).toHaveBeenCalledExactlyOnceWith([
         [
           { data: 'Workflow Trace ID', header: true },
           { data: 'cd18b4710d68394a9bdfa33be609d9ab' }
         ]
       ])
-      expect(mockSummary.write).toHaveBeenCalledOnce()
+      expect(mockSummary.write).toHaveBeenCalledExactlyOnceWith()
     })
 
     it('should handle empty trace ID by displaying no trace message', async () => {
       await writeSummaryIfNeeded('')
 
-      expect(mockSummary.addHeading).toHaveBeenCalledWith(
+      expect(mockSummary.addHeading).toHaveBeenCalledExactlyOnceWith(
         'OpenTelemetry Trace Information',
         3
       )
-      expect(mockSummary.addTable).toHaveBeenCalledWith([
+      expect(mockSummary.addTable).toHaveBeenCalledExactlyOnceWith([
         [
           { data: 'Workflow Trace ID', header: true },
           { data: 'No trace ID was generated' }
         ]
       ])
-      expect(mockSummary.write).toHaveBeenCalledOnce()
+      expect(mockSummary.write).toHaveBeenCalledExactlyOnceWith()
     })
 
     it('should handle summary writing failures gracefully with valid trace ID', async () => {
@@ -134,7 +134,7 @@ describe('summary', () => {
 
       await writeSummaryIfNeeded(traceId)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(consoleSpy).toHaveBeenCalledExactlyOnceWith(
         'Trace ID summary written successfully.'
       )
 
