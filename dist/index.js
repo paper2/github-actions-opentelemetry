@@ -10120,11 +10120,15 @@ function sanitizeAttributes(attributes) {
     if (typeof attributes !== 'object' || attributes == null) {
         return out;
     }
-    for (const [key, val] of Object.entries(attributes)) {
+    for (const key in attributes) {
+        if (!Object.prototype.hasOwnProperty.call(attributes, key)) {
+            continue;
+        }
         if (!isAttributeKey(key)) {
             api_1.diag.warn(`Invalid attribute key: ${key}`);
             continue;
         }
+        const val = attributes[key];
         if (!isAttributeValue(val)) {
             api_1.diag.warn(`Invalid attribute value set for key: ${key}`);
             continue;
@@ -10140,7 +10144,7 @@ function sanitizeAttributes(attributes) {
 }
 exports.sanitizeAttributes = sanitizeAttributes;
 function isAttributeKey(key) {
-    return typeof key === 'string' && key.length > 0;
+    return typeof key === 'string' && key !== '';
 }
 exports.isAttributeKey = isAttributeKey;
 function isAttributeValue(val) {
@@ -10150,7 +10154,7 @@ function isAttributeValue(val) {
     if (Array.isArray(val)) {
         return isHomogeneousAttributeValueArray(val);
     }
-    return isValidPrimitiveAttributeValue(val);
+    return isValidPrimitiveAttributeValueType(typeof val);
 }
 exports.isAttributeValue = isAttributeValue;
 function isHomogeneousAttributeValueArray(arr) {
@@ -10159,23 +10163,24 @@ function isHomogeneousAttributeValueArray(arr) {
         // null/undefined elements are allowed
         if (element == null)
             continue;
+        const elementType = typeof element;
+        if (elementType === type) {
+            continue;
+        }
         if (!type) {
-            if (isValidPrimitiveAttributeValue(element)) {
-                type = typeof element;
+            if (isValidPrimitiveAttributeValueType(elementType)) {
+                type = elementType;
                 continue;
             }
             // encountered an invalid primitive
             return false;
         }
-        if (typeof element === type) {
-            continue;
-        }
         return false;
     }
     return true;
 }
-function isValidPrimitiveAttributeValue(val) {
-    switch (typeof val) {
+function isValidPrimitiveAttributeValueType(valType) {
+    switch (valType) {
         case 'number':
         case 'boolean':
         case 'string':
@@ -10480,6 +10485,41 @@ exports.addHrTimes = addHrTimes;
 
 /***/ }),
 
+/***/ 9359:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.unrefTimer = void 0;
+/**
+ * @deprecated please copy this code to your implementation instead, this function will be removed in the next major version of this package.
+ * @param timer
+ */
+function unrefTimer(timer) {
+    if (typeof timer !== 'number') {
+        timer.unref();
+    }
+}
+exports.unrefTimer = unrefTimer;
+//# sourceMappingURL=timer-util.js.map
+
+/***/ }),
+
 /***/ 4637:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -10500,7 +10540,7 @@ exports.addHrTimes = addHrTimes;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.internal = exports.diagLogLevelFromString = exports.BindOnceFuture = exports.urlMatches = exports.isUrlIgnored = exports.callWithTimeout = exports.TimeoutError = exports.merge = exports.TraceState = exports.unsuppressTracing = exports.suppressTracing = exports.isTracingSuppressed = exports.setRPCMetadata = exports.getRPCMetadata = exports.deleteRPCMetadata = exports.RPCType = exports.parseTraceParent = exports.W3CTraceContextPropagator = exports.TRACE_STATE_HEADER = exports.TRACE_PARENT_HEADER = exports.CompositePropagator = exports.unrefTimer = exports.otperformance = exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getBooleanFromEnv = exports.getStringFromEnv = exports._globalThis = exports.SDK_INFO = exports.parseKeyPairsIntoRecord = exports.ExportResultCode = exports.timeInputToHrTime = exports.millisToHrTime = exports.isTimeInputHrTime = exports.isTimeInput = exports.hrTimeToTimeStamp = exports.hrTimeToNanoseconds = exports.hrTimeToMilliseconds = exports.hrTimeToMicroseconds = exports.hrTimeDuration = exports.hrTime = exports.getTimeOrigin = exports.addHrTimes = exports.loggingErrorHandler = exports.setGlobalErrorHandler = exports.globalErrorHandler = exports.sanitizeAttributes = exports.isAttributeValue = exports.AnchoredClock = exports.W3CBaggagePropagator = void 0;
+exports.internal = exports.diagLogLevelFromString = exports.BindOnceFuture = exports.urlMatches = exports.isUrlIgnored = exports.callWithTimeout = exports.TimeoutError = exports.merge = exports.TraceState = exports.unsuppressTracing = exports.suppressTracing = exports.isTracingSuppressed = exports.setRPCMetadata = exports.getRPCMetadata = exports.deleteRPCMetadata = exports.RPCType = exports.parseTraceParent = exports.W3CTraceContextPropagator = exports.TRACE_STATE_HEADER = exports.TRACE_PARENT_HEADER = exports.CompositePropagator = exports.otperformance = exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getBooleanFromEnv = exports.getStringFromEnv = exports._globalThis = exports.SDK_INFO = exports.parseKeyPairsIntoRecord = exports.ExportResultCode = exports.unrefTimer = exports.timeInputToHrTime = exports.millisToHrTime = exports.isTimeInputHrTime = exports.isTimeInput = exports.hrTimeToTimeStamp = exports.hrTimeToNanoseconds = exports.hrTimeToMilliseconds = exports.hrTimeToMicroseconds = exports.hrTimeDuration = exports.hrTime = exports.getTimeOrigin = exports.addHrTimes = exports.loggingErrorHandler = exports.setGlobalErrorHandler = exports.globalErrorHandler = exports.sanitizeAttributes = exports.isAttributeValue = exports.AnchoredClock = exports.W3CBaggagePropagator = void 0;
 var W3CBaggagePropagator_1 = __nccwpck_require__(2827);
 Object.defineProperty(exports, "W3CBaggagePropagator", ({ enumerable: true, get: function () { return W3CBaggagePropagator_1.W3CBaggagePropagator; } }));
 var anchored_clock_1 = __nccwpck_require__(8920);
@@ -10526,6 +10566,8 @@ Object.defineProperty(exports, "isTimeInput", ({ enumerable: true, get: function
 Object.defineProperty(exports, "isTimeInputHrTime", ({ enumerable: true, get: function () { return time_1.isTimeInputHrTime; } }));
 Object.defineProperty(exports, "millisToHrTime", ({ enumerable: true, get: function () { return time_1.millisToHrTime; } }));
 Object.defineProperty(exports, "timeInputToHrTime", ({ enumerable: true, get: function () { return time_1.timeInputToHrTime; } }));
+var timer_util_1 = __nccwpck_require__(9359);
+Object.defineProperty(exports, "unrefTimer", ({ enumerable: true, get: function () { return timer_util_1.unrefTimer; } }));
 var ExportResult_1 = __nccwpck_require__(5038);
 Object.defineProperty(exports, "ExportResultCode", ({ enumerable: true, get: function () { return ExportResult_1.ExportResultCode; } }));
 var utils_1 = __nccwpck_require__(7613);
@@ -10538,7 +10580,6 @@ Object.defineProperty(exports, "getBooleanFromEnv", ({ enumerable: true, get: fu
 Object.defineProperty(exports, "getNumberFromEnv", ({ enumerable: true, get: function () { return platform_1.getNumberFromEnv; } }));
 Object.defineProperty(exports, "getStringListFromEnv", ({ enumerable: true, get: function () { return platform_1.getStringListFromEnv; } }));
 Object.defineProperty(exports, "otperformance", ({ enumerable: true, get: function () { return platform_1.otperformance; } }));
-Object.defineProperty(exports, "unrefTimer", ({ enumerable: true, get: function () { return platform_1.unrefTimer; } }));
 var composite_1 = __nccwpck_require__(415);
 Object.defineProperty(exports, "CompositePropagator", ({ enumerable: true, get: function () { return composite_1.CompositePropagator; } }));
 var W3CTraceContextPropagator_1 = __nccwpck_require__(8769);
@@ -10676,7 +10717,7 @@ exports.validateValue = validateValue;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getStringFromEnv = exports.getBooleanFromEnv = exports.unrefTimer = exports.otperformance = exports._globalThis = exports.SDK_INFO = void 0;
+exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getStringFromEnv = exports.getBooleanFromEnv = exports.otperformance = exports._globalThis = exports.SDK_INFO = void 0;
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10696,7 +10737,6 @@ var node_1 = __nccwpck_require__(4158);
 Object.defineProperty(exports, "SDK_INFO", ({ enumerable: true, get: function () { return node_1.SDK_INFO; } }));
 Object.defineProperty(exports, "_globalThis", ({ enumerable: true, get: function () { return node_1._globalThis; } }));
 Object.defineProperty(exports, "otperformance", ({ enumerable: true, get: function () { return node_1.otperformance; } }));
-Object.defineProperty(exports, "unrefTimer", ({ enumerable: true, get: function () { return node_1.unrefTimer; } }));
 Object.defineProperty(exports, "getBooleanFromEnv", ({ enumerable: true, get: function () { return node_1.getBooleanFromEnv; } }));
 Object.defineProperty(exports, "getStringFromEnv", ({ enumerable: true, get: function () { return node_1.getStringFromEnv; } }));
 Object.defineProperty(exports, "getNumberFromEnv", ({ enumerable: true, get: function () { return node_1.getNumberFromEnv; } }));
@@ -10863,7 +10903,7 @@ exports._globalThis = typeof globalThis === 'object' ? globalThis : global;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.unrefTimer = exports.SDK_INFO = exports.otperformance = exports._globalThis = exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getBooleanFromEnv = exports.getStringFromEnv = void 0;
+exports.SDK_INFO = exports.otperformance = exports._globalThis = exports.getStringListFromEnv = exports.getNumberFromEnv = exports.getBooleanFromEnv = exports.getStringFromEnv = void 0;
 var environment_1 = __nccwpck_require__(447);
 Object.defineProperty(exports, "getStringFromEnv", ({ enumerable: true, get: function () { return environment_1.getStringFromEnv; } }));
 Object.defineProperty(exports, "getBooleanFromEnv", ({ enumerable: true, get: function () { return environment_1.getBooleanFromEnv; } }));
@@ -10875,8 +10915,6 @@ var performance_1 = __nccwpck_require__(408);
 Object.defineProperty(exports, "otperformance", ({ enumerable: true, get: function () { return performance_1.otperformance; } }));
 var sdk_info_1 = __nccwpck_require__(6375);
 Object.defineProperty(exports, "SDK_INFO", ({ enumerable: true, get: function () { return sdk_info_1.SDK_INFO; } }));
-var timer_util_1 = __nccwpck_require__(2780);
-Object.defineProperty(exports, "unrefTimer", ({ enumerable: true, get: function () { return timer_util_1.unrefTimer; } }));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -10940,35 +10978,6 @@ exports.SDK_INFO = {
     [semantic_conventions_1.ATTR_TELEMETRY_SDK_VERSION]: version_1.VERSION,
 };
 //# sourceMappingURL=sdk-info.js.map
-
-/***/ }),
-
-/***/ 2780:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.unrefTimer = void 0;
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-function unrefTimer(timer) {
-    timer.unref();
-}
-exports.unrefTimer = unrefTimer;
-//# sourceMappingURL=timer-util.js.map
 
 /***/ }),
 
@@ -12020,7 +12029,7 @@ exports.isUrlIgnored = isUrlIgnored;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VERSION = void 0;
 // this is autogenerated file, see scripts/version-update.js
-exports.VERSION = '2.1.0';
+exports.VERSION = '2.2.0';
 //# sourceMappingURL=version.js.map
 
 /***/ }),
@@ -12250,18 +12259,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OTLPMetricExporter = void 0;
 const OTLPMetricExporterBase_1 = __nccwpck_require__(9161);
 const otlp_transformer_1 = __nccwpck_require__(9107);
-const version_1 = __nccwpck_require__(9084);
 const node_http_1 = __nccwpck_require__(2207);
-const USER_AGENT = {
-    'User-Agent': `OTel-OTLP-Exporter-JavaScript/${version_1.VERSION}`,
-};
 /**
  * OTLP Metric Exporter for Node.js
  */
 class OTLPMetricExporter extends OTLPMetricExporterBase_1.OTLPMetricExporterBase {
     constructor(config) {
         super((0, node_http_1.createOtlpHttpExportDelegate)((0, node_http_1.convertLegacyHttpOptions)(config ?? {}, 'METRICS', 'v1/metrics', {
-            ...USER_AGENT,
             'Content-Type': 'application/json',
         }), otlp_transformer_1.JsonMetricsSerializer), config);
     }
@@ -12295,33 +12299,6 @@ exports.OTLPMetricExporter = void 0;
 var OTLPMetricExporter_1 = __nccwpck_require__(8898);
 Object.defineProperty(exports, "OTLPMetricExporter", ({ enumerable: true, get: function () { return OTLPMetricExporter_1.OTLPMetricExporter; } }));
 //# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ 9084:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VERSION = void 0;
-// this is autogenerated file, see scripts/version-update.js
-exports.VERSION = '0.206.0';
-//# sourceMappingURL=version.js.map
 
 /***/ }),
 
@@ -12403,12 +12380,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OTLPMetricExporter = void 0;
 const exporter_metrics_otlp_http_1 = __nccwpck_require__(8816);
 const otlp_transformer_1 = __nccwpck_require__(9107);
-const version_1 = __nccwpck_require__(6689);
 const node_http_1 = __nccwpck_require__(2207);
 class OTLPMetricExporter extends exporter_metrics_otlp_http_1.OTLPMetricExporterBase {
     constructor(config) {
         super((0, node_http_1.createOtlpHttpExportDelegate)((0, node_http_1.convertLegacyHttpOptions)(config ?? {}, 'METRICS', 'v1/metrics', {
-            'User-Agent': `OTel-OTLP-Exporter-JavaScript/${version_1.VERSION}`,
             'Content-Type': 'application/x-protobuf',
         }), otlp_transformer_1.ProtobufMetricsSerializer), config);
     }
@@ -12442,33 +12417,6 @@ exports.OTLPMetricExporter = void 0;
 var OTLPMetricExporter_1 = __nccwpck_require__(3811);
 Object.defineProperty(exports, "OTLPMetricExporter", ({ enumerable: true, get: function () { return OTLPMetricExporter_1.OTLPMetricExporter; } }));
 //# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ 6689:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VERSION = void 0;
-// this is autogenerated file, see scripts/version-update.js
-exports.VERSION = '0.206.0';
-//# sourceMappingURL=version.js.map
 
 /***/ }),
 
@@ -12550,7 +12498,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OTLPTraceExporter = void 0;
 const otlp_exporter_base_1 = __nccwpck_require__(6909);
 const otlp_transformer_1 = __nccwpck_require__(9107);
-const version_1 = __nccwpck_require__(7962);
 const node_http_1 = __nccwpck_require__(2207);
 /**
  * Collector Trace Exporter for Node with protobuf
@@ -12558,7 +12505,6 @@ const node_http_1 = __nccwpck_require__(2207);
 class OTLPTraceExporter extends otlp_exporter_base_1.OTLPExporterBase {
     constructor(config = {}) {
         super((0, node_http_1.createOtlpHttpExportDelegate)((0, node_http_1.convertLegacyHttpOptions)(config, 'TRACES', 'v1/traces', {
-            'User-Agent': `OTel-OTLP-Exporter-JavaScript/${version_1.VERSION}`,
             'Content-Type': 'application/x-protobuf',
         }), otlp_transformer_1.ProtobufTraceSerializer));
     }
@@ -12592,33 +12538,6 @@ exports.OTLPTraceExporter = void 0;
 var OTLPTraceExporter_1 = __nccwpck_require__(4388);
 Object.defineProperty(exports, "OTLPTraceExporter", ({ enumerable: true, get: function () { return OTLPTraceExporter_1.OTLPTraceExporter; } }));
 //# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ 7962:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VERSION = void 0;
-// this is autogenerated file, see scripts/version-update.js
-exports.VERSION = '0.206.0';
-//# sourceMappingURL=version.js.map
 
 /***/ }),
 
@@ -12728,6 +12647,39 @@ exports.createBoundedQueueExportPromiseHandler = createBoundedQueueExportPromise
 
 /***/ }),
 
+/***/ 7259:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.convertLegacyHeaders = void 0;
+const shared_configuration_1 = __nccwpck_require__(4636);
+function convertLegacyHeaders(config) {
+    if (typeof config.headers === 'function') {
+        return config.headers;
+    }
+    return (0, shared_configuration_1.wrapStaticHeadersInFunction)(config.headers);
+}
+exports.convertLegacyHeaders = convertLegacyHeaders;
+//# sourceMappingURL=convert-legacy-http-options.js.map
+
+/***/ }),
+
 /***/ 2657:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -12735,10 +12687,10 @@ exports.createBoundedQueueExportPromiseHandler = createBoundedQueueExportPromise
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.convertLegacyHttpOptions = void 0;
 const api_1 = __nccwpck_require__(3914);
-const shared_configuration_1 = __nccwpck_require__(4636);
 const otlp_node_http_configuration_1 = __nccwpck_require__(9472);
 const index_node_http_1 = __nccwpck_require__(2207);
 const otlp_node_http_env_configuration_1 = __nccwpck_require__(6494);
+const convert_legacy_http_options_1 = __nccwpck_require__(7259);
 function convertLegacyAgentOptions(config) {
     if (typeof config.httpAgentOptions === 'function') {
         return config.httpAgentOptions;
@@ -12768,11 +12720,12 @@ function convertLegacyHttpOptions(config, signalIdentifier, signalResourcePath, 
     }
     return (0, otlp_node_http_configuration_1.mergeOtlpNodeHttpConfigurationWithDefaults)({
         url: config.url,
-        headers: (0, shared_configuration_1.wrapStaticHeadersInFunction)(config.headers),
+        headers: (0, convert_legacy_http_options_1.convertLegacyHeaders)(config),
         concurrencyLimit: config.concurrencyLimit,
         timeoutMillis: config.timeoutMillis,
         compression: config.compression,
         agentFactory: convertLegacyAgentOptions(config),
+        userAgent: config.userAgent,
     }, (0, otlp_node_http_env_configuration_1.getNodeHttpConfigurationFromEnvironment)(signalIdentifier, signalResourcePath), (0, otlp_node_http_configuration_1.getNodeHttpConfigurationDefaults)(requiredHeaders, signalResourcePath));
 }
 exports.convertLegacyHttpOptions = convertLegacyHttpOptions;
@@ -12834,18 +12787,18 @@ exports.getHttpConfigurationDefaults = exports.mergeOtlpHttpConfigurationWithDef
 const shared_configuration_1 = __nccwpck_require__(4636);
 const util_1 = __nccwpck_require__(2653);
 function mergeHeaders(userProvidedHeaders, fallbackHeaders, defaultHeaders) {
-    const requiredHeaders = {
-        ...defaultHeaders(),
-    };
-    const headers = {};
-    return () => {
+    return async () => {
+        const requiredHeaders = {
+            ...(await defaultHeaders()),
+        };
+        const headers = {};
         // add fallback ones first
         if (fallbackHeaders != null) {
-            Object.assign(headers, fallbackHeaders());
+            Object.assign(headers, await fallbackHeaders());
         }
         // override with user-provided ones
         if (userProvidedHeaders != null) {
-            Object.assign(headers, userProvidedHeaders());
+            Object.assign(headers, (0, util_1.validateAndNormalizeHeaders)(await userProvidedHeaders()));
         }
         // override required ones.
         return Object.assign(headers, requiredHeaders);
@@ -12872,7 +12825,7 @@ function validateUserProvidedUrl(url) {
 function mergeOtlpHttpConfigurationWithDefaults(userProvidedConfiguration, fallbackConfiguration, defaultConfiguration) {
     return {
         ...(0, shared_configuration_1.mergeOtlpSharedConfigurationWithDefaults)(userProvidedConfiguration, fallbackConfiguration, defaultConfiguration),
-        headers: mergeHeaders((0, util_1.validateAndNormalizeHeaders)(userProvidedConfiguration.headers), fallbackConfiguration.headers, defaultConfiguration.headers),
+        headers: mergeHeaders(userProvidedConfiguration.headers, fallbackConfiguration.headers, defaultConfiguration.headers),
         url: validateUserProvidedUrl(userProvidedConfiguration.url) ??
             fallbackConfiguration.url ??
             defaultConfiguration.url,
@@ -12882,7 +12835,7 @@ exports.mergeOtlpHttpConfigurationWithDefaults = mergeOtlpHttpConfigurationWithD
 function getHttpConfigurationDefaults(requiredHeaders, signalResourcePath) {
     return {
         ...(0, shared_configuration_1.getSharedConfigurationDefaults)(),
-        headers: () => requiredHeaders,
+        headers: async () => requiredHeaders,
         url: 'http://localhost:4318/' + signalResourcePath,
     };
 }
@@ -12915,8 +12868,14 @@ exports.getNodeHttpConfigurationDefaults = exports.mergeOtlpNodeHttpConfiguratio
 const otlp_http_configuration_1 = __nccwpck_require__(5081);
 function httpAgentFactoryFromOptions(options) {
     return async (protocol) => {
-        const module = protocol === 'http:' ? Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 8611, 23)) : Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 5692, 23));
+        const isInsecure = protocol === 'http:';
+        const module = isInsecure ? Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 8611, 23)) : Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 5692, 23));
         const { Agent } = await module;
+        if (isInsecure) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- these props should not be used in agent options
+            const { ca, cert, key, ...insecureOptions } = options;
+            return new Agent(insecureOptions);
+        }
         return new Agent(options);
     };
 }
@@ -12932,6 +12891,7 @@ function mergeOtlpNodeHttpConfigurationWithDefaults(userProvidedConfiguration, f
         agentFactory: userProvidedConfiguration.agentFactory ??
             fallbackConfiguration.agentFactory ??
             defaultConfiguration.agentFactory,
+        userAgent: userProvidedConfiguration.userAgent,
     };
 }
 exports.mergeOtlpNodeHttpConfigurationWithDefaults = mergeOtlpNodeHttpConfigurationWithDefaults;
@@ -12967,10 +12927,13 @@ exports.getNodeHttpConfigurationFromEnvironment = void 0;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const fs = __nccwpck_require__(9896);
+const path = __nccwpck_require__(6928);
 const core_1 = __nccwpck_require__(4637);
 const api_1 = __nccwpck_require__(3914);
 const shared_env_configuration_1 = __nccwpck_require__(4394);
 const shared_configuration_1 = __nccwpck_require__(4636);
+const otlp_node_http_configuration_1 = __nccwpck_require__(9472);
 function getStaticHeadersFromEnv(signalIdentifier) {
     const signalSpecificRawHeaders = (0, core_1.getStringFromEnv)(`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`);
     const nonSignalSpecificRawHeaders = (0, core_1.getStringFromEnv)('OTEL_EXPORTER_OTLP_HEADERS');
@@ -13032,6 +12995,32 @@ function getSpecificUrlFromEnv(signalIdentifier) {
     }
     return appendRootPathToUrlIfNeeded(envUrl);
 }
+function readFileFromEnv(signalSpecificEnvVar, nonSignalSpecificEnvVar, warningMessage) {
+    const signalSpecificPath = (0, core_1.getStringFromEnv)(signalSpecificEnvVar);
+    const nonSignalSpecificPath = (0, core_1.getStringFromEnv)(nonSignalSpecificEnvVar);
+    const filePath = signalSpecificPath ?? nonSignalSpecificPath;
+    if (filePath != null) {
+        try {
+            return fs.readFileSync(path.resolve(process.cwd(), filePath));
+        }
+        catch {
+            api_1.diag.warn(warningMessage);
+            return undefined;
+        }
+    }
+    else {
+        return undefined;
+    }
+}
+function getClientCertificateFromEnv(signalIdentifier) {
+    return readFileFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_CERTIFICATE`, 'OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE', 'Failed to read client certificate chain file');
+}
+function getClientKeyFromEnv(signalIdentifier) {
+    return readFileFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_KEY`, 'OTEL_EXPORTER_OTLP_CLIENT_KEY', 'Failed to read client certificate private key file');
+}
+function getRootCertificateFromEnv(signalIdentifier) {
+    return readFileFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_CERTIFICATE`, 'OTEL_EXPORTER_OTLP_CERTIFICATE', 'Failed to read root certificate file');
+}
 /**
  * Reads and returns configuration from the environment
  *
@@ -13044,6 +13033,12 @@ function getNodeHttpConfigurationFromEnvironment(signalIdentifier, signalResourc
         url: getSpecificUrlFromEnv(signalIdentifier) ??
             getNonSpecificUrlFromEnv(signalResourcePath),
         headers: (0, shared_configuration_1.wrapStaticHeadersInFunction)(getStaticHeadersFromEnv(signalIdentifier)),
+        agentFactory: (0, otlp_node_http_configuration_1.httpAgentFactoryFromOptions)({
+            keepAlive: true,
+            ca: getRootCertificateFromEnv(signalIdentifier),
+            cert: getClientCertificateFromEnv(signalIdentifier),
+            key: getClientKeyFromEnv(signalIdentifier),
+        }),
     };
 }
 exports.getNodeHttpConfigurationFromEnvironment = getNodeHttpConfigurationFromEnvironment;
@@ -13083,7 +13078,7 @@ function wrapStaticHeadersInFunction(headers) {
     if (headers == null) {
         return undefined;
     }
-    return () => headers;
+    return async () => headers;
 }
 exports.wrapStaticHeadersInFunction = wrapStaticHeadersInFunction;
 /**
@@ -13646,8 +13641,9 @@ class HttpExporterTransport {
     }
     async send(data, timeoutMillis) {
         const { agent, request } = await this._loadUtils();
+        const headers = await this._parameters.headers();
         return new Promise(resolve => {
-            (0, http_transport_utils_1.sendWithHttp)(request, this._parameters, agent, data, result => {
+            (0, http_transport_utils_1.sendWithHttp)(request, this._parameters.url, headers, this._parameters.compression, this._parameters.userAgent, agent, data, result => {
                 resolve(result);
             }, timeoutMillis);
         });
@@ -13691,6 +13687,8 @@ const zlib = __nccwpck_require__(3106);
 const stream_1 = __nccwpck_require__(2203);
 const is_export_retryable_1 = __nccwpck_require__(8175);
 const types_1 = __nccwpck_require__(5860);
+const version_1 = __nccwpck_require__(9461);
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${version_1.VERSION}`;
 /**
  * Sends data using http
  * @param request
@@ -13700,17 +13698,21 @@ const types_1 = __nccwpck_require__(5860);
  * @param onDone
  * @param timeoutMillis
  */
-function sendWithHttp(request, params, agent, data, onDone, timeoutMillis) {
-    const parsedUrl = new URL(params.url);
+function sendWithHttp(request, url, headers, compression, userAgent, agent, data, onDone, timeoutMillis) {
+    const parsedUrl = new URL(url);
+    if (userAgent) {
+        headers['User-Agent'] = `${userAgent} ${DEFAULT_USER_AGENT}`;
+    }
+    else {
+        headers['User-Agent'] = DEFAULT_USER_AGENT;
+    }
     const options = {
         hostname: parsedUrl.hostname,
         port: parsedUrl.port,
         path: parsedUrl.pathname,
         method: 'POST',
-        headers: {
-            ...params.headers(),
-        },
-        agent: agent,
+        headers,
+        agent,
     };
     const req = request(options, (res) => {
         const responseData = [];
@@ -13750,7 +13752,7 @@ function sendWithHttp(request, params, agent, data, onDone, timeoutMillis) {
             error,
         });
     });
-    compressAndSend(req, params.compression, data, (error) => {
+    compressAndSend(req, compression, data, (error) => {
         onDone({
             status: 'failure',
             error,
@@ -13846,21 +13848,46 @@ const api_1 = __nccwpck_require__(3914);
  * @param partialHeaders
  */
 function validateAndNormalizeHeaders(partialHeaders) {
-    return () => {
-        const headers = {};
-        Object.entries(partialHeaders?.() ?? {}).forEach(([key, value]) => {
-            if (typeof value !== 'undefined') {
-                headers[key] = String(value);
-            }
-            else {
-                api_1.diag.warn(`Header "${key}" has invalid value (${value}) and will be ignored`);
-            }
-        });
-        return headers;
-    };
+    const headers = {};
+    Object.entries(partialHeaders ?? {}).forEach(([key, value]) => {
+        if (typeof value !== 'undefined') {
+            headers[key] = String(value);
+        }
+        else {
+            api_1.diag.warn(`Header "${key}" has invalid value (${value}) and will be ignored`);
+        }
+    });
+    return headers;
 }
 exports.validateAndNormalizeHeaders = validateAndNormalizeHeaders;
 //# sourceMappingURL=util.js.map
+
+/***/ }),
+
+/***/ 9461:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VERSION = void 0;
+// this is autogenerated file, see scripts/version-update.js
+exports.VERSION = '0.208.0';
+//# sourceMappingURL=version.js.map
 
 /***/ }),
 
@@ -32285,7 +32312,10 @@ class PeriodicExportingMetricReader extends MetricReader_1.MetricReader {
             // this._runOnce never rejects. Using void operator to suppress @typescript-eslint/no-floating-promises.
             void this._runOnce();
         }, this._exportInterval);
-        (0, core_1.unrefTimer)(this._interval);
+        // depending on runtime, this may be a 'number' or NodeJS.Timeout
+        if (typeof this._interval !== 'number') {
+            this._interval.unref();
+        }
     }
     async onForceFlush() {
         await this._runOnce();
@@ -35466,7 +35496,10 @@ class BatchSpanProcessorBase {
         if (this._timer !== undefined)
             return;
         this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
-        (0, core_1.unrefTimer)(this._timer);
+        // depending on runtime, this may be a 'number' or NodeJS.Timeout
+        if (typeof this._timer !== 'number') {
+            this._timer.unref();
+        }
     }
     _clearTimer() {
         if (this._timer !== undefined) {
@@ -38129,8 +38162,9 @@ exports.ATTR_HTTP_REQUEST_HEADER = ATTR_HTTP_REQUEST_HEADER;
  * @example HEAD
  *
  * @note HTTP request method value **SHOULD** be "known" to the instrumentation.
- * By default, this convention defines "known" methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
- * and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
+ * By default, this convention defines "known" methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods),
+ * the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html)
+ * and the QUERY method defined in [httpbis-safe-method-w-body](https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/?include_text=1).
  *
  * If the HTTP request method is not known to instrumentation, it **MUST** set the `http.request.method` attribute to `_OTHER`.
  *
@@ -38251,13 +38285,21 @@ exports.ATTR_HTTP_RESPONSE_HEADER = ATTR_HTTP_RESPONSE_HEADER;
  */
 exports.ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 /**
- * The matched route, that is, the path template in the format used by the respective server framework.
+ * The matched route template for the request. This **MUST** be low-cardinality and include all static path segments, with dynamic path segments represented with placeholders.
  *
  * @example /users/:userID?
- * @example {controller}/{action}/{id?}
+ * @example my-controller/my-action/{id?}
  *
  * @note **MUST NOT** be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
  * **SHOULD** include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
+ *
+ * A static path segment is a part of the route template with a fixed, low-cardinality value. This includes literal strings like `/users/` and placeholders that
+ * are constrained to a finite, predefined set of values, e.g. `{controller}` or `{action}`.
+ *
+ * A dynamic path segment is a placeholder for a value that can have high cardinality and is not constrained to a predefined list like static path segments.
+ *
+ * Instrumentations **SHOULD** use routing information provided by the corresponding web framework. They **SHOULD** pick the most precise source of routing information and **MAY**
+ * support custom route formatting. Instrumentations **SHOULD** document the format and the API used to obtain the route string.
  */
 exports.ATTR_HTTP_ROUTE = 'http.route';
 /**
