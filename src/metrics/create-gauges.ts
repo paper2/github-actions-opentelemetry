@@ -1,6 +1,7 @@
 import * as opentelemetry from '@opentelemetry/api'
 import {
   getLatestCompletedAt,
+  getEarliestStartedAt,
   WorkflowRun,
   WorkflowJob,
   WorkflowJobs
@@ -27,8 +28,13 @@ const createMetricsAttributes = (
 ): opentelemetry.Attributes => ({
   [ak.WORKFLOW_NAME]: workflow.name,
   [ak.REPOSITORY]: workflow.repository.full_name,
+  ...(workflow.conclusion && { [ak.WORKFLOW_CONCLUSION]: workflow.conclusion }),
+  ...(workflow.actor && { [ak.WORKFLOW_ACTOR]: workflow.actor }),
+  ...(workflow.event && { [ak.WORKFLOW_EVENT]: workflow.event }),
   ...(job && { [ak.JOB_NAME]: job.name }),
-  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }) // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }), // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+  ...(job && job.runner_name && { [ak.RUNNER_NAME]: job.runner_name }),
+  ...(job && job.runner_group_name && { [ak.RUNNER_GROUP_NAME]: job.runner_group_name })
 })
 
 export const createWorkflowGauges = (
@@ -44,6 +50,22 @@ export const createWorkflowGauges = (
     workflowMetricsAttributes,
     { unit: 's' }
   )
+
+  // workflow queue duration = time from workflow creation to first job start
+  const jobStartedAtMin = getEarliestStartedAt(workflowRunJobs)
+  const workflowQueuedDuration = calcDiffSec(workflow.created_at, jobStartedAtMin)
+  if (workflowQueuedDuration >= 0) {
+    createGauge(
+      dn.WORKFLOW_QUEUED_DURATION,
+      workflowQueuedDuration,
+      workflowMetricsAttributes,
+      { unit: 's' }
+    )
+  } else {
+    core.notice(
+      `${workflow.name}: Skip creating ${dn.WORKFLOW_QUEUED_DURATION} metric. Queue duration is negative (${workflowQueuedDuration}s), indicating a timing issue.`
+    )
+  }
 }
 
 export const createJobGauges = (
