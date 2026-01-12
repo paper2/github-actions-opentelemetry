@@ -31,6 +31,8 @@ const createMetricsAttributes = (
   ...(workflow.conclusion && { [ak.WORKFLOW_CONCLUSION]: workflow.conclusion }),
   ...(workflow.actor && { [ak.WORKFLOW_ACTOR]: workflow.actor }),
   ...(workflow.event && { [ak.WORKFLOW_EVENT]: workflow.event }),
+  ...(workflow.head_branch && { [ak.WORKFLOW_HEAD_BRANCH]: workflow.head_branch }),
+  ...(workflow.base_branch && { [ak.WORKFLOW_BASE_BRANCH]: workflow.base_branch }),
   ...(job && { [ak.JOB_NAME]: job.name }),
   ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }), // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
   ...(job && job.runner_name && { [ak.RUNNER_NAME]: job.runner_name }),

@@ -11,6 +11,8 @@ export const attributeKeys = {
   WORKFLOW_CONCLUSION: 'workflow.conclusion',
   WORKFLOW_ACTOR: 'workflow.actor',
   WORKFLOW_EVENT: 'workflow.event',
+  WORKFLOW_HEAD_BRANCH: 'workflow.head_branch',
+  WORKFLOW_BASE_BRANCH: 'workflow.base_branch',
   JOB_NAME: 'job.name',
   JOB_CONCLUSION: 'job.conclusion',
   RUNNER_NAME: 'runner.name',
