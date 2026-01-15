@@ -16,19 +16,38 @@ import { settings } from './settings.js'
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
-  // required: run initialize() first.
-  // usually use --required runtime option for first reading.
-  // for simple use this action, this is satisfied on here.
-  initialize()
-
   let exitCode = 0
 
   try {
-    // Create Octokit client and workflow context
+    // Fetch workflow data FIRST before initializing SDK
+    // This allows us to set workflow attributes as resource attributes
     const octokit = createOctokitClient()
     const workflowContext = getWorkflowContext(github.context, settings)
-
     const results = await fetchWorkflowResults(octokit, workflowContext)
+
+    // Initialize SDK with workflow data as resource attributes
+    // This ensures they become Prometheus labels
+    const workflowResourceAttributes: Record<string, string> = {}
+    if (results.workflow.actor) {
+      workflowResourceAttributes['workflow.actor'] = results.workflow.actor
+    }
+    if (results.workflow.event) {
+      workflowResourceAttributes['workflow.event'] = results.workflow.event
+    }
+    if (results.workflow.head_branch) {
+      workflowResourceAttributes['workflow.head_branch'] =
+        results.workflow.head_branch
+    }
+    if (results.workflow.base_branch) {
+      workflowResourceAttributes['workflow.base_branch'] =
+        results.workflow.base_branch
+    }
+
+    core.info(
+      `Setting workflow resource attributes: ${JSON.stringify(workflowResourceAttributes)}`
+    )
+    initialize(undefined, undefined, workflowResourceAttributes)
+
     await createMetrics(results)
     const traceId = await createTrace(results)
     await writeSummaryIfNeeded(traceId)

@@ -127,3 +127,11 @@ export const getLatestCompletedAt = (jobs: WorkflowJob[]): Date => {
   const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number))
   return new Date(maxDateNumber)
 }
+
+export const getEarliestStartedAt = (jobs: WorkflowJob[]): Date => {
+  if (jobs.length === 0)
+    throw new Error('no jobs found to get earliest started_at date.')
+  const jobStartedAtDates = jobs.map(job => job.started_at)
+  const minDateNumber = Math.min(...jobStartedAtDates.map(Number))
+  return new Date(minDateNumber)
+}

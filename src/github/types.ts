@@ -60,6 +60,10 @@ export type Workflow = {
   readonly created_at: Date
   readonly run_attempt: number
   readonly html_url: string
+  readonly actor: string | null
+  readonly event: string | null
+  readonly head_branch: string | null
+  readonly base_branch: string | null
   readonly repository: {
     readonly full_name: string
   }
@@ -159,6 +163,10 @@ export const toWorkflowRun = (workflowRun: WorkflowResponse): Workflow => {
     created_at: new Date(workflowRun.created_at),
     run_attempt: workflowRun.run_attempt,
     html_url: workflowRun.html_url,
+    actor: workflowRun.actor?.login || null,
+    event: workflowRun.event || null,
+    head_branch: workflowRun.head_branch || null,
+    base_branch: workflowRun.pull_requests?.[0]?.base?.ref || null,
     repository: {
       full_name: workflowRun.repository.full_name
     }

@@ -1,4 +1,8 @@
-import { detectResources, envDetector } from '@opentelemetry/resources'
+import {
+  detectResources,
+  envDetector,
+  resourceFromAttributes
+} from '@opentelemetry/resources'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import {
   MeterProvider,
@@ -19,19 +23,31 @@ let meterProvider: MeterProvider
 
 export const initialize = (
   meterExporter?: PushMetricExporter,
-  spanExporter?: SpanExporter
+  spanExporter?: SpanExporter,
+  additionalResourceAttributes?: Record<string, string>
 ): void => {
   if (settings.logeLevel === 'debug')
     opentelemetry.diag.setLogger(
       new opentelemetry.DiagConsoleLogger(),
       opentelemetry.DiagLogLevel.DEBUG
     )
-  initializeMeter(meterExporter)
-  initializeTracer(spanExporter)
+  initializeMeter(meterExporter, additionalResourceAttributes)
+  initializeTracer(spanExporter, additionalResourceAttributes)
 }
 
-const initializeMeter = (exporter?: PushMetricExporter): void => {
+const initializeMeter = (
+  exporter?: PushMetricExporter,
+  additionalResourceAttributes?: Record<string, string>
+): void => {
   if (settings.FeatureFlagMetrics) {
+    // Detect base resource from environment
+    const baseResource = detectResources({ detectors: [envDetector] })
+
+    // Merge additional workflow attributes into resource
+    const resource = additionalResourceAttributes
+      ? baseResource.merge(resourceFromAttributes(additionalResourceAttributes))
+      : baseResource
+
     meterProvider = new MeterProvider({
       readers: [
         new PeriodicExportingMetricReader({
@@ -41,7 +57,7 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
           exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
         })
       ],
-      resource: detectResources({ detectors: [envDetector] })
+      resource
     })
   } else {
     meterProvider = new MeterProvider()
@@ -54,10 +70,21 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
   }
 }
 
-const initializeTracer = (exporter?: SpanExporter): void => {
+const initializeTracer = (
+  exporter?: SpanExporter,
+  additionalResourceAttributes?: Record<string, string>
+): void => {
   if (settings.FeatureFlagTrace) {
+    // Detect base resource from environment
+    const baseResource = detectResources({ detectors: [envDetector] })
+
+    // Merge additional workflow attributes into resource
+    const resource = additionalResourceAttributes
+      ? baseResource.merge(resourceFromAttributes(additionalResourceAttributes))
+      : baseResource
+
     traceProvider = new BasicTracerProvider({
-      resource: detectResources({ detectors: [envDetector] }),
+      resource,
       spanProcessors: [
         new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))
       ]

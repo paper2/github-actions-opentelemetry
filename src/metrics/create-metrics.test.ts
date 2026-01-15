@@ -26,7 +26,11 @@ const workflowRunResults: WorkflowResults = {
     repository: {
       full_name: 'paper2/github-actions-opentelemetry'
     },
-    html_url: 'http://example.com/workflow_run'
+    html_url: 'http://example.com/workflow_run',
+    actor: null,
+    event: null,
+    head_branch: null,
+    base_branch: null
   },
   workflowJobs: [
     {

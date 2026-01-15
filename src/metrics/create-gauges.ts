@@ -1,6 +1,7 @@
 import * as opentelemetry from '@opentelemetry/api'
 import {
   getLatestCompletedAt,
+  getEarliestStartedAt,
   WorkflowRun,
   WorkflowJob,
   WorkflowJobs
@@ -27,8 +28,20 @@ const createMetricsAttributes = (
 ): opentelemetry.Attributes => ({
   [ak.WORKFLOW_NAME]: workflow.name,
   [ak.REPOSITORY]: workflow.repository.full_name,
+  ...(workflow.conclusion && { [ak.WORKFLOW_CONCLUSION]: workflow.conclusion }),
+  ...(workflow.actor && { [ak.WORKFLOW_ACTOR]: workflow.actor }),
+  ...(workflow.event && { [ak.WORKFLOW_EVENT]: workflow.event }),
+  ...(workflow.head_branch && {
+    [ak.WORKFLOW_HEAD_BRANCH]: workflow.head_branch
+  }),
+  ...(workflow.base_branch && {
+    [ak.WORKFLOW_BASE_BRANCH]: workflow.base_branch
+  }),
   ...(job && { [ak.JOB_NAME]: job.name }),
-  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }) // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+  ...(job && job.conclusion && { [ak.JOB_CONCLUSION]: job.conclusion }), // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+  ...(job && job.runner_name && { [ak.RUNNER_NAME]: job.runner_name }),
+  ...(job &&
+    job.runner_group_name && { [ak.RUNNER_GROUP_NAME]: job.runner_group_name })
 })
 
 export const createWorkflowGauges = (
@@ -36,6 +49,15 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
+
+  // Debug: log the attributes being used
+  core.info(
+    `Workflow metrics attributes: ${JSON.stringify(workflowMetricsAttributes)}`
+  )
+  core.info(
+    `Workflow data - actor: ${workflow.actor}, event: ${workflow.event}, head_branch: ${workflow.head_branch}, base_branch: ${workflow.base_branch}`
+  )
+
   // workflow run context has no end time, so use the latest job's completed_at
   const jobCompletedAtMax = getLatestCompletedAt(workflowRunJobs)
   createGauge(
@@ -44,6 +66,25 @@ export const createWorkflowGauges = (
     workflowMetricsAttributes,
     { unit: 's' }
   )
+
+  // workflow queue duration = time from workflow creation to first job start
+  const jobStartedAtMin = getEarliestStartedAt(workflowRunJobs)
+  const workflowQueuedDuration = calcDiffSec(
+    workflow.created_at,
+    jobStartedAtMin
+  )
+  if (workflowQueuedDuration >= 0) {
+    createGauge(
+      dn.WORKFLOW_QUEUED_DURATION,
+      workflowQueuedDuration,
+      workflowMetricsAttributes,
+      { unit: 's' }
+    )
+  } else {
+    core.notice(
+      `${workflow.name}: Skip creating ${dn.WORKFLOW_QUEUED_DURATION} metric. Queue duration is negative (${workflowQueuedDuration}s), indicating a timing issue.`
+    )
+  }
 }
 
 export const createJobGauges = (
