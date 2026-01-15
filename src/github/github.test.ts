@@ -625,6 +625,10 @@ describe('Type converters', () => {
       created_at: new Date('2023-01-01T00:00:00Z'),
       run_attempt: 1,
       html_url: 'https://github.com/test/repo/actions/runs/12345',
+      actor: null,
+      event: null,
+      head_branch: null,
+      base_branch: null,
       repository: {
         full_name: 'test-owner/test-repo'
       }

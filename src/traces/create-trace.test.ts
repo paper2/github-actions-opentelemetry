@@ -21,7 +21,11 @@ const workflowRunResults: WorkflowResults = {
       full_name: 'paper2/github-actions-opentelemetry'
     },
     conclusion: 'failure',
-    html_url: 'http://example.com/workflow_run'
+    html_url: 'http://example.com/workflow_run',
+    actor: null,
+    event: null,
+    head_branch: null,
+    base_branch: null
   },
   workflowJobs: [
     {
