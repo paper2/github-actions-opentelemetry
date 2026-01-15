@@ -44,6 +44,11 @@ export const createWorkflowGauges = (
   workflowRunJobs: WorkflowJobs
 ): void => {
   const workflowMetricsAttributes = createMetricsAttributes(workflow)
+
+  // Debug: log the attributes being used
+  core.info(`Workflow metrics attributes: ${JSON.stringify(workflowMetricsAttributes)}`)
+  core.info(`Workflow data - actor: ${workflow.actor}, event: ${workflow.event}, head_branch: ${workflow.head_branch}, base_branch: ${workflow.base_branch}`)
+
   // workflow run context has no end time, so use the latest job's completed_at
   const jobCompletedAtMax = getLatestCompletedAt(workflowRunJobs)
   createGauge(
