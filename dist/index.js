@@ -74281,12 +74281,17 @@ const createMetricsAttributes = (workflow, job) => ({
     ...(workflow.conclusion && { [attributeKeys.WORKFLOW_CONCLUSION]: workflow.conclusion }),
     ...(workflow.actor && { [attributeKeys.WORKFLOW_ACTOR]: workflow.actor }),
     ...(workflow.event && { [attributeKeys.WORKFLOW_EVENT]: workflow.event }),
-    ...(workflow.head_branch && { [attributeKeys.WORKFLOW_HEAD_BRANCH]: workflow.head_branch }),
-    ...(workflow.base_branch && { [attributeKeys.WORKFLOW_BASE_BRANCH]: workflow.base_branch }),
+    ...(workflow.head_branch && {
+        [attributeKeys.WORKFLOW_HEAD_BRANCH]: workflow.head_branch
+    }),
+    ...(workflow.base_branch && {
+        [attributeKeys.WORKFLOW_BASE_BRANCH]: workflow.base_branch
+    }),
     ...(job && { [attributeKeys.JOB_NAME]: job.name }),
     ...(job && job.conclusion && { [attributeKeys.JOB_CONCLUSION]: job.conclusion }), // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
     ...(job && job.runner_name && { [attributeKeys.RUNNER_NAME]: job.runner_name }),
-    ...(job && job.runner_group_name && { [attributeKeys.RUNNER_GROUP_NAME]: job.runner_group_name })
+    ...(job &&
+        job.runner_group_name && { [attributeKeys.RUNNER_GROUP_NAME]: job.runner_group_name })
 });
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     const workflowMetricsAttributes = createMetricsAttributes(workflow);
@@ -74475,14 +74480,20 @@ var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7358);
 
 let traceProvider;
 let meterProvider;
-const initialize = (meterExporter, spanExporter) => {
+const initialize = (meterExporter, spanExporter, additionalResourceAttributes) => {
     if (src_settings.logeLevel === 'debug')
         src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
-    initializeMeter(meterExporter);
-    initializeTracer(spanExporter);
+    initializeMeter(meterExporter, additionalResourceAttributes);
+    initializeTracer(spanExporter, additionalResourceAttributes);
 };
-const initializeMeter = (exporter) => {
+const initializeMeter = (exporter, additionalResourceAttributes) => {
     if (src_settings.FeatureFlagMetrics) {
+        // Detect base resource from environment
+        const baseResource = (0,build_src.detectResources)({ detectors: [build_src.envDetector] });
+        // Merge additional workflow attributes into resource
+        const resource = additionalResourceAttributes
+            ? baseResource.merge((0,build_src.resourceFromAttributes)(additionalResourceAttributes))
+            : baseResource;
         meterProvider = new sdk_metrics_build_src.MeterProvider({
             readers: [
                 new sdk_metrics_build_src.PeriodicExportingMetricReader({
@@ -74492,7 +74503,7 @@ const initializeMeter = (exporter) => {
                     exportIntervalMillis: 24 * 60 * 60 * 1000 // 24 hours
                 })
             ],
-            resource: (0,build_src.detectResources)({ detectors: [build_src.envDetector] })
+            resource
         });
     }
     else {
@@ -74503,10 +74514,16 @@ const initializeMeter = (exporter) => {
         throw new Error('setGlobalMeterProvider failed. please check settings or duplicate registration.');
     }
 };
-const initializeTracer = (exporter) => {
+const initializeTracer = (exporter, additionalResourceAttributes) => {
     if (src_settings.FeatureFlagTrace) {
+        // Detect base resource from environment
+        const baseResource = (0,build_src.detectResources)({ detectors: [build_src.envDetector] });
+        // Merge additional workflow attributes into resource
+        const resource = additionalResourceAttributes
+            ? baseResource.merge((0,build_src.resourceFromAttributes)(additionalResourceAttributes))
+            : baseResource;
         traceProvider = new sdk_trace_base_build_src/* BasicTracerProvider */.l({
-            resource: (0,build_src.detectResources)({ detectors: [build_src.envDetector] }),
+            resource,
             spanProcessors: [
                 new sdk_trace_base_build_src/* BatchSpanProcessor */.J(exporter || new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.Q({}))
             ]
@@ -74555,16 +74572,32 @@ const shutdown = async () => {
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
-    // required: run initialize() first.
-    // usually use --required runtime option for first reading.
-    // for simple use this action, this is satisfied on here.
-    initialize();
     let exitCode = 0;
     try {
-        // Create Octokit client and workflow context
+        // Fetch workflow data FIRST before initializing SDK
+        // This allows us to set workflow attributes as resource attributes
         const octokit = createOctokitClient();
         const workflowContext = getWorkflowContext(github.context, settings);
         const results = await fetchWorkflowResults(octokit, workflowContext);
+        // Initialize SDK with workflow data as resource attributes
+        // This ensures they become Prometheus labels
+        const workflowResourceAttributes = {};
+        if (results.workflow.actor) {
+            workflowResourceAttributes['workflow.actor'] = results.workflow.actor;
+        }
+        if (results.workflow.event) {
+            workflowResourceAttributes['workflow.event'] = results.workflow.event;
+        }
+        if (results.workflow.head_branch) {
+            workflowResourceAttributes['workflow.head_branch'] =
+                results.workflow.head_branch;
+        }
+        if (results.workflow.base_branch) {
+            workflowResourceAttributes['workflow.base_branch'] =
+                results.workflow.base_branch;
+        }
+        core.info(`Setting workflow resource attributes: ${JSON.stringify(workflowResourceAttributes)}`);
+        initialize(undefined, undefined, workflowResourceAttributes);
         await createMetrics(results);
         const traceId = await createTrace(results);
         await writeSummaryIfNeeded(traceId);
