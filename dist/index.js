@@ -74043,6 +74043,10 @@ const toWorkflowRun = (workflowRun) => {
         created_at: new Date(workflowRun.created_at),
         run_attempt: workflowRun.run_attempt,
         html_url: workflowRun.html_url,
+        actor: workflowRun.actor?.login || null,
+        event: workflowRun.event || null,
+        head_branch: workflowRun.head_branch || null,
+        base_branch: workflowRun.pull_requests?.[0]?.base?.ref || null,
         repository: {
             full_name: workflowRun.repository.full_name
         }
@@ -74143,6 +74147,13 @@ const getLatestCompletedAt = (jobs) => {
     const maxDateNumber = Math.max(...jobCompletedAtDates.map(Number));
     return new Date(maxDateNumber);
 };
+const getEarliestStartedAt = (jobs) => {
+    if (jobs.length === 0)
+        throw new Error('no jobs found to get earliest started_at date.');
+    const jobStartedAtDates = jobs.map(job => job.started_at);
+    const minDateNumber = Math.min(...jobStartedAtDates.map(Number));
+    return new Date(minDateNumber);
+};
 
 ;// CONCATENATED MODULE: ./src/github/summary.ts
 
@@ -74236,13 +74247,21 @@ const calcDiffSec = (startDate, endDate) => {
 const descriptorNames = {
     JOB_DURATION: 'github.job.duration',
     JOB_QUEUED_DURATION: 'github.job.queued_duration',
-    WORKFLOW_DURATION: 'github.workflow.duration'
+    WORKFLOW_DURATION: 'github.workflow.duration',
+    WORKFLOW_QUEUED_DURATION: 'github.workflow.queued_duration'
 };
 const attributeKeys = {
     REPOSITORY: 'repository',
     WORKFLOW_NAME: 'workflow.name',
+    WORKFLOW_CONCLUSION: 'workflow.conclusion',
+    WORKFLOW_ACTOR: 'workflow.actor',
+    WORKFLOW_EVENT: 'workflow.event',
+    WORKFLOW_HEAD_BRANCH: 'workflow.head_branch',
+    WORKFLOW_BASE_BRANCH: 'workflow.base_branch',
     JOB_NAME: 'job.name',
-    JOB_CONCLUSION: 'job.conclusion'
+    JOB_CONCLUSION: 'job.conclusion',
+    RUNNER_NAME: 'runner.name',
+    RUNNER_GROUP_NAME: 'runner.group_name'
 };
 
 ;// CONCATENATED MODULE: ./src/metrics/create-gauges.ts
@@ -74259,14 +74278,33 @@ const createGauge = (name, value, attributes, option) => {
 const createMetricsAttributes = (workflow, job) => ({
     [attributeKeys.WORKFLOW_NAME]: workflow.name,
     [attributeKeys.REPOSITORY]: workflow.repository.full_name,
+    ...(workflow.conclusion && { [attributeKeys.WORKFLOW_CONCLUSION]: workflow.conclusion }),
+    ...(workflow.actor && { [attributeKeys.WORKFLOW_ACTOR]: workflow.actor }),
+    ...(workflow.event && { [attributeKeys.WORKFLOW_EVENT]: workflow.event }),
+    ...(workflow.head_branch && { [attributeKeys.WORKFLOW_HEAD_BRANCH]: workflow.head_branch }),
+    ...(workflow.base_branch && { [attributeKeys.WORKFLOW_BASE_BRANCH]: workflow.base_branch }),
     ...(job && { [attributeKeys.JOB_NAME]: job.name }),
-    ...(job && job.conclusion && { [attributeKeys.JOB_CONCLUSION]: job.conclusion }) // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+    ...(job && job.conclusion && { [attributeKeys.JOB_CONCLUSION]: job.conclusion }), // conclusion specification: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#check-statuses-and-conclusions
+    ...(job && job.runner_name && { [attributeKeys.RUNNER_NAME]: job.runner_name }),
+    ...(job && job.runner_group_name && { [attributeKeys.RUNNER_GROUP_NAME]: job.runner_group_name })
 });
 const createWorkflowGauges = (workflow, workflowRunJobs) => {
     const workflowMetricsAttributes = createMetricsAttributes(workflow);
+    // Debug: log the attributes being used
+    core.info(`Workflow metrics attributes: ${JSON.stringify(workflowMetricsAttributes)}`);
+    core.info(`Workflow data - actor: ${workflow.actor}, event: ${workflow.event}, head_branch: ${workflow.head_branch}, base_branch: ${workflow.base_branch}`);
     // workflow run context has no end time, so use the latest job's completed_at
     const jobCompletedAtMax = getLatestCompletedAt(workflowRunJobs);
     createGauge(descriptorNames.WORKFLOW_DURATION, calcDiffSec(workflow.created_at, jobCompletedAtMax), workflowMetricsAttributes, { unit: 's' });
+    // workflow queue duration = time from workflow creation to first job start
+    const jobStartedAtMin = getEarliestStartedAt(workflowRunJobs);
+    const workflowQueuedDuration = calcDiffSec(workflow.created_at, jobStartedAtMin);
+    if (workflowQueuedDuration >= 0) {
+        createGauge(descriptorNames.WORKFLOW_QUEUED_DURATION, workflowQueuedDuration, workflowMetricsAttributes, { unit: 's' });
+    }
+    else {
+        core.notice(`${workflow.name}: Skip creating ${descriptorNames.WORKFLOW_QUEUED_DURATION} metric. Queue duration is negative (${workflowQueuedDuration}s), indicating a timing issue.`);
+    }
 };
 const createJobGauges = (workflow, workflowRunJobs) => {
     for (const job of workflowRunJobs) {
