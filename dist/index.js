@@ -73962,6 +73962,7 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 
 
 ;// CONCATENATED MODULE: ./src/github/types.ts
+
 // refer steps.<step_id>.conclusion	https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#steps-context
 const STEP_CONCLUSION_VALUES = [
     'success',
@@ -73975,6 +73976,8 @@ const isStepConclusion = (value) => {
 };
 // Map GitHub Actions API responses to application models
 const toWorkflowStep = (step) => {
+    // GitHub can return steps without conclusion/completed_at even when the job is completed
+    // (eventual consistency). We keep this converter strict, and handle tolerance in toWorkflowJob.
     if (!step.conclusion)
         throw new Error('Step conclusion is required');
     if (!isStepConclusion(step.conclusion))
@@ -74008,6 +74011,18 @@ const toWorkflowJob = (job, eventName) => {
         throw new Error(`Job completed_at is required for job: ${job.name} (id: ${job.id})`);
     if (!job.workflow_name)
         throw new Error(`Job workflow_name is required for job: ${job.name} (id: ${job.id})`);
+    const steps = job.steps
+        ?.map(step => {
+        try {
+            return toWorkflowStep(step);
+        }
+        catch (err) {
+            // Log which job/step caused the conversion to fail (helps diagnose missing conclusion).
+            core.info(`Skipping step due to missing/invalid data: job="${job.name}" (id=${job.id}) step="${step.name}" conclusion=${String(step.conclusion)} started_at=${String(step.started_at)} completed_at=${String(step.completed_at)} error="${err instanceof Error ? err.message : String(err)}"`);
+            return null;
+        }
+    })
+        .filter((s) => s !== null) ?? [];
     return {
         id: job.id,
         name: job.name,
@@ -74018,7 +74033,7 @@ const toWorkflowJob = (job, eventName) => {
         completed_at: new Date(job.completed_at),
         workflow_name: job.workflow_name,
         run_id: job.run_id,
-        steps: job.steps?.map(toWorkflowStep) || [],
+        steps,
         runner_name: job.runner_name,
         runner_group_name: job.runner_group_name
     };
@@ -74057,11 +74072,16 @@ var cjs = __nccwpck_require__(4151);
 
 
 const createOctokitClient = () => {
-    // process.env.GITHUB_TOKEN is used for GitHub Enterprise Server.
     const token = core.getInput('GITHUB_TOKEN') || process.env.GITHUB_TOKEN;
     return new dist_src_Octokit({
         baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
-        auth: token
+        auth: token,
+        log: {
+            debug: (msg) => core.debug(msg),
+            info: (msg) => core.info(msg),
+            warn: (msg) => core.warning(msg),
+            error: (msg) => core.error(msg)
+        }
     });
 };
 const fetchWorkflowResults = async (octokit, workflowContext, delayMs = 1000, maxTry = 10) => {
@@ -74108,13 +74128,68 @@ const fetchWorkflow = async (octokit, workflowContext) => {
     };
 };
 const fetchWorkflowJobs = async (octokit, workflowContext) => {
-    const res = await octokit.rest.actions.listJobsForWorkflowRun({
+    const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
         owner: workflowContext.owner,
         repo: workflowContext.repo,
         run_id: workflowContext.runId,
-        per_page: 100
+        per_page: 50
+    }, response => {
+        // With this overload, `response.data` is typically the array of jobs.
+        // However, Octokit paginate overloads differ, so handle both shapes:
+        // - response.data: WorkflowJobsResponse
+        // - response.data: { jobs: WorkflowJobsResponse }
+        const data = response.data;
+        const pageJobs = Array.isArray(data)
+            ? data
+            : (data.jobs ?? []);
+        core.info(`GET ${response.url} -> ${response.status} (items this page: ${pageJobs.length})`);
+        core.debug(`Response headers: ${JSON.stringify(response.headers)}`);
+        // Debug-print a compact per-job summary.
+        // Note: keep this in debug/info level to avoid log bloat on large runs.
+        // for (const job of pageJobs) {
+        //   core.debug(
+        //     `job: ${JSON.stringify(
+        //       {
+        //         id: job.id,
+        //         name: job.name,
+        //         status: job.status,
+        //         conclusion: job.conclusion,
+        //         created_at: job.created_at,
+        //         started_at: job.started_at,
+        //         completed_at: job.completed_at,
+        //         runner_name: job.runner_name,
+        //         runner_group_name: job.runner_group_name,
+        //         workflow_name: job.workflow_name,
+        //         steps_count: job.steps?.length ?? 0
+        //       },
+        //       null,
+        //       0
+        //     )}`
+        //   )
+        // Print each step's details (name/timing/status) for troubleshooting.
+        // Use debug level to avoid massive logs; enable with ACTIONS_STEP_DEBUG=true.
+        // const steps = job.steps ?? []
+        // for (const step of steps) {
+        //   core.debug(
+        //     `  step: ${JSON.stringify(
+        //       {
+        //         name: step.name,
+        //         number: (step as { number?: number }).number,
+        //         status: step.status,
+        //         conclusion: step.conclusion,
+        //         started_at: step.started_at,
+        //         completed_at: step.completed_at
+        //       },
+        //       null,
+        //       0
+        //     )}`
+        //   )
+        // }
+        // }
+        return pageJobs;
     });
-    return res.data.jobs;
+    core.info(`Fetched ${jobs.length} workflow jobs for run_id=${workflowContext.runId} (per_page=50)`);
+    return jobs;
 };
 const getWorkflowContext = (context, settings) => {
     const owner = settings.owner ?? context.repo.owner;
@@ -74219,7 +74294,40 @@ const createSettings = (env) => ({
         : true,
     logeLevel: env.RUNNER_DEBUG === '1'
         ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-        : env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+        : env.OTEL_LOG_LEVEL || 'info', // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
+    // BatchSpanProcessor tuning (helps prevent dropping spans in large workflows)
+    // https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_sdk_trace_base.BatchSpanProcessorConfig.html
+    traceBatch: {
+        // Max spans buffered before being dropped.
+        maxQueueSize: env.OTEL_BSP_MAX_QUEUE_SIZE
+            ? parseInt(env.OTEL_BSP_MAX_QUEUE_SIZE)
+            : 1000,
+        // Max spans per export call. Must be <= maxQueueSize.
+        maxExportBatchSize: env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE
+            ? parseInt(env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE)
+            : 128,
+        // How often the batch processor attempts to export.
+        scheduledDelayMillis: env.OTEL_BSP_SCHEDULED_DELAY_MILLIS
+            ? parseInt(env.OTEL_BSP_SCHEDULED_DELAY_MILLIS)
+            : 10,
+        // Timeout for an export call.
+        exportTimeoutMillis: env.OTEL_BSP_EXPORT_TIMEOUT_MILLIS
+            ? parseInt(env.OTEL_BSP_EXPORT_TIMEOUT_MILLIS)
+            : 180
+    },
+    // OTLP exporter concurrency limit (in-flight export requests). If you see
+    // 'Concurrent export limit reached', lower the batch processor aggressiveness
+    // or increase this if the network/collector can handle it.
+    otlp: {
+        tracesConcurrencyLimit: env.OTEL_EXPORTER_OTLP_TRACES_CONCURRENCY_LIMIT
+            ? parseInt(env.OTEL_EXPORTER_OTLP_TRACES_CONCURRENCY_LIMIT)
+            : 1
+    },
+    // When enabled, the action will count exactly how many spans were ended/exported
+    // by installing an additional SpanProcessor. Useful to verify large workflows.
+    FeatureFlagExactSpanCount: env.OTEL_EXACT_SPAN_COUNT
+        ? env.OTEL_EXACT_SPAN_COUNT.toLowerCase() === 'true'
+        : true
 });
 const settings = createSettings(process.env);
 /* harmony default export */ const src_settings = (settings);
@@ -74321,18 +74429,23 @@ const createWorkflowJobSpan = (ctx, job) => {
     if (!job.completed_at) {
         throw new Error(`Job completed_at is required for span creation: ${job.name} (id: ${job.id})`);
     }
-    const spanWithWaiting = createSpan(ctx, `${job.name} with time of waiting runner`, job.created_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) });
+    const spanWithWaitingName = `${job.name} with time of waiting runner`;
+    const spanWithWaitingAttrs = { ...buildWorkflowJobAttributes(job) };
+    const spanWithWaiting = createSpan(ctx, spanWithWaitingName, job.created_at, job.completed_at, job.conclusion, spanWithWaitingAttrs);
     const ctxWithWaiting = src.trace.setSpan(ctx, spanWithWaiting);
     const waitingSpanName = `waiting runner for ${job.name}`;
     const jobQueuedDuration = calcDiffSec(job.created_at, job.started_at);
     if (jobQueuedDuration >= 0) {
-        createSpan(ctxWithWaiting, waitingSpanName, job.created_at, job.started_at, 'success', // waiting runner is not a error.
-        { ...buildWorkflowJobAttributes(job) });
+        const waitingAttrs = { ...buildWorkflowJobAttributes(job) };
+        const waitingSpan = createSpan(ctxWithWaiting, waitingSpanName, job.created_at, job.started_at, 'success', // waiting runner is not a error.
+        waitingAttrs);
     }
     else {
-        core.notice(`${job.name}: Skip to create "${waitingSpanName}" span. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`);
+        core.info(`${job.name}: Skip to create "${waitingSpanName}" span. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`);
     }
-    const jobSpan = createSpan(ctxWithWaiting, job.name, job.started_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) });
+    const jobAttrs = { ...buildWorkflowJobAttributes(job) };
+    const jobSpanName = job.name;
+    const jobSpan = createSpan(ctxWithWaiting, jobSpanName, job.started_at, job.completed_at, job.conclusion, jobAttrs);
     return src.trace.setSpan(ctxWithWaiting, jobSpan);
 };
 const createWorkflowRunStepSpan = (ctx, job) => {
@@ -74388,6 +74501,7 @@ const buildWorkflowJobAttributes = (job) => ({
 
 
 
+
 const createTrace = async (results) => {
     if (!src_settings.FeatureFlagTrace) {
         console.log('trace feature is disabled.');
@@ -74395,6 +74509,8 @@ const createTrace = async (results) => {
     }
     try {
         const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results;
+        // Info log so it shows up without debug flags.
+        core.info(`About to create spans for ${workflowRunJobs.length} workflow jobs (and their steps) for run_id=${workflowRun.id}`);
         const rootCtx = createWorkflowTrace(workflowRun, workflowRunJobs);
         for (const job of workflowRunJobs) {
             const jobCtx = createWorkflowJobSpan(rootCtx, job);
@@ -74427,7 +74543,161 @@ var sdk_metrics_build_src = __nccwpck_require__(9174);
 var sdk_trace_base_build_src = __nccwpck_require__(4952);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-trace-otlp-proto/build/src/index.js
 var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7358);
+;// CONCATENATED MODULE: ./src/instrumentation/serialized-span-exporter.ts
+
+/**
+ * Serializes export calls so an underlying OTLP exporter never has more than one
+ * in-flight export at a time.
+ *
+ * This is a defensive workaround for "Concurrent export limit reached" errors
+ * that can happen when BatchSpanProcessor triggers overlapping exports
+ * (timer flush + forceFlush/shutdown).
+ */
+class SerializedSpanExporter {
+    exporter;
+    chain = Promise.resolve();
+    constructor(exporter) {
+        this.exporter = exporter;
+    }
+    export(spans, resultCallback) {
+        this.chain = this.chain
+            .then(async () => new Promise(resolve => {
+            this.exporter.export(spans, result => {
+                resultCallback(result);
+                resolve();
+            });
+        }))
+            .catch(err => {
+            src.diag.error('SerializedSpanExporter export failed', err);
+        });
+    }
+    async shutdown() {
+        await this.chain;
+        await this.exporter.shutdown();
+    }
+    async forceFlush() {
+        const maybeForceFlush = this.exporter.forceFlush;
+        await this.chain;
+        if (maybeForceFlush)
+            await maybeForceFlush();
+    }
+}
+
+;// CONCATENATED MODULE: ./src/instrumentation/span-counter.ts
+
+/**
+ * Captures an exact count of spans produced by this process.
+ *
+ * - `ended` is the most important number: each ended span is a span the SDK will
+ *   attempt to export.
+ * - `exported` counts spans passed to the exporter (after batching). If this is
+ *   lower than `ended`, something prevented exporting some spans.
+ */
+class SpanCounter {
+    started = 0;
+    ended = 0;
+    exported = 0;
+    exportCalls = 0;
+    exportCallsSucceeded = 0;
+    exportCallsFailed = 0;
+    exportedSucceeded = 0;
+    exportedFailed = 0;
+    onStart() {
+        this.started++;
+    }
+    onEnd() {
+        this.ended++;
+    }
+    onExportCall(batchSize) {
+        this.exportCalls++;
+        this.exported += batchSize;
+    }
+    onExportResult(batchSize, ok) {
+        if (ok) {
+            this.exportCallsSucceeded++;
+            this.exportedSucceeded += batchSize;
+        }
+        else {
+            this.exportCallsFailed++;
+            this.exportedFailed += batchSize;
+        }
+    }
+    snapshot() {
+        const dropped = Math.max(0, this.ended - this.exported);
+        return {
+            started: this.started,
+            ended: this.ended,
+            exported: this.exported,
+            dropped,
+            exportCalls: this.exportCalls,
+            exportCallsSucceeded: this.exportCallsSucceeded,
+            exportCallsFailed: this.exportCallsFailed,
+            exportedSucceeded: this.exportedSucceeded,
+            exportedFailed: this.exportedFailed
+        };
+    }
+}
+class CountingSpanProcessor {
+    counter;
+    constructor(counter) {
+        this.counter = counter;
+    }
+    onStart() {
+        this.counter.onStart();
+    }
+    onEnd() {
+        this.counter.onEnd();
+    }
+    async forceFlush() {
+        // Nothing buffered here
+    }
+    async shutdown() {
+        // Nothing to shutdown
+    }
+}
+const isExportSuccess = (result) => {
+    // OpenTelemetry JS exporters usually return { code: ExportResultCode, error? }
+    // but we keep this defensive so it works across versions/transpilation.
+    if (result == null)
+        return false;
+    if (typeof result !== 'object')
+        return false;
+    const maybeCode = result.code;
+    // Most common: ExportResultCode.SUCCESS === 0
+    if (typeof maybeCode === 'number')
+        return maybeCode === 0;
+    // Fallbacks seen in some wrappers
+    if (typeof maybeCode === 'string') {
+        return maybeCode.toUpperCase() === 'SUCCESS';
+    }
+    return false;
+};
+/**
+ * Wraps an exporter and records how many spans were handed to it.
+ */
+const wrapExporterWithCounting = (exporter, counter) => {
+    const originalExport = exporter.export.bind(exporter);
+    exporter.export = (spans, cb) => {
+        const batchSize = spans.length;
+        counter.onExportCall(batchSize);
+        return originalExport(spans, result => {
+            const ok = isExportSuccess(result);
+            counter.onExportResult(batchSize, ok);
+            if (!ok) {
+                src.diag.error(`Exporter reported failure for batch size=${batchSize}`, result);
+            }
+            else {
+                src.diag.debug(`Exporter succeeded for batch size=${batchSize}`);
+            }
+            cb(result);
+        });
+    };
+    return exporter;
+};
+
 ;// CONCATENATED MODULE: ./src/instrumentation/instrumentation.ts
+
+
 
 
 
@@ -74437,6 +74707,7 @@ var exporter_trace_otlp_proto_build_src = __nccwpck_require__(7358);
 
 let traceProvider;
 let meterProvider;
+let spanCounter;
 const initialize = (meterExporter, spanExporter) => {
     if (src_settings.logeLevel === 'debug')
         src.diag.setLogger(new src.DiagConsoleLogger(), src.DiagLogLevel.DEBUG);
@@ -74467,11 +74738,59 @@ const initializeMeter = (exporter) => {
 };
 const initializeTracer = (exporter) => {
     if (src_settings.FeatureFlagTrace) {
+        const traceBatch = src_settings.traceBatch;
+        // Guard against misconfiguration that can cause unexpected behavior.
+        // In OpenTelemetry JS, maxExportBatchSize must be <= maxQueueSize.
+        const maxQueueSize = Number.isFinite(traceBatch.maxQueueSize)
+            ? traceBatch.maxQueueSize
+            : 100000;
+        const maxExportBatchSize = Number.isFinite(traceBatch.maxExportBatchSize)
+            ? traceBatch.maxExportBatchSize
+            : 512;
+        const safeMaxQueueSize = maxQueueSize > 0 ? maxQueueSize : 100000;
+        const safeMaxExportBatchSize = maxExportBatchSize > 0
+            ? Math.min(maxExportBatchSize, safeMaxQueueSize)
+            : Math.min(512, safeMaxQueueSize);
+        const scheduledDelayMillis = Number.isFinite(traceBatch.scheduledDelayMillis) &&
+            traceBatch.scheduledDelayMillis > 0
+            ? Math.max(traceBatch.scheduledDelayMillis, 30000)
+            : 30000;
+        const exportTimeoutMillis = Number.isFinite(traceBatch.exportTimeoutMillis) &&
+            traceBatch.exportTimeoutMillis > 0
+            ? traceBatch.exportTimeoutMillis
+            : 120000;
+        const configuredConcurrencyLimit = Number.isFinite(src_settings.otlp?.tracesConcurrencyLimit) &&
+            src_settings.otlp.tracesConcurrencyLimit > 0
+            ? src_settings.otlp.tracesConcurrencyLimit
+            : 1;
+        const baseTraceExporterRaw = exporter ||
+            new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.Q({
+                concurrencyLimit: configuredConcurrencyLimit
+            });
+        if (src_settings.FeatureFlagExactSpanCount) {
+            spanCounter = new SpanCounter();
+        }
+        const baseTraceExporter = spanCounter != null
+            ? wrapExporterWithCounting(baseTraceExporterRaw, spanCounter)
+            : baseTraceExporterRaw;
+        const traceExporter = new SerializedSpanExporter(baseTraceExporter);
+        src.diag.info(`Trace exporter config: OTLPTraceExporter(concurrencyLimit=${configuredConcurrencyLimit}) + SerializedSpanExporter`);
+        src.diag.info(`BatchSpanProcessor config: maxQueueSize=${safeMaxQueueSize}, maxExportBatchSize=${safeMaxExportBatchSize}, scheduledDelayMillis=${scheduledDelayMillis}, exportTimeoutMillis=${exportTimeoutMillis}`);
+        const spanProcessors = [
+            new sdk_trace_base_build_src/* BatchSpanProcessor */.J(traceExporter, {
+                maxQueueSize: safeMaxQueueSize,
+                maxExportBatchSize: safeMaxExportBatchSize,
+                scheduledDelayMillis,
+                exportTimeoutMillis
+            })
+        ];
+        if (spanCounter != null) {
+            spanProcessors.unshift(new CountingSpanProcessor(spanCounter));
+            src.diag.info('Exact span counting is ENABLED (OTEL_EXACT_SPAN_COUNT=true)');
+        }
         traceProvider = new sdk_trace_base_build_src/* BasicTracerProvider */.l({
             resource: (0,build_src.detectResources)({ detectors: [build_src.envDetector] }),
-            spanProcessors: [
-                new sdk_trace_base_build_src/* BatchSpanProcessor */.J(exporter || new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.Q({}))
-            ]
+            spanProcessors
         });
     }
     else {
@@ -74500,11 +74819,13 @@ const shutdown = async () => {
     await meterProvider.shutdown();
     await traceProvider.shutdown();
 };
+const getSpanCountSnapshot = () => spanCounter?.snapshot();
 
 ;// CONCATENATED MODULE: ./src/instrumentation/index.ts
 
 
 ;// CONCATENATED MODULE: ./src/main.ts
+
 
 
 
@@ -74522,13 +74843,18 @@ async function run() {
     // for simple use this action, this is satisfied on here.
     initialize();
     let exitCode = 0;
+    let results;
     try {
         // Create Octokit client and workflow context
         const octokit = createOctokitClient();
         const workflowContext = getWorkflowContext(github.context, settings);
-        const results = await fetchWorkflowResults(octokit, workflowContext);
+        results = await fetchWorkflowResults(octokit, workflowContext);
         await createMetrics(results);
         const traceId = await createTrace(results);
+        const afterCreateTrace = getSpanCountSnapshot();
+        if (afterCreateTrace && settings.FeatureFlagTrace) {
+            core.info(`Exact span count (after-createTrace): started=${afterCreateTrace.started}, ended=${afterCreateTrace.ended}, exported=${afterCreateTrace.exported}, dropped=${afterCreateTrace.dropped}, exportCalls=${afterCreateTrace.exportCalls}, exportCallsFailed=${afterCreateTrace.exportCallsFailed}, exportedFailed=${afterCreateTrace.exportedFailed}`);
+        }
         await writeSummaryIfNeeded(traceId);
     }
     catch (error) {
@@ -74538,10 +74864,33 @@ async function run() {
         exitCode = 1;
     }
     try {
+        if (results && settings.FeatureFlagTrace) {
+            const jobs = results.workflowJobs ?? [];
+            const stepCount = jobs.reduce((acc, job) => acc + (job.steps?.length ?? 0), 0);
+            // Rough estimate of spans created by this action:
+            // - 1 workflow(root) span
+            // - 2 spans per job (job + "with waiting")
+            // - +1 waiting span per job (if created; can be skipped when timestamps are invalid)
+            // - +1 span per step (if step timestamps/conclusion are valid)
+            const estimatedSpans = 1 + jobs.length * 3 + stepCount;
+            core.info(`About to export spans: jobs=${jobs.length}, steps=${stepCount}, estimatedSpans=${estimatedSpans}`);
+            const snapshot = getSpanCountSnapshot();
+            if (snapshot) {
+                core.info(`Exact span count (pre-flush): started=${snapshot.started}, ended=${snapshot.ended}, exported=${snapshot.exported}, dropped=${snapshot.dropped}, exportCalls=${snapshot.exportCalls}, exportCallsFailed=${snapshot.exportCallsFailed}, exportedFailed=${snapshot.exportedFailed}`);
+            }
+        }
         await forceFlush();
         console.log('Providers force flush successfully.');
+        const afterFlush = getSpanCountSnapshot();
+        if (afterFlush) {
+            core.info(`Exact span count (post-flush): started=${afterFlush.started}, ended=${afterFlush.ended}, exported=${afterFlush.exported}, dropped=${afterFlush.dropped}, exportCalls=${afterFlush.exportCalls}, exportCallsFailed=${afterFlush.exportCallsFailed}, exportedFailed=${afterFlush.exportedFailed}`);
+        }
         await shutdown();
         console.log('Providers shutdown successfully.');
+        const afterShutdown = getSpanCountSnapshot();
+        if (afterShutdown) {
+            core.info(`Exact span count (post-shutdown): started=${afterShutdown.started}, ended=${afterShutdown.ended}, exported=${afterShutdown.exported}, dropped=${afterShutdown.dropped}, exportCalls=${afterShutdown.exportCalls}, exportCallsFailed=${afterShutdown.exportCallsFailed}, exportedFailed=${afterShutdown.exportedFailed}`);
+        }
     }
     catch (error) {
         if (error instanceof Error)

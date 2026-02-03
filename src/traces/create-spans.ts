@@ -34,43 +34,46 @@ export const createWorkflowJobSpan = (
       `Job completed_at is required for span creation: ${job.name} (id: ${job.id})`
     )
   }
-
+  const spanWithWaitingName = `${job.name} with time of waiting runner`
+  const spanWithWaitingAttrs = { ...buildWorkflowJobAttributes(job) }
   const spanWithWaiting = createSpan(
     ctx,
-    `${job.name} with time of waiting runner`,
+    spanWithWaitingName,
     job.created_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowJobAttributes(job) }
+    spanWithWaitingAttrs
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
   const waitingSpanName = `waiting runner for ${job.name}`
   const jobQueuedDuration = calcDiffSec(job.created_at, job.started_at)
   if (jobQueuedDuration >= 0) {
-    createSpan(
+    const waitingAttrs = { ...buildWorkflowJobAttributes(job) }
+    const waitingSpan = createSpan(
       ctxWithWaiting,
       waitingSpanName,
       job.created_at,
       job.started_at,
       'success', // waiting runner is not a error.
-      { ...buildWorkflowJobAttributes(job) }
+      waitingAttrs
     )
   } else {
-    core.notice(
+    core.info(
       `${job.name}: Skip to create "${waitingSpanName}" span. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`
     )
   }
 
+  const jobAttrs = { ...buildWorkflowJobAttributes(job) }
+  const jobSpanName = job.name
   const jobSpan = createSpan(
     ctxWithWaiting,
-    job.name,
+    jobSpanName,
     job.started_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowJobAttributes(job) }
+    jobAttrs
   )
-
   return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
 }
 
@@ -89,6 +92,8 @@ export const createWorkflowRunStepSpan = (
       ctx,
       step.name,
       step.started_at,
+
+
       step.completed_at,
       step.conclusion,
       {}

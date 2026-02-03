@@ -9,13 +9,21 @@ import * as opentelemetry from '@opentelemetry/api'
 import {
   SpanExporter,
   BasicTracerProvider,
-  BatchSpanProcessor
+  BatchSpanProcessor,
+  SpanProcessor
 } from '@opentelemetry/sdk-trace-base'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto'
 import settings from '../settings.js'
+import { SerializedSpanExporter } from './serialized-span-exporter.js'
+import {
+  CountingSpanProcessor,
+  SpanCounter,
+  wrapExporterWithCounting
+} from './span-counter.js'
 
 let traceProvider: BasicTracerProvider
 let meterProvider: MeterProvider
+let spanCounter: SpanCounter | undefined
 
 export const initialize = (
   meterExporter?: PushMetricExporter,
@@ -56,11 +64,83 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 
 const initializeTracer = (exporter?: SpanExporter): void => {
   if (settings.FeatureFlagTrace) {
+    const traceBatch = settings.traceBatch
+
+    // Guard against misconfiguration that can cause unexpected behavior.
+    // In OpenTelemetry JS, maxExportBatchSize must be <= maxQueueSize.
+    const maxQueueSize = Number.isFinite(traceBatch.maxQueueSize)
+      ? traceBatch.maxQueueSize
+      : 100000
+    const maxExportBatchSize = Number.isFinite(traceBatch.maxExportBatchSize)
+      ? traceBatch.maxExportBatchSize
+      : 512
+
+    const safeMaxQueueSize = maxQueueSize > 0 ? maxQueueSize : 100000
+    const safeMaxExportBatchSize =
+      maxExportBatchSize > 0
+        ? Math.min(maxExportBatchSize, safeMaxQueueSize)
+        : Math.min(512, safeMaxQueueSize)
+
+    const scheduledDelayMillis =
+      Number.isFinite(traceBatch.scheduledDelayMillis) &&
+      traceBatch.scheduledDelayMillis > 0
+        ? Math.max(traceBatch.scheduledDelayMillis, 30000)
+        : 30000
+    const exportTimeoutMillis =
+      Number.isFinite(traceBatch.exportTimeoutMillis) &&
+      traceBatch.exportTimeoutMillis > 0
+        ? traceBatch.exportTimeoutMillis
+        : 120000
+
+    const configuredConcurrencyLimit =
+      Number.isFinite(settings.otlp?.tracesConcurrencyLimit) &&
+      settings.otlp.tracesConcurrencyLimit > 0
+        ? settings.otlp.tracesConcurrencyLimit
+        : 1
+
+    const baseTraceExporterRaw =
+      exporter ||
+      new OTLPTraceExporter({
+        concurrencyLimit: configuredConcurrencyLimit
+      })
+
+    if (settings.FeatureFlagExactSpanCount) {
+      spanCounter = new SpanCounter()
+    }
+
+    const baseTraceExporter =
+      spanCounter != null
+        ? wrapExporterWithCounting(baseTraceExporterRaw, spanCounter)
+        : baseTraceExporterRaw
+
+    const traceExporter = new SerializedSpanExporter(baseTraceExporter)
+
+    opentelemetry.diag.info(
+      `Trace exporter config: OTLPTraceExporter(concurrencyLimit=${configuredConcurrencyLimit}) + SerializedSpanExporter`
+    )
+    opentelemetry.diag.info(
+      `BatchSpanProcessor config: maxQueueSize=${safeMaxQueueSize}, maxExportBatchSize=${safeMaxExportBatchSize}, scheduledDelayMillis=${scheduledDelayMillis}, exportTimeoutMillis=${exportTimeoutMillis}`
+    )
+
+    const spanProcessors: SpanProcessor[] = [
+      new BatchSpanProcessor(traceExporter, {
+        maxQueueSize: safeMaxQueueSize,
+        maxExportBatchSize: safeMaxExportBatchSize,
+        scheduledDelayMillis,
+        exportTimeoutMillis
+      })
+    ]
+
+    if (spanCounter != null) {
+      spanProcessors.unshift(new CountingSpanProcessor(spanCounter))
+      opentelemetry.diag.info(
+        'Exact span counting is ENABLED (OTEL_EXACT_SPAN_COUNT=true)'
+      )
+    }
+
     traceProvider = new BasicTracerProvider({
       resource: detectResources({ detectors: [envDetector] }),
-      spanProcessors: [
-        new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))
-      ]
+      spanProcessors
     })
   } else {
     traceProvider = new BasicTracerProvider()
@@ -93,3 +173,7 @@ export const shutdown = async (): Promise<void> => {
   await meterProvider.shutdown()
   await traceProvider.shutdown()
 }
+
+export const getSpanCountSnapshot = ():
+  | ReturnType<SpanCounter['snapshot']>
+  | undefined => spanCounter?.snapshot()

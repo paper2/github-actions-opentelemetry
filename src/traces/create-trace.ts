@@ -6,6 +6,7 @@ import {
   createWorkflowRunStepSpan
 } from './create-spans.js'
 import * as opentelemetry from '@opentelemetry/api'
+import * as core from '@actions/core'
 
 export const createTrace = async (
   results: WorkflowResults
@@ -17,6 +18,12 @@ export const createTrace = async (
 
   try {
     const { workflow: workflowRun, workflowJobs: workflowRunJobs } = results
+
+    // Info log so it shows up without debug flags.
+    core.info(
+      `About to create spans for ${workflowRunJobs.length} workflow jobs (and their steps) for run_id=${workflowRun.id}`
+    )
+
     const rootCtx = createWorkflowTrace(workflowRun, workflowRunJobs)
     for (const job of workflowRunJobs) {
       const jobCtx = createWorkflowJobSpan(rootCtx, job)

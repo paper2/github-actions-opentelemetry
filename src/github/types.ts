@@ -1,5 +1,6 @@
 import { Endpoints } from '@octokit/types'
 import { context } from '@actions/github'
+import * as core from '@actions/core'
 
 // Define types for GitHub Actions workflow run and job responses
 export type WorkflowResponse =
@@ -78,6 +79,8 @@ export type GitHubContext = typeof context
 
 // Map GitHub Actions API responses to application models
 export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
+  // GitHub can return steps without conclusion/completed_at even when the job is completed
+  // (eventual consistency). We keep this converter strict, and handle tolerance in toWorkflowJob.
   if (!step.conclusion) throw new Error('Step conclusion is required')
   if (!isStepConclusion(step.conclusion))
     throw new Error(`Invalid step conclusion: ${step.conclusion}`)
@@ -91,6 +94,7 @@ export const toWorkflowStep = (step: WorkflowStepResponse): WorkflowStep => {
     completed_at: new Date(step.completed_at)
   }
 }
+
 export const toWorkflowJob = (
   job: WorkflowJobResponse,
   eventName: string
@@ -119,6 +123,21 @@ export const toWorkflowJob = (
       `Job workflow_name is required for job: ${job.name} (id: ${job.id})`
     )
 
+  const steps: WorkflowStep[] =
+    job.steps
+      ?.map(step => {
+        try {
+          return toWorkflowStep(step)
+        } catch (err) {
+          // Log which job/step caused the conversion to fail (helps diagnose missing conclusion).
+          core.info(
+            `Skipping step due to missing/invalid data: job="${job.name}" (id=${job.id}) step="${step.name}" conclusion=${String(step.conclusion)} started_at=${String(step.started_at)} completed_at=${String(step.completed_at)} error="${err instanceof Error ? err.message : String(err)}"`
+          )
+          return null
+        }
+      })
+      .filter((s): s is WorkflowStep => s !== null) ?? []
+
   return {
     id: job.id,
     name: job.name,
@@ -129,7 +148,7 @@ export const toWorkflowJob = (
     completed_at: new Date(job.completed_at),
     workflow_name: job.workflow_name,
     run_id: job.run_id,
-    steps: job.steps?.map(toWorkflowStep) || [],
+    steps,
     runner_name: job.runner_name,
     runner_group_name: job.runner_group_name
   }

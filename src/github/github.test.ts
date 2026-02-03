@@ -20,7 +20,11 @@ describe('fetchWorkflowResults', () => {
   // Tips: If API limit exceed, authenticate by using below command
   //       $ export GITHUB_TOKEN=`gh auth token`
   test('should fetch results using real api', async () => {
-    // not test retry because it needs mock of checkCompleted but it affects correct test case.
+    // Skip unless a token exists. This test hits the real GitHub API.
+    if (!process.env.GITHUB_TOKEN) {
+      return
+    }
+
     const octokit = createOctokitClient()
     const workflowContext = getWorkflowContext(github.context, settings)
     await expect(
@@ -31,6 +35,9 @@ describe('fetchWorkflowResults', () => {
   test('should handle fetchWorkflowResults error and retry', async () => {
     // Create a mock Octokit that fails
     const mockOctokit = {
+      paginate: async () => {
+        throw new Error('API Error')
+      },
       rest: {
         actions: {
           getWorkflowRunAttempt: async () => {
@@ -53,6 +60,31 @@ describe('fetchWorkflowResults', () => {
   test('should handle no completed jobs found error', async () => {
     // Create a mock Octokit that returns workflow but no completed jobs
     const mockOctokit = {
+      paginate: async (
+        _route: unknown,
+        _options: unknown,
+        mapFn: (response: { data: { jobs: unknown[] } }) => unknown[]
+      ) => {
+        return mapFn({
+          data: {
+            jobs: [
+              // Return jobs that will be filtered out (not completed)
+              {
+                id: 1,
+                name: 'test-job',
+                status: 'in_progress',
+                conclusion: null,
+                created_at: '2023-01-01T00:00:00Z',
+                started_at: '2023-01-01T00:01:00Z',
+                completed_at: null,
+                workflow_name: 'Test Workflow',
+                run_id: 12345,
+                steps: []
+              }
+            ]
+          }
+        })
+      },
       rest: {
         actions: {
           getWorkflowRunAttempt: async () => ({
@@ -70,25 +102,7 @@ describe('fetchWorkflowResults', () => {
               event: 'push'
             }
           }),
-          listJobsForWorkflowRun: async () => ({
-            data: {
-              jobs: [
-                // Return jobs that will be filtered out (not completed)
-                {
-                  id: 1,
-                  name: 'test-job',
-                  status: 'in_progress',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                }
-              ]
-            }
-          })
+          listJobsForWorkflowRun: vi.fn()
         }
       }
     } as unknown as Octokit
@@ -103,6 +117,57 @@ describe('fetchWorkflowResults', () => {
   test('should filter incomplete jobs and process completed ones for non-workflow_run events', async () => {
     // Create a mock Octokit that returns workflow with mixed job statuses
     const mockOctokit = {
+      paginate: async (
+        _route: unknown,
+        _options: unknown,
+        mapFn: (response: { data: { jobs: unknown[] } }) => unknown[]
+      ) => {
+        return mapFn({
+          data: {
+            jobs: [
+              // Completed job - should be included
+              {
+                id: 1,
+                name: 'completed-job',
+                status: 'completed',
+                conclusion: 'success',
+                created_at: '2023-01-01T00:00:00Z',
+                started_at: '2023-01-01T00:01:00Z',
+                completed_at: '2023-01-01T00:05:00Z',
+                workflow_name: 'Test Workflow',
+                run_id: 12345,
+                steps: []
+              },
+              // In-progress job - should be filtered out
+              {
+                id: 2,
+                name: 'in-progress-job',
+                status: 'in_progress',
+                conclusion: null,
+                created_at: '2023-01-01T00:00:00Z',
+                started_at: '2023-01-01T00:01:00Z',
+                completed_at: null,
+                workflow_name: 'Test Workflow',
+                run_id: 12345,
+                steps: []
+              },
+              // Queued job - should be filtered out
+              {
+                id: 3,
+                name: 'queued-job',
+                status: 'queued',
+                conclusion: null,
+                created_at: '2023-01-01T00:00:00Z',
+                started_at: null,
+                completed_at: null,
+                workflow_name: 'Test Workflow',
+                run_id: 12345,
+                steps: []
+              }
+            ]
+          }
+        })
+      },
       rest: {
         actions: {
           getWorkflowRunAttempt: async () => ({
@@ -120,51 +185,7 @@ describe('fetchWorkflowResults', () => {
               event: 'push'
             }
           }),
-          listJobsForWorkflowRun: async () => ({
-            data: {
-              jobs: [
-                // Completed job - should be included
-                {
-                  id: 1,
-                  name: 'completed-job',
-                  status: 'completed',
-                  conclusion: 'success',
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: '2023-01-01T00:05:00Z',
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                },
-                // In-progress job - should be filtered out
-                {
-                  id: 2,
-                  name: 'in-progress-job',
-                  status: 'in_progress',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                },
-                // Queued job - should be filtered out
-                {
-                  id: 3,
-                  name: 'queued-job',
-                  status: 'queued',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: null,
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                }
-              ]
-            }
-          })
+          listJobsForWorkflowRun: vi.fn()
         }
       }
     } as unknown as Octokit
@@ -182,6 +203,92 @@ describe('fetchWorkflowResults', () => {
     expect(result.workflowJobs).toHaveLength(1)
     expect(result.workflowJobs[0].name).toBe('completed-job')
     expect(result.workflowJobs[0].status).toBe('completed')
+    expect(result.workflow.name).toBe('Test Workflow')
+  })
+
+  test('should fetch workflow jobs using pagination (multiple pages)', async () => {
+    const workflowRunId = 12345
+
+    const page1Jobs = [
+      {
+        id: 1,
+        name: 'job-page-1',
+        status: 'completed',
+        conclusion: 'success',
+        created_at: '2023-01-01T00:00:00Z',
+        started_at: '2023-01-01T00:01:00Z',
+        completed_at: '2023-01-01T00:02:00Z',
+        workflow_name: 'Test Workflow',
+        run_id: workflowRunId,
+        steps: []
+      }
+    ]
+
+    const page2Jobs = [
+      {
+        id: 2,
+        name: 'job-page-2',
+        status: 'completed',
+        conclusion: 'success',
+        created_at: '2023-01-01T00:00:00Z',
+        started_at: '2023-01-01T00:02:00Z',
+        completed_at: '2023-01-01T00:03:00Z',
+        workflow_name: 'Test Workflow',
+        run_id: workflowRunId,
+        steps: []
+      }
+    ]
+
+    const paginate = vi.fn(async (_route, options, mapFn) => {
+      expect(options).toMatchObject({ run_id: workflowRunId })
+      const mapped1 = mapFn({ data: { jobs: page1Jobs } })
+      const mapped2 = mapFn({ data: { jobs: page2Jobs } })
+      return [...mapped1, ...mapped2]
+    })
+
+    const mockOctokit = {
+      paginate,
+      rest: {
+        actions: {
+          getWorkflowRunAttempt: async () => ({
+            data: {
+              id: workflowRunId,
+              name: 'Test Workflow',
+              status: 'completed',
+              conclusion: 'success',
+              created_at: '2023-01-01T00:00:00Z',
+              run_attempt: 1,
+              html_url: `https://github.com/test/repo/actions/runs/${workflowRunId}`,
+              repository: {
+                full_name: 'test-owner/test-repo'
+              },
+              event: 'push'
+            }
+          }),
+          listJobsForWorkflowRun: vi.fn()
+        }
+      }
+    } as unknown as Octokit
+
+    const workflowContext = {
+      owner: 'test-owner',
+      repo: 'test-repo',
+      runId: workflowRunId,
+      attempt_number: 1
+    }
+
+    const result = await fetchWorkflowResults(
+      mockOctokit,
+      workflowContext,
+      0,
+      1
+    )
+
+    expect(paginate).toHaveBeenCalledTimes(1)
+    expect(result.workflowJobs.map(j => j.name)).toEqual([
+      'job-page-1',
+      'job-page-2'
+    ])
     expect(result.workflow.name).toBe('Test Workflow')
   })
 })
