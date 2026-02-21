@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   many-jobs:
-    name: Pagination Test Job ${{ matrix.job-number }}
+    name: Many Test Job ${{ matrix.job-number }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -233,6 +233,6 @@ jobs:
       retention-days: 5
       validate-traces: false
       validate-metrics: false
-      validate-job-count: true
       expected-job-count: 200
+      expected-job-name-pattern: 'Many Test Job'
     secrets: inherit
