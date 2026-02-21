@@ -84,14 +84,14 @@ jobs:
           # Extract job spans from traces (spans with name starting with "job:")
           JOB_COUNT=$(jq '[.resourceSpans[]?.scopeSpans[]?.spans[]? | select(.name | startswith("job:"))] | length' collector-logs/traces-exported-original.json)
           echo "Found $JOB_COUNT job spans in traces"
-          
+
           # We expect 200 jobs from the matrix
           if [ "$JOB_COUNT" -lt 200 ]; then
             echo "✗ Expected at least 200 job spans, but found only $JOB_COUNT"
             echo "This indicates pagination is not working correctly"
             exit 1
           fi
-          
+
           echo "✓ Successfully collected telemetry for $JOB_COUNT jobs (pagination working)"
 
       # Upload collector logs as GitHub artifact for debugging

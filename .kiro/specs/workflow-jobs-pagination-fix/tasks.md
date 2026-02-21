@@ -37,11 +37,17 @@
     pagination fix
   - _Requirements: Code cleanup and maintainability_
 
-- [-] 4. Create and run integration test with 200 jobs
-  - Create GitHub Actions workflow files for testing pagination with 200 parallel jobs
-  - Target workflow: `.github/workflows/test-pagination-200-jobs-target.yml` with 200 matrix jobs
-  - Collector workflow: `.github/workflows/test-pagination-200-jobs-collector.yml` using workflow_run trigger
+- [ ] 4. Create and run integration test with 200 jobs
+  - Create GitHub Actions workflow files for testing pagination with 200
+    parallel jobs
+  - Target workflow: `.github/workflows/test-pagination-200-jobs-target.yml`
+    with 200 matrix jobs
+  - Collector workflow:
+    `.github/workflows/test-pagination-200-jobs-collector.yml` using
+    workflow_run trigger
   - Push changes to trigger the test workflow
-  - Verify both workflows complete successfully (no need to validate output data)
-  - This validates that pagination works correctly with workflows exceeding 100 jobs
+  - Verify both workflows complete successfully (no need to validate output
+    data)
+  - This validates that pagination works correctly with workflows exceeding 100
+    jobs
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
