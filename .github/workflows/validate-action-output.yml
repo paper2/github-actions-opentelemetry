@@ -150,6 +150,8 @@ jobs:
 
       - name: Generate normalized files
         run: |
+          set -euo pipefail
+          
           jq -f /tmp/normalize-traces.jq collector-logs/traces-exported-original.json > collector-logs/traces-actual.json
           jq -f /tmp/normalize-metrics.jq collector-logs/metrics-exported-original.json > collector-logs/metrics-actual.json
 
@@ -165,6 +167,8 @@ jobs:
       - name: Validate Traces
         if: inputs.validate-traces
         run: |
+          set -euo pipefail
+
           diff -u collector-logs/traces-actual.json .github/test-data/${{ inputs.test-data-directory }}/traces-expected.json
           if [ $? -ne 0 ]; then
             echo "✗ Trace structure differs from expected format"
@@ -174,6 +178,8 @@ jobs:
       - name: Validate Metrics
         if: inputs.validate-metrics
         run: |
+          set -euo pipefail
+
           diff -u collector-logs/metrics-actual.json .github/test-data/${{ inputs.test-data-directory }}/metrics-expected.json
           if [ $? -ne 0 ]; then
             echo "✗ Metrics structure differs from expected format"
@@ -183,16 +189,19 @@ jobs:
       - name: Validate Job Count
         if: inputs.validate-job-count
         run: |
-          ACTUAL_JOB_COUNT=$(jq '[.resourceSpans[]?.scopeSpans[]?.spans[]? | select(.name | startswith("job:"))] | length' collector-logs/traces-actual.json)
-          EXPECTED_JOB_COUNT=${{ inputs.expected-job-count }}
+          set -euo pipefail
 
+          ACTUAL_JOB_COUNT=$(jq -r '[.resourceSpans[]?.scopeSpans[]?.spans[]? | select(.name | startswith("job:"))] | length' collector-logs/traces-actual.json)
+          EXPECTED_JOB_COUNT=${{ inputs.expected-job-count }}
+          
           echo "Expected job count: $EXPECTED_JOB_COUNT"
           echo "Actual job count: $ACTUAL_JOB_COUNT"
-
+          
           if [ "$ACTUAL_JOB_COUNT" -ne "$EXPECTED_JOB_COUNT" ]; then
             echo "✗ Job count mismatch: expected $EXPECTED_JOB_COUNT, got $ACTUAL_JOB_COUNT"
             exit 1
           fi
+          
           echo "✓ Job count validation passed"
 
       # Show final collector status and logs for debugging
