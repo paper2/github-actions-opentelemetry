@@ -1,4 +1,4 @@
-name: Test Workflow for Workflow Run Event Tests
+name: Workflow Run Test (Event)
 
 on:
   push:

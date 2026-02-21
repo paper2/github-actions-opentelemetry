@@ -1815,7 +1815,7 @@
               "endTimeUnixNano": "0",
               "flags": 257,
               "kind": 1,
-              "name": "Test Workflow for Workflow Run Event Tests",
+              "name": "Workflow Run Test (Event)",
               "parentSpanId": "0000000000000000",
               "spanId": "0000000000000000",
               "startTimeUnixNano": "0",
