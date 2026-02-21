@@ -555,7 +555,7 @@ describe('Type converters', () => {
     test('should log warning for skipped incomplete jobs', () => {
       const consoleLogSpy = vi
         .spyOn(console, 'log')
-        .mockImplementation(() => { })
+        .mockImplementation(() => {})
 
       const incompleteJob = {
         ...mockJobResponse,
@@ -649,7 +649,7 @@ describe('Type converters', () => {
     test('should handle in-progress workflows for non-workflow_run events', () => {
       const consoleLogSpy = vi
         .spyOn(console, 'log')
-        .mockImplementation(() => { })
+        .mockImplementation(() => {})
 
       const inProgressWorkflow = {
         ...mockWorkflowResponse,

@@ -6,9 +6,8 @@ The `fetchWorkflowJobs` function currently fetches only the first 100 jobs from
 a workflow run due to GitHub API pagination limits. This fix implements proper
 pagination using `octokit.paginate()` to fetch all jobs without any artificial
 limits, ensuring complete telemetry data is sent to the observability backend.
-When a workflow has more than 100 jobs, a warning is logged to alert users about
-potential memory usage. The fix maintains backward compatibility with existing
-code structure and error handling patterns.
+The fix maintains backward compatibility with existing code structure and error
+handling patterns.
 
 ## Glossary
 
@@ -118,8 +117,8 @@ configurable maximum limit.
 
 - **Risk**: Workflows with extremely large job counts (1000+) could cause memory
   issues in constrained environments
-- **Mitigation**: Log a warning when job count exceeds 100 to alert users of
-  potential memory usage
+- **Mitigation**: Code comments document this risk acceptance and explain that
+  memory issues would crash the process before warning logs could be written
 - **Acceptance**: This is an acknowledged risk for the initial implementation
 
 **Future Considerations**:
@@ -149,15 +148,6 @@ structure, error handling, and performance characteristics.
 
 **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
 
-Property 3: Warning - Large Workflow Memory Alert
-
-_For any_ workflow run where the total number of jobs exceeds 100, the fixed
-fetchWorkflowJobs function SHALL log a warning message containing the job count
-and a memory usage advisory, alerting users that large workflows may cause
-memory issues in constrained environments.
-
-**Validates: Requirements 2.3, 2.4**
-
 ## Fix Implementation
 
 ### Changes Required
@@ -177,12 +167,14 @@ Assuming our root cause analysis is correct:
    - Keep the same parameters: `owner`, `repo`, `run_id`, `per_page: 100`
    - This will automatically fetch all pages and return a flat array of all jobs
 
-2. **Add Warning Logic for Large Workflows**: After fetching all jobs, check if
-   the count exceeds 100
-   - If `jobs.length > 100`, log a warning using `core.warning()`
-   - Warning message format:
-     `"Fetched ${jobs.length} jobs for workflow run. Large workflows may cause memory issues in constrained environments."`
-   - This alerts users to potential memory concerns without blocking execution
+2. **Add Code Comment Documenting Risk**: Before the `octokit.paginate()` call,
+   add a code comment explaining:
+   - Risk acceptance: Workflows with 1000+ jobs could cause OOM errors
+   - Why no warning logs: Memory exhaustion crashes the process before logs are
+     written
+   - Future consideration: If users report issues, implement configurable
+     `MAX_WORKFLOW_JOBS` limit
+   - This documents the design decision for future maintainers
 
 3. **No Function Signature Changes**: The function signature remains unchanged
    - No settings parameter needed

@@ -37,12 +37,6 @@ complete traces including all jobs to the observability backend
 2.4 WHEN `fetchWorkflowJobs` is called THEN the system SHALL fetch ALL jobs
 without any maximum limit
 
-2.5 WHEN a workflow run has more than 100 jobs THEN the system SHALL log a
-warning message that includes the total number of jobs being fetched
-
-2.6 WHEN a workflow run has more than 100 jobs THEN the system SHALL log a
-warning that large workflows may cause memory issues
-
 ### Unchanged Behavior (Regression Prevention)
 
 3.1 WHEN a workflow run has 100 or fewer jobs THEN the system SHALL CONTINUE TO

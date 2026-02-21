@@ -6,9 +6,8 @@
   - Use syntax:
     `octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {...})`
   - Keep same parameters: owner, repo, run_id, per_page: 100
-  - Add warning logic: if jobs.length > 100, log warning using `core.warning()`
-  - Warning message: "Fetched ${jobs.length} jobs for workflow run. Large
-    workflows may cause memory issues in constrained environments."
+  - Add comment before octokit.paginate() explaining the risk acceptance for
+    large workflows and OOM error implications
   - Keep function signature unchanged
   - _Bug_Condition: Workflows with >100 jobs only fetch first 100 jobs_
   - _Expected_Behavior: octokit.paginate() fetches all jobs across multiple
