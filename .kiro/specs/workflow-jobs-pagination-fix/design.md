@@ -182,7 +182,7 @@ Assuming our root cause analysis is correct:
 
 ## Testing Strategy
 
-### 1. Preservation Testing (Primary Focus)
+### 1. Preservation Testing (Existing Tests)
 
 Run existing test suite to ensure no regressions:
 
@@ -191,25 +191,52 @@ Run existing test suite to ensure no regressions:
 - Existing error handling, data transformation, and filtering logic remain
   unchanged
 
-### 2. Manual Verification (Optional)
+### 2. Integration Testing with Job Count Validation
 
-For workflows with >100 jobs, manual testing can be performed if needed:
+Create integration test using GitHub Actions workflows to validate pagination:
 
-- Create a test workflow with matrix strategy to generate 100+ jobs
-- Verify all jobs appear in traces in the observability backend
-- This is optional and not part of automated test suite
+- **Target Workflow**: `test-pagination-200-jobs-target.yml` creates 200
+  parallel jobs using matrix strategy
+- **Collector Workflow**: `test-pagination-200-jobs-collector.yml` runs on
+  workflow_run event to collect telemetry
+- **Validation**: Verifies that all 200 jobs are captured in the telemetry
+  output by counting job spans in traces
+- **Pattern**: Follows the same pattern as existing workflow-run-tests.yml for
+  consistency
 
-### 3. No New Unit Tests Required
+### 3. Test Infrastructure Enhancements
 
-Do not add tests for pagination logic with mocked responses or warning log
-output. The implementation is straightforward enough that existing tests provide
-sufficient coverage.
+Enhanced `validate-action-output.yml` reusable workflow with flexible validation
+options:
+
+- **New Input**: `validate-traces` (boolean, default: true) - enables trace
+  validation against expected output
+- **New Input**: `validate-metrics` (boolean, default: true) - enables metrics
+  validation against expected output
+- **New Input**: `validate-job-count` (boolean, default: false) - enables job
+  count validation
+- **New Input**: `expected-job-count` (number, optional) - expected number of
+  jobs in workflow
+- **Validation Logic**:
+  - Trace/metrics validation: Compares actual output to expected JSON files
+    (when enabled)
+  - Job count validation: Counts job spans in traces (spans with name starting
+    with "job:") and compares to expected count
+- **Backward Compatibility**: Existing test workflows continue to work without
+  changes (trace/metrics validation enabled by default)
+- **Usage**: Pagination tests disable trace/metrics validation and only validate
+  job count for efficiency
+
+### 4. No New Unit Tests Required
+
+Do not add tests for pagination logic with mocked responses. The implementation
+is straightforward enough that existing tests provide sufficient coverage.
 
 **Rationale:**
 
 - Mocking `octokit.paginate()` with 150 fake jobs doesn't provide meaningful
   validation
-- Testing log output is not worth the maintenance burden
 - The real validation comes from: (1) existing tests passing, and (2) actual
-  usage with large workflows
-- This is a simple bug fix, not a complex feature requiring extensive new tests
+  integration tests with 200 real jobs
+- Integration tests provide more confidence than mocked unit tests for this
+  pagination fix

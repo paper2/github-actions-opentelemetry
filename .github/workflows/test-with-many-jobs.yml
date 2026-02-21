@@ -1,18 +1,14 @@
-name: Test Pagination with 200 Jobs (Target)
+name: Test with Many Jobs
 
 on:
   push:
-    branches:
-      - main
-      - fix/workflow-jobs-pagination
-    paths:
-      - '.github/workflows/test-pagination-200-jobs-target.yml'
-      - '.github/workflows/test-pagination-200-jobs-collector.yml'
+
+permissions:
+  contents: read
 
 jobs:
-  # Create 200 parallel jobs using matrix strategy to test pagination
-  pagination-test-job:
-    name: Job ${{ matrix.job-number }}
+  many-jobs:
+    name: Pagination Test Job ${{ matrix.job-number }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -220,7 +216,23 @@ jobs:
             200
           ]
     steps:
-      - name: Run test job
+      - name: Run test step 1
         run: |
           echo "Running pagination test job ${{ matrix.job-number }}"
-          sleep 1
+      - name: Run test step 2
+        run: |
+          echo "Running pagination test job ${{ matrix.job-number }}"
+
+  verification:
+    needs: [many-jobs]
+    name: Verification Number of Jobs
+    uses: ./.github/workflows/validate-action-output.yml
+    with:
+      test-data-directory: pagination-test-200-jobs
+      artifact-name: collector-logs-pagination-200-jobs
+      retention-days: 5
+      validate-traces: false
+      validate-metrics: false
+      validate-job-count: true
+      expected-job-count: 200
+    secrets: inherit

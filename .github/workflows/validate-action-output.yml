@@ -28,6 +28,26 @@ on:
         required: false
         type: number
         default: 5
+      validate-traces:
+        description: 'Enable trace validation against expected output'
+        required: false
+        type: boolean
+        default: true
+      validate-metrics:
+        description: 'Enable metrics validation against expected output'
+        required: false
+        type: boolean
+        default: true
+      validate-job-count:
+        description: 'Enable job count validation in traces'
+        required: false
+        type: boolean
+        default: false
+      expected-job-count:
+        description: 'Expected number of jobs in the workflow'
+        required: false
+        type: number
+        default: 0
 
 jobs:
   test-action:
@@ -143,6 +163,7 @@ jobs:
           retention-days: ${{ inputs.retention-days }}
 
       - name: Validate Traces
+        if: inputs.validate-traces
         run: |
           diff -u collector-logs/traces-actual.json .github/test-data/${{ inputs.test-data-directory }}/traces-expected.json
           if [ $? -ne 0 ]; then
@@ -151,12 +172,28 @@ jobs:
           fi
 
       - name: Validate Metrics
+        if: inputs.validate-metrics
         run: |
           diff -u collector-logs/metrics-actual.json .github/test-data/${{ inputs.test-data-directory }}/metrics-expected.json
           if [ $? -ne 0 ]; then
             echo "✗ Metrics structure differs from expected format"
             exit 1
           fi
+
+      - name: Validate Job Count
+        if: inputs.validate-job-count
+        run: |
+          ACTUAL_JOB_COUNT=$(jq '[.resourceSpans[]?.scopeSpans[]?.spans[]? | select(.name | startswith("job:"))] | length' collector-logs/traces-actual.json)
+          EXPECTED_JOB_COUNT=${{ inputs.expected-job-count }}
+
+          echo "Expected job count: $EXPECTED_JOB_COUNT"
+          echo "Actual job count: $ACTUAL_JOB_COUNT"
+
+          if [ "$ACTUAL_JOB_COUNT" -ne "$EXPECTED_JOB_COUNT" ]; then
+            echo "✗ Job count mismatch: expected $EXPECTED_JOB_COUNT, got $ACTUAL_JOB_COUNT"
+            exit 1
+          fi
+          echo "✓ Job count validation passed"
 
       # Show final collector status and logs for debugging
       - name: Show collector debug info
