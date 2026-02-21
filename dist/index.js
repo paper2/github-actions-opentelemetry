@@ -74108,13 +74108,16 @@ const fetchWorkflow = async (octokit, workflowContext) => {
     };
 };
 const fetchWorkflowJobs = async (octokit, workflowContext) => {
-    const res = await octokit.rest.actions.listJobsForWorkflowRun({
+    const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
         owner: workflowContext.owner,
         repo: workflowContext.repo,
         run_id: workflowContext.runId,
         per_page: 100
     });
-    return res.data.jobs;
+    if (jobs.length > 100) {
+        core.warning(`Fetched ${jobs.length} jobs for workflow run. Large workflows may cause memory issues in constrained environments.`);
+    }
+    return jobs;
 };
 const getWorkflowContext = (context, settings) => {
     const owner = settings.owner ?? context.repo.owner;

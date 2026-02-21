@@ -85,13 +85,23 @@ const fetchWorkflowJobs = async (
   octokit: Octokit,
   workflowContext: WorkflowContext
 ): Promise<WorkflowJobsResponse> => {
-  const res = await octokit.rest.actions.listJobsForWorkflowRun({
-    owner: workflowContext.owner,
-    repo: workflowContext.repo,
-    run_id: workflowContext.runId,
-    per_page: 100
-  })
-  return res.data.jobs
+  const jobs = await octokit.paginate(
+    octokit.rest.actions.listJobsForWorkflowRun,
+    {
+      owner: workflowContext.owner,
+      repo: workflowContext.repo,
+      run_id: workflowContext.runId,
+      per_page: 100
+    }
+  )
+
+  if (jobs.length > 100) {
+    core.warning(
+      `Fetched ${jobs.length} jobs for workflow run. Large workflows may cause memory issues in constrained environments.`
+    )
+  }
+
+  return jobs
 }
 
 export const getWorkflowContext = (
