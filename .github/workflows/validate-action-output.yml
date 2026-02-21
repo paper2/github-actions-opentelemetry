@@ -28,6 +28,27 @@ on:
         required: false
         type: number
         default: 5
+      validate-traces:
+        description: 'Enable trace validation against expected output'
+        required: false
+        type: boolean
+        default: true
+      validate-metrics:
+        description: 'Enable metrics validation against expected output'
+        required: false
+        type: boolean
+        default: true
+      expected-job-count:
+        description: 'Expected number of jobs in the workflow'
+        required: false
+        type: number
+        default: 0
+      expected-job-name-pattern:
+        description:
+          'Job name pattern to match when counting jobs (used with grep)'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   test-action:
@@ -130,6 +151,8 @@ jobs:
 
       - name: Generate normalized files
         run: |
+          set -euo pipefail
+
           jq -f /tmp/normalize-traces.jq collector-logs/traces-exported-original.json > collector-logs/traces-actual.json
           jq -f /tmp/normalize-metrics.jq collector-logs/metrics-exported-original.json > collector-logs/metrics-actual.json
 
@@ -143,7 +166,10 @@ jobs:
           retention-days: ${{ inputs.retention-days }}
 
       - name: Validate Traces
+        if: inputs.validate-traces
         run: |
+          set -euo pipefail
+
           diff -u collector-logs/traces-actual.json .github/test-data/${{ inputs.test-data-directory }}/traces-expected.json
           if [ $? -ne 0 ]; then
             echo "✗ Trace structure differs from expected format"
@@ -151,12 +177,56 @@ jobs:
           fi
 
       - name: Validate Metrics
+        if: inputs.validate-metrics
         run: |
+          set -euo pipefail
+
           diff -u collector-logs/metrics-actual.json .github/test-data/${{ inputs.test-data-directory }}/metrics-expected.json
           if [ $? -ne 0 ]; then
             echo "✗ Metrics structure differs from expected format"
             exit 1
           fi
+
+      - name: Validate Job Count
+        if: inputs.expected-job-count > 0
+        run: |
+          set -euo pipefail
+
+          # Configuration variables
+          TRACES_FILE="collector-logs/traces-actual.json"
+          JOB_NAME_PATTERN="${{ inputs.expected-job-name-pattern }}"
+          # This pattern is depended on the span name for implementation. This is hardcoding :)
+          # https://github.com/paper2/github-actions-opentelemetry/blob/7389d2e92195cf8406104f4ab233be997799d9db/src/traces/create-spans.ts#L38-L62
+          EXCLUDE_PATTERN="waiting runner"
+          EXPECTED_JOB_COUNT=${{ inputs.expected-job-count }}
+
+          # Extract job count by filtering span names
+          # 1. Extract all span names from traces
+          # 2. Filter for jobs matching the pattern
+          # 3. Exclude spans with "waiting runner" status
+          # 4. Count the results
+          ACTUAL_JOB_COUNT=$(jq -r '.resourceSpans[]?.scopeSpans[]?.spans[].name' "$TRACES_FILE" \
+            | grep "$JOB_NAME_PATTERN" \
+            | sort \
+            | grep -v "$EXCLUDE_PATTERN" \
+            | wc -l \
+            | tr -d ' ')
+
+          echo "Expected job count: $EXPECTED_JOB_COUNT"
+          echo "Actual job count: $ACTUAL_JOB_COUNT"
+
+          # Validate that ACTUAL_JOB_COUNT is a numeric value
+          if ! [[ "$ACTUAL_JOB_COUNT" =~ ^[0-9]+$ ]]; then
+            echo "✗ ACTUAL_JOB_COUNT is not a valid number: '$ACTUAL_JOB_COUNT'"
+            exit 1
+          fi
+
+          if [ "$ACTUAL_JOB_COUNT" -ne "$EXPECTED_JOB_COUNT" ]; then
+            echo "✗ Job count mismatch: expected $EXPECTED_JOB_COUNT, got $ACTUAL_JOB_COUNT"
+            exit 1
+          fi
+
+          echo "✓ Job count validation passed"
 
       # Show final collector status and logs for debugging
       - name: Show collector debug info

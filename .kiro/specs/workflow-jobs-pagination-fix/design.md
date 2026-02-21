@@ -1,0 +1,242 @@
+# Workflow Jobs Pagination Fix Bugfix Design
+
+## Overview
+
+The `fetchWorkflowJobs` function currently fetches only the first 100 jobs from
+a workflow run due to GitHub API pagination limits. This fix implements proper
+pagination using `octokit.paginate()` to fetch all jobs without any artificial
+limits, ensuring complete telemetry data is sent to the observability backend.
+The fix maintains backward compatibility with existing code structure and error
+handling patterns.
+
+## Glossary
+
+- **Bug_Condition (C)**: The condition that triggers the bug - when a workflow
+  run has more than 100 jobs and pagination is not implemented
+- **Property (P)**: The desired behavior - all jobs should be fetched using
+  pagination
+- **Preservation**: Existing behavior for workflows with ≤100 jobs, error
+  handling, data structure, and filtering logic must remain unchanged
+- **fetchWorkflowJobs**: The function in `src/github/github.ts` (line 88) that
+  fetches workflow jobs from the GitHub API
+- **octokit.paginate()**: The Octokit method that automatically handles
+  pagination by fetching all pages of results
+- **WorkflowJobsResponse**: Type alias for the array of jobs returned by the
+  GitHub API
+  (`Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']`)
+
+## Bug Details
+
+### Fault Condition
+
+The bug manifests when a workflow run has more than 100 jobs. The
+`fetchWorkflowJobs` function uses `octokit.rest.actions.listJobsForWorkflowRun`
+with `per_page: 100` but does not handle pagination, resulting in only the first
+100 jobs being returned. This causes incomplete traces to be sent to the
+observability backend.
+
+**Formal Specification:**
+
+```
+FUNCTION isBugCondition(input)
+  INPUT: input of type { workflowRunId: number, totalJobsInWorkflow: number }
+  OUTPUT: boolean
+
+  RETURN input.totalJobsInWorkflow > 100
+         AND fetchWorkflowJobs_called(input.workflowRunId)
+         AND NOT pagination_implemented()
+END FUNCTION
+```
+
+### Examples
+
+- **Example 1**: Workflow run with 150 jobs → Only first 100 jobs fetched → 50
+  jobs missing from traces
+- **Example 2**: Workflow run with 250 jobs → Only first 100 jobs fetched → 150
+  jobs missing from traces
+- **Example 3**: Workflow run with 101 jobs → Only first 100 jobs fetched → 1
+  job missing from traces
+- **Edge Case**: Workflow run with exactly 100 jobs → All jobs fetched correctly
+  (no bug)
+
+## Expected Behavior
+
+### Preservation Requirements
+
+**Unchanged Behaviors:**
+
+- Workflows with 100 or fewer jobs must continue to fetch all jobs successfully
+- The function must continue to return `Promise<WorkflowJobsResponse>` (array of
+  jobs)
+- API errors must continue to propagate to the caller for retry handling in
+  `fetchWorkflowResults`
+- Jobs must continue to be filtered and transformed using `toWorkflowJob`
+  function
+- Validation that at least one completed job exists must continue to work
+
+**Scope:** All inputs where the workflow has ≤100 jobs should be completely
+unaffected by this fix. This includes:
+
+- Small workflows (1-100 jobs)
+- Error handling and retry logic
+- Data transformation and filtering
+- Type signatures and return values
+
+## Hypothesized Root Cause
+
+Based on the bug description and code analysis, the root cause is:
+
+1. **Missing Pagination Implementation**: The function uses
+   `octokit.rest.actions.listJobsForWorkflowRun` which returns only one page of
+   results (max 100 items per page as specified by `per_page: 100`)
+
+2. **No Iteration Over Pages**: The GitHub API returns paginated results, but
+   the code does not iterate through subsequent pages to fetch remaining jobs
+
+3. **Octokit Pagination Support Available**: The `@octokit/rest` library
+   provides `octokit.paginate()` method specifically for this use case, but it's
+   not being used
+
+## Design Decisions
+
+### Decision: Full Pagination Without Limits
+
+**Approach**: Use `octokit.paginate()` to fetch all jobs without implementing a
+configurable maximum limit.
+
+**Rationale**:
+
+- Simplicity: Reduces implementation complexity and configuration surface area
+- Typical Usage: Most GitHub Actions workflows have fewer than 1000 jobs
+- Complete Data: Ensures all telemetry data is captured without artificial
+  truncation
+- Maintainability: Fewer configuration options mean less code to maintain and
+  test
+
+**Trade-offs**:
+
+- **Risk**: Workflows with extremely large job counts (1000+) could cause memory
+  issues in constrained environments
+- **Mitigation**: Code comments document this risk acceptance and explain that
+  memory issues would crash the process before warning logs could be written
+- **Acceptance**: This is an acknowledged risk for the initial implementation
+
+**Future Considerations**:
+
+- If users report memory issues with large workflows, implement a configurable
+  `MAX_WORKFLOW_JOBS` environment variable in a future version
+- Consider streaming or batching approaches for workflows with 1000+ jobs
+- Monitor GitHub API rate limiting behavior with large pagination requests
+
+## Correctness Properties
+
+Property 1: Fault Condition - Pagination Fetches All Jobs
+
+_For any_ workflow run where the total number of jobs exceeds 100, the fixed
+fetchWorkflowJobs function SHALL use octokit.paginate() to fetch all jobs across
+multiple pages, ensuring complete telemetry data is available for trace
+creation.
+
+**Validates: Requirements 2.1, 2.2**
+
+Property 2: Preservation - Small Workflow Behavior
+
+_For any_ workflow run where the total number of jobs is 100 or fewer, the fixed
+fetchWorkflowJobs function SHALL produce exactly the same result as the original
+function, preserving the existing behavior for small workflows including data
+structure, error handling, and performance characteristics.
+
+**Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
+
+## Fix Implementation
+
+### Changes Required
+
+Assuming our root cause analysis is correct:
+
+**File**: `src/github/github.ts`
+
+**Function**: `fetchWorkflowJobs`
+
+**Specific Changes**:
+
+1. **Replace Direct API Call with Pagination**: Replace
+   `octokit.rest.actions.listJobsForWorkflowRun` with `octokit.paginate()`
+   - Use `octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {...})`
+     syntax
+   - Keep the same parameters: `owner`, `repo`, `run_id`, `per_page: 100`
+   - This will automatically fetch all pages and return a flat array of all jobs
+
+2. **Add Code Comment Documenting Risk**: Before the `octokit.paginate()` call,
+   add a code comment explaining:
+   - Risk acceptance: Workflows with 1000+ jobs could cause OOM errors
+   - Why no warning logs: Memory exhaustion crashes the process before logs are
+     written
+   - Future consideration: If users report issues, implement configurable
+     `MAX_WORKFLOW_JOBS` limit
+   - This documents the design decision for future maintainers
+
+3. **No Function Signature Changes**: The function signature remains unchanged
+   - No settings parameter needed
+   - Return type stays the same: `Promise<WorkflowJobsResponse>`
+
+## Testing Strategy
+
+### 1. Preservation Testing (Existing Tests)
+
+Run existing test suite to ensure no regressions:
+
+- All existing tests in `src/github/github.test.ts` must continue to pass
+- This validates that workflows with ≤100 jobs work exactly as before
+- Existing error handling, data transformation, and filtering logic remain
+  unchanged
+
+### 2. Integration Testing with Job Count Validation
+
+Create integration test using GitHub Actions workflows to validate pagination:
+
+- **Target Workflow**: `test-pagination-200-jobs-target.yml` creates 200
+  parallel jobs using matrix strategy
+- **Collector Workflow**: `test-pagination-200-jobs-collector.yml` runs on
+  workflow_run event to collect telemetry
+- **Validation**: Verifies that all 200 jobs are captured in the telemetry
+  output by counting job spans in traces
+- **Pattern**: Follows the same pattern as existing workflow-run-tests.yml for
+  consistency
+
+### 3. Test Infrastructure Enhancements
+
+Enhanced `validate-action-output.yml` reusable workflow with flexible validation
+options:
+
+- **New Input**: `validate-traces` (boolean, default: true) - enables trace
+  validation against expected output
+- **New Input**: `validate-metrics` (boolean, default: true) - enables metrics
+  validation against expected output
+- **New Input**: `validate-job-count` (boolean, default: false) - enables job
+  count validation
+- **New Input**: `expected-job-count` (number, optional) - expected number of
+  jobs in workflow
+- **Validation Logic**:
+  - Trace/metrics validation: Compares actual output to expected JSON files
+    (when enabled)
+  - Job count validation: Counts job spans in traces (spans with name starting
+    with "job:") and compares to expected count
+- **Backward Compatibility**: Existing test workflows continue to work without
+  changes (trace/metrics validation enabled by default)
+- **Usage**: Pagination tests disable trace/metrics validation and only validate
+  job count for efficiency
+
+### 4. No New Unit Tests Required
+
+Do not add tests for pagination logic with mocked responses. The implementation
+is straightforward enough that existing tests provide sufficient coverage.
+
+**Rationale:**
+
+- Mocking `octokit.paginate()` with 150 fake jobs doesn't provide meaningful
+  validation
+- The real validation comes from: (1) existing tests passing, and (2) actual
+  integration tests with 200 real jobs
+- Integration tests provide more confidence than mocked unit tests for this
+  pagination fix

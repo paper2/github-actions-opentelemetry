@@ -74108,13 +74108,16 @@ const fetchWorkflow = async (octokit, workflowContext) => {
     };
 };
 const fetchWorkflowJobs = async (octokit, workflowContext) => {
-    const res = await octokit.rest.actions.listJobsForWorkflowRun({
+    // Fetch all jobs using pagination without artificial limits.
+    // This accepts the risk of potential memory issues for workflows with very large job counts (1000+).
+    // If OOM (Out of Memory) errors occur, the workflow likely has too many jobs.
+    const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
         owner: workflowContext.owner,
         repo: workflowContext.repo,
         run_id: workflowContext.runId,
         per_page: 100
     });
-    return res.data.jobs;
+    return jobs;
 };
 const getWorkflowContext = (context, settings) => {
     const owner = settings.owner ?? context.repo.owner;

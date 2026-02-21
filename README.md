@@ -217,6 +217,12 @@ To configure the action, you need to set the following environment variables:
 | `FEATURE_METRICS`                     | No       | `true`        | Enable Metrics feature.                                                                            |
 | `OTEL_LOG_LEVEL`                      | No       | `info`        | Log level.                                                                                         |
 
+This action relies on the OpenTelemetry SDK, which automatically reads `OTEL_`
+environment variables from `jobs.<job_id>.steps[*].env`. The table above lists
+commonly used variables, but other variables defined in the
+[OpenTelemetry Environment Variable Specification](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/)
+may also work depending on SDK support.
+
 ### Getting Started
 
 We prepared a [Getting Started](./examples/google-cloud/README.md) to create

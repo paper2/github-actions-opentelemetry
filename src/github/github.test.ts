@@ -69,28 +69,24 @@ describe('fetchWorkflowResults', () => {
               },
               event: 'push'
             }
-          }),
-          listJobsForWorkflowRun: async () => ({
-            data: {
-              jobs: [
-                // Return jobs that will be filtered out (not completed)
-                {
-                  id: 1,
-                  name: 'test-job',
-                  status: 'in_progress',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                }
-              ]
-            }
           })
         }
-      }
+      },
+      paginate: async () => [
+        // Return jobs that will be filtered out (not completed)
+        {
+          id: 1,
+          name: 'test-job',
+          status: 'in_progress',
+          conclusion: null,
+          created_at: '2023-01-01T00:00:00Z',
+          started_at: '2023-01-01T00:01:00Z',
+          completed_at: null,
+          workflow_name: 'Test Workflow',
+          run_id: 12345,
+          steps: []
+        }
+      ]
     } as unknown as Octokit
 
     const workflowContext = getWorkflowContext(github.context, settings)
@@ -119,54 +115,50 @@ describe('fetchWorkflowResults', () => {
               },
               event: 'push'
             }
-          }),
-          listJobsForWorkflowRun: async () => ({
-            data: {
-              jobs: [
-                // Completed job - should be included
-                {
-                  id: 1,
-                  name: 'completed-job',
-                  status: 'completed',
-                  conclusion: 'success',
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: '2023-01-01T00:05:00Z',
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                },
-                // In-progress job - should be filtered out
-                {
-                  id: 2,
-                  name: 'in-progress-job',
-                  status: 'in_progress',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: '2023-01-01T00:01:00Z',
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                },
-                // Queued job - should be filtered out
-                {
-                  id: 3,
-                  name: 'queued-job',
-                  status: 'queued',
-                  conclusion: null,
-                  created_at: '2023-01-01T00:00:00Z',
-                  started_at: null,
-                  completed_at: null,
-                  workflow_name: 'Test Workflow',
-                  run_id: 12345,
-                  steps: []
-                }
-              ]
-            }
           })
         }
-      }
+      },
+      paginate: async () => [
+        // Completed job - should be included
+        {
+          id: 1,
+          name: 'completed-job',
+          status: 'completed',
+          conclusion: 'success',
+          created_at: '2023-01-01T00:00:00Z',
+          started_at: '2023-01-01T00:01:00Z',
+          completed_at: '2023-01-01T00:05:00Z',
+          workflow_name: 'Test Workflow',
+          run_id: 12345,
+          steps: []
+        },
+        // In-progress job - should be filtered out
+        {
+          id: 2,
+          name: 'in-progress-job',
+          status: 'in_progress',
+          conclusion: null,
+          created_at: '2023-01-01T00:00:00Z',
+          started_at: '2023-01-01T00:01:00Z',
+          completed_at: null,
+          workflow_name: 'Test Workflow',
+          run_id: 12345,
+          steps: []
+        },
+        // Queued job - should be filtered out
+        {
+          id: 3,
+          name: 'queued-job',
+          status: 'queued',
+          conclusion: null,
+          created_at: '2023-01-01T00:00:00Z',
+          started_at: null,
+          completed_at: null,
+          workflow_name: 'Test Workflow',
+          run_id: 12345,
+          steps: []
+        }
+      ]
     } as unknown as Octokit
 
     const workflowContext = getWorkflowContext(github.context, settings)
