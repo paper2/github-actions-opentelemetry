@@ -447,9 +447,7 @@ describe('Type converters', () => {
 
       const result = toWorkflowJob(jobWithoutSteps as never, 'workflow_run')
       expect(result).not.toBeNull()
-      if (result) {
-        expect(result.steps).toEqual([])
-      }
+      expect(result?.steps).toEqual([])
     })
 
     test('should return null when job is not completed', () => {
@@ -507,10 +505,8 @@ describe('Type converters', () => {
 
       const result = toWorkflowJob(jobWithRunner as never, 'workflow_run')
       expect(result).not.toBeNull()
-      if (result) {
-        expect(result.runner_name).toBe('ubuntu-latest-runner')
-        expect(result.runner_group_name).toBe('github-hosted')
-      }
+      expect(result?.runner_name).toBe('ubuntu-latest-runner')
+      expect(result?.runner_group_name).toBe('github-hosted')
     })
 
     test('should handle null runner information', () => {
@@ -522,10 +518,8 @@ describe('Type converters', () => {
 
       const result = toWorkflowJob(jobWithNullRunner as never, 'workflow_run')
       expect(result).not.toBeNull()
-      if (result) {
-        expect(result.runner_name).toBeNull()
-        expect(result.runner_group_name).toBeNull()
-      }
+      expect(result?.runner_name).toBeNull()
+      expect(result?.runner_group_name).toBeNull()
     })
 
     test('should skip incomplete jobs for push events', () => {
@@ -577,23 +571,21 @@ describe('Type converters', () => {
     test('should process completed jobs for non-workflow_run events', () => {
       const result = toWorkflowJob(mockJobResponse as never, 'push')
       expect(result).not.toBeNull()
-      if (result) {
-        const expected: WorkflowJob = {
-          ...mockJobResponse,
-          created_at: new Date(mockJobResponse.created_at),
-          started_at: new Date(mockJobResponse.started_at),
-          completed_at: new Date(mockJobResponse.completed_at),
-          steps: [
-            {
-              name: 'test-step',
-              conclusion: 'success' as const,
-              started_at: new Date('2023-01-01T00:01:00Z'),
-              completed_at: new Date('2023-01-01T00:02:00Z')
-            }
-          ]
-        }
-        expect(result).toEqual(expected)
+      const expected: WorkflowJob = {
+        ...mockJobResponse,
+        created_at: new Date(mockJobResponse.created_at),
+        started_at: new Date(mockJobResponse.started_at),
+        completed_at: new Date(mockJobResponse.completed_at),
+        steps: [
+          {
+            name: 'test-step',
+            conclusion: 'success' as const,
+            started_at: new Date('2023-01-01T00:01:00Z'),
+            completed_at: new Date('2023-01-01T00:02:00Z')
+          }
+        ]
       }
+      expect(result).toEqual(expected)
     })
   })
 
