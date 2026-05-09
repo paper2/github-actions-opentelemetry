@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.10.0",
+  "version": "v0.10.1",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -22,7 +22,7 @@
     ".": "./dist/index.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package",
@@ -70,7 +70,7 @@
     "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-vitest": "^0.5.4",
-    "globals": "^16.5.0",
+    "globals": "^17.4.0",
     "make-coverage-badge": "^1.2.0",
     "prettier": "^3.8.1",
     "prettier-eslint": "^16.4.2",
