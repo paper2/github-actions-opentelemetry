@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
-  "version": "v0.10.0",
+  "version": "v0.10.1",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
@@ -22,7 +22,7 @@
     ".": "./dist/index.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package",
