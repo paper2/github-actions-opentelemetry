@@ -29,7 +29,8 @@ async function writeSummary(options: SummaryOptions): Promise<void> {
       .write()
   } catch (error) {
     throw new Error(
-      `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to write summary: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error }
     )
   }
 }

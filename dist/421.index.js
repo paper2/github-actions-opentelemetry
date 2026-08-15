@@ -2,7 +2,7 @@ export const id = 421;
 export const ids = [421];
 export const modules = {
 
-/***/ 421:
+/***/ 10421:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -12,8 +12,8 @@ exports.getMachineId = void 0;
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-const fs_1 = __webpack_require__(9896);
-const api_1 = __webpack_require__(3914);
+const fs_1 = __webpack_require__(79896);
+const api_1 = __webpack_require__(63914);
 async function getMachineId() {
     const paths = ['/etc/machine-id', '/var/lib/dbus/machine-id'];
     for (const path of paths) {

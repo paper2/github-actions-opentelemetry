@@ -1,6 +1,6 @@
 import settings from '../settings.js'
 import { createWorkflowGauges, createJobGauges } from './create-gauges.js'
-import { WorkflowResults } from 'src/github/types.js'
+import { WorkflowResults } from '../github/types.js'
 
 export const createMetrics = async (
   results: WorkflowResults

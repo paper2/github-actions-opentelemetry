@@ -34,7 +34,7 @@ const defaultEnv = {
   OTEL_RESOURCE_ATTRIBUTES: 'test.attribute=example,test.attribute2=example2',
   OWNER: 'paper2',
   REPOSITORY: 'github-actions-opentelemetry',
-  WORKFLOW_RUN_ID: '15793094512'
+  WORKFLOW_RUN_ID: '30698996994'
 }
 
 const CIEnv = {
