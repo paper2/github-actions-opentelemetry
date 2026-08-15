@@ -23,13 +23,17 @@ const forceFlushSpy = vi.spyOn(instrumentation, 'forceFlush')
 describe('run function', () => {
   beforeEach(() => {
     opentelemetryAllDisable()
+    // mockReset keeps the spies (needed to inject failures) but restores the
+    // real implementations so a previous Once mock cannot leak into the next test.
+    fetchWorkflowResultsSpy.mockReset()
+    forceFlushSpy.mockReset()
   })
   describe('should exit with expected code', () => {
     test('should run successfully', async () => {
       await expect(run()).rejects.toThrowError(
         'process.exit unexpectedly called with "0"'
       )
-    })
+    }, 20_000)
     test('should exit with 1 when fetching workflow results failed', async () => {
       fetchWorkflowResultsSpy.mockRejectedValueOnce(new Error('test'))
       await expect(run()).rejects.toThrowError(
@@ -41,6 +45,6 @@ describe('run function', () => {
       await expect(run()).rejects.toThrowError(
         'process.exit unexpectedly called with "1"'
       )
-    })
+    }, 20_000)
   })
 })

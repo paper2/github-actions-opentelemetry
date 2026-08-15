@@ -1,5 +1,5 @@
 import settings from '../settings.js'
-import { WorkflowResults } from 'src/github/types.js'
+import { WorkflowResults } from '../github/types.js'
 import {
   createWorkflowTrace,
   createWorkflowJobSpan,

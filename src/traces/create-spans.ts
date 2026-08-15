@@ -7,7 +7,7 @@ import {
 import * as opentelemetry from '@opentelemetry/api'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
-import { Workflow } from 'src/github/types.js'
+import { Workflow } from '../github/types.js'
 
 export const createWorkflowTrace = (
   workflow: Workflow,
