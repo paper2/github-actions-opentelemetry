@@ -73,7 +73,7 @@
     "globals": "^17.8.0",
     "make-coverage-badge": "^1.2.0",
     "prettier": "^3.9.6",
-    "prettier-eslint": "^16.4.2",
+    "prettier-eslint": "^17.1.2",
     "tsx": "^4.23.1",
     "typescript": "~6.0.3",
     "vitest": "^4.0.8"
