@@ -53,7 +53,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
-    "@octokit/types": "^16.0.0",
+    "@octokit/types": "^17.0.0",
     "@opentelemetry/sdk-node": "0.221.0",
     "@opentelemetry/semantic-conventions": "^1.43.0",
     "@types/node": "^24.10.0",
