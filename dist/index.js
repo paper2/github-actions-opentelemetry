@@ -41398,7 +41398,7 @@ var __webpack_unused_export__;
  * SPDX-License-Identifier: Apache-2.0
  */
 __webpack_unused_export__ = ({ value: true });
-__webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = exports.J = exports.l = void 0;
+__webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = exports.sB = __webpack_unused_export__ = __webpack_unused_export__ = exports.J = exports.l = void 0;
 var BasicTracerProvider_shim_1 = __nccwpck_require__(77254);
 Object.defineProperty(exports, "l", ({ enumerable: true, get: function () { return BasicTracerProvider_shim_1.BasicTracerProvider; } }));
 var BatchSpanProcessor_shim_1 = __nccwpck_require__(98462);
@@ -41407,7 +41407,7 @@ var SimpleSpanProcessor_shim_1 = __nccwpck_require__(46162);
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return SimpleSpanProcessor_shim_1.SimpleSpanProcessor; } });
 var sdk_trace_1 = __nccwpck_require__(16410);
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return sdk_trace_1.ConsoleSpanExporter; } });
-__webpack_unused_export__ = ({ enumerable: true, get: function () { return sdk_trace_1.RandomIdGenerator; } });
+Object.defineProperty(exports, "sB", ({ enumerable: true, get: function () { return sdk_trace_1.RandomIdGenerator; } }));
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return sdk_trace_1.InMemorySpanExporter; } });
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return sdk_trace_1.NoopSpanProcessor; } });
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return sdk_trace_1.AlwaysOffSampler; } });
@@ -85393,6 +85393,7 @@ const createSettings = (env) => ({
     FeatureFlagMetrics: env.FEATURE_METRICS
         ? env.FEATURE_METRICS.toLowerCase() === 'true'
         : true,
+    deterministicTraceIds: env.INPUT_DETERMINISTIC_TRACE_IDS?.toLowerCase() === 'true',
     logeLevel: env.RUNNER_DEBUG === '1'
         ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
         : env.OTEL_LOG_LEVEL || 'info' // https://opentelemetry.io/docs/zero-code/js/#troubleshooting
@@ -85482,7 +85483,50 @@ const createMetrics = async (results) => {
 ;// CONCATENATED MODULE: ./src/metrics/index.ts
 
 
+// EXTERNAL MODULE: external "node:crypto"
+var external_node_crypto_ = __nccwpck_require__(77598);
+// EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-trace-base/build/src/index-shim.js
+var index_shim = __nccwpck_require__(19644);
+;// CONCATENATED MODULE: ./src/traces/span-ids.ts
+
+
+const hashId = (key, bytes) => (0,external_node_crypto_.createHash)('sha256')
+    .update(key)
+    .digest('hex')
+    .slice(0, bytes * 2);
+// Deterministic so other tools can attach spans to a workflow run's trace
+// without talking to this action. See "Deterministic trace IDs" in README.md.
+const workflowTraceId = (repository, runId, runAttempt) => hashId(`${repository}:${runId}:${runAttempt}`, 16);
+const workflowSpanId = (runId, runAttempt) => hashId(`workflow:${runId}:${runAttempt}`, 8);
+const jobSpanId = (jobId) => hashId(`job:${jobId}`, 8);
+const jobWithWaitingSpanId = (jobId) => hashId(`job:${jobId}:with-waiting`, 8);
+const jobWaitingSpanId = (jobId) => hashId(`job:${jobId}:waiting`, 8);
+// The tracer asks the provider's IdGenerator for ids without saying which span
+// they are for, so createSpan presets them immediately around startSpan.
+class PresetIdGenerator {
+    random = new index_shim/* RandomIdGenerator */.sB();
+    preset = {};
+    withIds(ids, start) {
+        this.preset = ids;
+        try {
+            return start();
+        }
+        finally {
+            this.preset = {};
+        }
+    }
+    generateTraceId() {
+        return this.preset.traceId ?? this.random.generateTraceId();
+    }
+    generateSpanId() {
+        return this.preset.spanId ?? this.random.generateSpanId();
+    }
+}
+const idGenerator = new PresetIdGenerator();
+
 ;// CONCATENATED MODULE: ./src/traces/create-spans.ts
+
+
 
 
 
@@ -85490,25 +85534,28 @@ const createMetrics = async (results) => {
 
 const createWorkflowTrace = (workflow, workflowJobs) => {
     const span = createSpan(src.ROOT_CONTEXT, workflow.name, workflow.created_at, getLatestCompletedAt(workflowJobs), workflow.conclusion || '', // '' is converted to UNSET status. we should not use ''.
-    { ...buildWorkflowAttributes(workflow) });
+    { ...buildWorkflowAttributes(workflow) }, {
+        traceId: workflowTraceId(workflow.repository.full_name, workflow.id, workflow.run_attempt),
+        spanId: workflowSpanId(workflow.id, workflow.run_attempt)
+    });
     return src.trace.setSpan(src.ROOT_CONTEXT, span);
 };
 const createWorkflowJobSpan = (ctx, job) => {
     if (!job.completed_at) {
         throw new Error(`Job completed_at is required for span creation: ${job.name} (id: ${job.id})`);
     }
-    const spanWithWaiting = createSpan(ctx, `${job.name} with time of waiting runner`, job.created_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) });
+    const spanWithWaiting = createSpan(ctx, `${job.name} with time of waiting runner`, job.created_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) }, { spanId: jobWithWaitingSpanId(job.id) });
     const ctxWithWaiting = src.trace.setSpan(ctx, spanWithWaiting);
     const waitingSpanName = `waiting runner for ${job.name}`;
     const jobQueuedDuration = calcDiffSec(job.created_at, job.started_at);
     if (jobQueuedDuration >= 0) {
         createSpan(ctxWithWaiting, waitingSpanName, job.created_at, job.started_at, 'success', // waiting runner is not a error.
-        { ...buildWorkflowJobAttributes(job) });
+        { ...buildWorkflowJobAttributes(job) }, { spanId: jobWaitingSpanId(job.id) });
     }
     else {
         core.notice(`${job.name}: Skip to create "${waitingSpanName}" span. This is a GitHub specification issue that occasionally occurs, so it can't be recover.`);
     }
-    const jobSpan = createSpan(ctxWithWaiting, job.name, job.started_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) });
+    const jobSpan = createSpan(ctxWithWaiting, job.name, job.started_at, job.completed_at, job.conclusion, { ...buildWorkflowJobAttributes(job) }, { spanId: jobSpanId(job.id) });
     return src.trace.setSpan(ctxWithWaiting, jobSpan);
 };
 const createWorkflowRunStepSpan = (ctx, job) => {
@@ -85522,9 +85569,9 @@ const createWorkflowRunStepSpan = (ctx, job) => {
 };
 const createSpan = (ctx, name, startAt, endAt, 
 // TODO: use user defined type instead of string
-conclusion, attributes) => {
+conclusion, attributes, ids = {}) => {
     const tracer = src.trace.getTracer('github-actions-opentelemetry');
-    const span = tracer.startSpan(name, { startTime: startAt, attributes }, ctx);
+    const span = idGenerator.withIds(src_settings.deterministicTraceIds ? ids : {}, () => tracer.startSpan(name, { startTime: startAt, attributes }, ctx));
     span.setStatus(getSpanStatusFromConclusion(conclusion));
     span.end(endAt);
     return span;
@@ -85599,11 +85646,10 @@ var build_src = __nccwpck_require__(75647);
 var exporter_metrics_otlp_proto_build_src = __nccwpck_require__(8458);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-metrics/build/src/index.js
 var sdk_metrics_build_src = __nccwpck_require__(89174);
-// EXTERNAL MODULE: ./node_modules/@opentelemetry/sdk-trace-base/build/src/index-shim.js
-var index_shim = __nccwpck_require__(19644);
 // EXTERNAL MODULE: ./node_modules/@opentelemetry/exporter-trace-otlp-proto/build/src/index.js
 var exporter_trace_otlp_proto_build_src = __nccwpck_require__(57358);
 ;// CONCATENATED MODULE: ./src/instrumentation/instrumentation.ts
+
 
 
 
@@ -85644,6 +85690,7 @@ const initializeMeter = (exporter) => {
 const initializeTracer = (exporter) => {
     if (src_settings.FeatureFlagTrace) {
         traceProvider = new index_shim/* BasicTracerProvider */.l({
+            idGenerator: idGenerator,
             resource: (0,build_src.detectResources)({ detectors: [build_src.envDetector] }),
             spanProcessors: [
                 new index_shim/* BatchSpanProcessor */.J(exporter || new exporter_trace_otlp_proto_build_src/* OTLPTraceExporter */.Q({}))

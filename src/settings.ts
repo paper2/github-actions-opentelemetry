@@ -11,6 +11,8 @@ export const createSettings = (env: typeof process.env) => ({
   FeatureFlagMetrics: env.FEATURE_METRICS
     ? env.FEATURE_METRICS.toLowerCase() === 'true'
     : true,
+  deterministicTraceIds:
+    env.INPUT_DETERMINISTIC_TRACE_IDS?.toLowerCase() === 'true',
   logeLevel:
     env.RUNNER_DEBUG === '1'
       ? 'debug' // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables

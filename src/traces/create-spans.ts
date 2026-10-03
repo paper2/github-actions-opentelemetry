@@ -8,6 +8,16 @@ import * as opentelemetry from '@opentelemetry/api'
 import { calcDiffSec } from '../utils/calc-diff-sec.js'
 import * as core from '@actions/core'
 import { Workflow } from '../github/types.js'
+import settings from '../settings.js'
+import {
+  SpanIds,
+  idGenerator,
+  jobSpanId,
+  jobWaitingSpanId,
+  jobWithWaitingSpanId,
+  workflowSpanId,
+  workflowTraceId
+} from './span-ids.js'
 
 export const createWorkflowTrace = (
   workflow: Workflow,
@@ -19,7 +29,15 @@ export const createWorkflowTrace = (
     workflow.created_at,
     getLatestCompletedAt(workflowJobs),
     workflow.conclusion || '', // '' is converted to UNSET status. we should not use ''.
-    { ...buildWorkflowAttributes(workflow) }
+    { ...buildWorkflowAttributes(workflow) },
+    {
+      traceId: workflowTraceId(
+        workflow.repository.full_name,
+        workflow.id,
+        workflow.run_attempt
+      ),
+      spanId: workflowSpanId(workflow.id, workflow.run_attempt)
+    }
   )
 
   return opentelemetry.trace.setSpan(ROOT_CONTEXT, span)
@@ -41,7 +59,8 @@ export const createWorkflowJobSpan = (
     job.created_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowJobAttributes(job) }
+    { ...buildWorkflowJobAttributes(job) },
+    { spanId: jobWithWaitingSpanId(job.id) }
   )
   const ctxWithWaiting = opentelemetry.trace.setSpan(ctx, spanWithWaiting)
 
@@ -54,7 +73,8 @@ export const createWorkflowJobSpan = (
       job.created_at,
       job.started_at,
       'success', // waiting runner is not a error.
-      { ...buildWorkflowJobAttributes(job) }
+      { ...buildWorkflowJobAttributes(job) },
+      { spanId: jobWaitingSpanId(job.id) }
     )
   } else {
     core.notice(
@@ -68,7 +88,8 @@ export const createWorkflowJobSpan = (
     job.started_at,
     job.completed_at,
     job.conclusion,
-    { ...buildWorkflowJobAttributes(job) }
+    { ...buildWorkflowJobAttributes(job) },
+    { spanId: jobSpanId(job.id) }
   )
 
   return opentelemetry.trace.setSpan(ctxWithWaiting, jobSpan)
@@ -103,10 +124,14 @@ const createSpan = (
   endAt: Date,
   // TODO: use user defined type instead of string
   conclusion: string,
-  attributes: opentelemetry.Attributes
+  attributes: opentelemetry.Attributes,
+  ids: SpanIds = {}
 ): opentelemetry.Span => {
   const tracer = opentelemetry.trace.getTracer('github-actions-opentelemetry')
-  const span = tracer.startSpan(name, { startTime: startAt, attributes }, ctx)
+  const span = idGenerator.withIds(
+    settings.deterministicTraceIds ? ids : {},
+    () => tracer.startSpan(name, { startTime: startAt, attributes }, ctx)
+  )
   span.setStatus(getSpanStatusFromConclusion(conclusion))
   span.end(endAt)
   return span

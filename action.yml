@@ -10,6 +10,12 @@ inputs:
   GITHUB_TOKEN:
     description: 'GitHub token for client authentication'
     required: true
+  DETERMINISTIC_TRACE_IDS:
+    description:
+      'Derive the trace ID from the workflow run, and job span IDs from job IDs,
+      so other tools can attach spans to the trace. See README.'
+    required: false
+    default: 'false'
 
 runs:
   using: node24

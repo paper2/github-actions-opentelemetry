@@ -314,6 +314,32 @@ describe('should export expected spans', () => {
     expect(traceId).toBe(rootSpan.spanContext().traceId)
   })
 
+  test('should keep random IDs unless deterministic IDs are enabled', async () => {
+    const traceId = await createTrace(workflowRunResults)
+    expect(traceId).toMatch(/^[0-9a-f]{32}$/)
+    expect(traceId).not.toBe('9b622c3f42e4e04dcc07e34075e07913')
+  })
+
+  test('should derive trace and job span IDs from the run and job IDs', async () => {
+    settings.deterministicTraceIds = true
+    const traceId = await createTrace(workflowRunResults)
+    await forceFlush()
+    settings.deterministicTraceIds = false
+
+    // Hard-coded: these are the documented contract other tools compute against.
+    expect(traceId).toBe('9b622c3f42e4e04dcc07e34075e07913')
+    const spans = exporter.getFinishedSpans()
+    const spanId = (name: string): string =>
+      findSpanByName(spans, name).spanContext().spanId
+    expect(spanId(workflowRun.name)).toBe('a20d690c4ccb758d')
+    expect(spanId('job1')).toBe('d45e31f76cac183d')
+    expect(spanId('job1 with time of waiting runner')).toBe('df18a27dfc12d482')
+    expect(spanId('waiting runner for job1')).toBe('4a0b581f5a1cf0af')
+    expect(new Set(spans.map(span => span.spanContext().spanId)).size).toBe(
+      spans.length
+    )
+  })
+
   test('should return empty string when trace feature is disabled', async () => {
     settings.FeatureFlagTrace = false
     const traceId = await createTrace(workflowRunResults)

@@ -13,6 +13,7 @@ import {
 } from '@opentelemetry/sdk-trace-base'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto'
 import settings from '../settings.js'
+import { idGenerator } from '../traces/span-ids.js'
 
 let traceProvider: BasicTracerProvider
 let meterProvider: MeterProvider
@@ -57,6 +58,7 @@ const initializeMeter = (exporter?: PushMetricExporter): void => {
 const initializeTracer = (exporter?: SpanExporter): void => {
   if (settings.FeatureFlagTrace) {
     traceProvider = new BasicTracerProvider({
+      idGenerator,
       resource: detectResources({ detectors: [envDetector] }),
       spanProcessors: [
         new BatchSpanProcessor(exporter || new OTLPTraceExporter({}))

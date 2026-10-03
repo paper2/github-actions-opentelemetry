@@ -72,6 +72,36 @@ GitHub Actions summary for easy access:
 
 ![Trace ID Summary](./img/trace-id-summary.png)
 
+## Deterministic Trace IDs
+
+By default, trace and span IDs are random. Set `DETERMINISTIC_TRACE_IDS: true`
+to derive them from the workflow run instead, so another tool (for example, a
+step that exports test results) can add spans to the same trace without talking
+to this action:
+
+```yaml
+with:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DETERMINISTIC_TRACE_IDS: true
+```
+
+Each ID is the leading bytes of the hex SHA-256 of a key:
+
+| Span                                | Key                                     | Length   |
+| ----------------------------------- | --------------------------------------- | -------- |
+| Trace ID                            | `<owner>/<repo>:<run_id>:<run_attempt>` | 16 bytes |
+| Workflow (root) span                | `workflow:<run_id>:<run_attempt>`       | 8 bytes  |
+| `<job>` span                        | `job:<job_id>`                          | 8 bytes  |
+| `<job> with time of waiting runner` | `job:<job_id>:with-waiting`             | 8 bytes  |
+| `waiting runner for <job>`          | `job:<job_id>:waiting`                  | 8 bytes  |
+
+Step spans keep random IDs. For example, to parent a span under a job in shell:
+
+```bash
+trace_id=$(printf '%s' "$GITHUB_REPOSITORY:$RUN_ID:$RUN_ATTEMPT" | sha256sum | cut -c1-32)
+parent_span_id=$(printf '%s' "job:$JOB_ID" | sha256sum | cut -c1-16)
+```
+
 ## How it works
 
 This action creates metrics and traces of GitHub Actions workflows and sends
