@@ -53,8 +53,11 @@ export const fetchWorkflowResults = async (
       {
         delay: delayMs,
         maxTry,
-        onError: (err, currentTry) =>
+        onError: (err, currentTry) => {
           console.error(`current try: ${currentTry}`, err)
+          // Returning undefined keeps the pre-v6 behavior: continue retrying.
+          return undefined
+        }
       }
     )
     return results

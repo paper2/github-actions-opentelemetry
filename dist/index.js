@@ -49348,10 +49348,11 @@ __exportStar(__nccwpck_require__(21360), exports);
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
-__webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = exports.tH = __webpack_unused_export__ = exports.f8 = __webpack_unused_export__ = void 0;
+__webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = __webpack_unused_export__ = exports.tH = __webpack_unused_export__ = __webpack_unused_export__ = exports.f8 = __webpack_unused_export__ = void 0;
 var retry_1 = __nccwpck_require__(27154);
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.getDefaultRetryOptions; } });
 Object.defineProperty(exports, "f8", ({ enumerable: true, get: function () { return retry_1.isTooManyTries; } }));
+__webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.isAbortError; } });
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retry; } });
 Object.defineProperty(exports, "tH", ({ enumerable: true, get: function () { return retry_1.retryAsync; } }));
 __webpack_unused_export__ = ({ enumerable: true, get: function () { return retry_1.retryUntilDefined; } });
@@ -49411,15 +49412,17 @@ exports.assertDefined = assertDefined;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryDecorator = exports.retryAsyncDecorator = exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = exports.retryAsyncUntilResponseDecorator = exports.retryAsyncUntilResponse = exports.retryUntilTruthyDecorator = exports.retryUntilTruthy = exports.retryUntilDefinedDecorator = exports.retryUntilDefined = exports.retryAsyncUntilTruthyDecorator = exports.retryAsyncUntilTruthy = exports.retryAsyncUntilDefinedDecorator = exports.retryAsyncUntilDefined = exports.isTooManyTries = exports.retryAsync = exports.retry = exports.setDefaultRetryOptions = exports.getDefaultRetryOptions = void 0;
+exports.retryDecorator = exports.retryAsyncDecorator = exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = exports.retryAsyncUntilResponseDecorator = exports.retryAsyncUntilResponse = exports.retryUntilTruthyDecorator = exports.retryUntilTruthy = exports.retryUntilDefinedDecorator = exports.retryUntilDefined = exports.retryAsyncUntilTruthyDecorator = exports.retryAsyncUntilTruthy = exports.retryAsyncUntilDefinedDecorator = exports.retryAsyncUntilDefined = exports.isAbortError = exports.isTooManyTries = exports.retryAsync = exports.retry = exports.setDefaultRetryOptions = exports.getDefaultRetryOptions = void 0;
 var options_1 = __nccwpck_require__(94364);
 Object.defineProperty(exports, "getDefaultRetryOptions", ({ enumerable: true, get: function () { return options_1.getDefaultRetryOptions; } }));
 Object.defineProperty(exports, "setDefaultRetryOptions", ({ enumerable: true, get: function () { return options_1.setDefaultRetryOptions; } }));
 var retry_1 = __nccwpck_require__(3336);
 Object.defineProperty(exports, "retry", ({ enumerable: true, get: function () { return retry_1.retry; } }));
 Object.defineProperty(exports, "retryAsync", ({ enumerable: true, get: function () { return retry_1.retryAsync; } }));
-var tooManyTries_1 = __nccwpck_require__(35626);
+var tooManyTries_1 = __nccwpck_require__(26790);
 Object.defineProperty(exports, "isTooManyTries", ({ enumerable: true, get: function () { return tooManyTries_1.isTooManyTries; } }));
+var abortError_1 = __nccwpck_require__(61680);
+Object.defineProperty(exports, "isAbortError", ({ enumerable: true, get: function () { return abortError_1.isAbortError; } }));
 var utils_1 = __nccwpck_require__(3132);
 Object.defineProperty(exports, "retryAsyncUntilDefined", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilDefined; } }));
 Object.defineProperty(exports, "retryAsyncUntilDefinedDecorator", ({ enumerable: true, get: function () { return utils_1.retryAsyncUntilDefinedDecorator; } }));
@@ -49445,7 +49448,9 @@ Object.defineProperty(exports, "retryDecorator", ({ enumerable: true, get: funct
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDefaultRetryOptions = exports.setDefaultRetryOptions = exports.defaultRetryOptions = exports.defaultMaxTry = exports.defaultDelay = void 0;
+exports.defaultRetryOptions = exports.defaultMaxTry = exports.defaultDelay = void 0;
+exports.setDefaultRetryOptions = setDefaultRetryOptions;
+exports.getDefaultRetryOptions = getDefaultRetryOptions;
 exports.defaultDelay = 250;
 exports.defaultMaxTry = 4 * 60;
 exports.defaultRetryOptions = {
@@ -49457,11 +49462,9 @@ function setDefaultRetryOptions(retryOptions) {
     exports.defaultRetryOptions = Object.assign(Object.assign({}, exports.defaultRetryOptions), retryOptions);
     return getDefaultRetryOptions();
 }
-exports.setDefaultRetryOptions = setDefaultRetryOptions;
 function getDefaultRetryOptions() {
     return Object.assign({}, exports.defaultRetryOptions);
 }
-exports.getDefaultRetryOptions = getDefaultRetryOptions;
 
 
 /***/ }),
@@ -49471,13 +49474,12 @@ exports.getDefaultRetryOptions = getDefaultRetryOptions;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRetryParameters = void 0;
+exports.getRetryParameters = getRetryParameters;
 const options_1 = __nccwpck_require__(94364);
 function getRetryParameters(currentTry, retryOptions) {
     const fullOptions = Object.assign(Object.assign({}, (0, options_1.getDefaultRetryOptions)()), retryOptions);
     return Object.assign(Object.assign({}, fullOptions), { currentTry, maxTry: fullOptions.maxTry || options_1.defaultMaxTry, delay: getDelay(fullOptions.delay), until: fullOptions.until ? fullOptions.until : () => true });
 }
-exports.getRetryParameters = getRetryParameters;
 function getDelay(delay) {
     if (delay === undefined) {
         return () => options_1.defaultDelay;
@@ -49505,27 +49507,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsync = exports.retry = void 0;
+exports.retry = retry;
+exports.retryAsync = retryAsync;
 const misc_1 = __nccwpck_require__(699);
 const wait_1 = __nccwpck_require__(12480);
 const parameters_1 = __nccwpck_require__(15712);
-const tooManyTries_1 = __nccwpck_require__(35626);
+const abortError_1 = __nccwpck_require__(61680);
+const tooManyTries_1 = __nccwpck_require__(26790);
 function retry(fn, retryOptions) {
     return __awaiter(this, void 0, void 0, function* () {
         const fnAsync = (0, misc_1.asyncDecorator)(fn);
         return yield retryAsync(fnAsync, retryOptions);
     });
 }
-exports.retry = retry;
 function retryAsync(fn, retryOptions) {
     return __awaiter(this, void 0, void 0, function* () {
         const retryParameters = (0, parameters_1.getRetryParameters)(1, retryOptions);
         return yield actualRetry(fn, retryParameters);
     });
 }
-exports.retryAsync = retryAsync;
 function actualRetry(fn, retryParameters) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         const canRecall = retryParameters.currentTry < retryParameters.maxTry;
         try {
             const result = yield fn();
@@ -49546,10 +49549,11 @@ function actualRetry(fn, retryParameters) {
         }
         catch (err) {
             if (!(0, tooManyTries_1.isTooManyTries)(err) && canRecall) {
-                if (retryParameters.onError) {
-                    retryParameters.onError(err, retryParameters.currentTry);
+                const canRecall = (_a = retryParameters.onError) === null || _a === void 0 ? void 0 : _a.call(retryParameters, err, retryParameters.currentTry);
+                if (canRecall === false) {
+                    throw new abortError_1.AbortError(err, retryParameters.currentTry);
                 }
-                return yield recall(fn, retryParameters);
+                return yield recall(fn, retryParameters, undefined, err);
             }
             else {
                 if (retryParameters.onMaxRetryFunc) {
@@ -49560,13 +49564,14 @@ function actualRetry(fn, retryParameters) {
         }
     });
 }
-function recall(fn, retryParameters, lastResult) {
+function recall(fn, retryParameters, lastResult, lastError) {
     return __awaiter(this, void 0, void 0, function* () {
         const delay = retryParameters.delay({
             currentTry: retryParameters.currentTry,
             maxTry: retryParameters.maxTry,
             lastDelay: retryParameters.lastDelay,
-            lastResult
+            lastResult,
+            lastError,
         });
         yield (0, wait_1.wait)(delay);
         const newRetryParameters = Object.assign(Object.assign({}, retryParameters), { currentTry: retryParameters.currentTry + 1 });
@@ -49578,37 +49583,13 @@ function recall(fn, retryParameters, lastResult) {
 
 /***/ }),
 
-/***/ 35626:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isTooManyTries = exports.TooManyTries = void 0;
-class TooManyTries extends Error {
-    constructor(lastResult = undefined) {
-        super("function did not complete within allowed number of attempts");
-        this.lastResult = lastResult;
-        this.tooManyTries = true;
-    }
-    getLastResult() {
-        return this.lastResult;
-    }
-}
-exports.TooManyTries = TooManyTries;
-function isTooManyTries(error) {
-    return error.tooManyTries === true;
-}
-exports.isTooManyTries = isTooManyTries;
-
-
-/***/ }),
-
 /***/ 83385:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryDecorator = exports.retryAsyncDecorator = void 0;
+exports.retryAsyncDecorator = retryAsyncDecorator;
+exports.retryDecorator = retryDecorator;
 const retry_1 = __nccwpck_require__(3336);
 function retryAsyncDecorator(fn, retryOptions) {
     return (...args) => {
@@ -49616,14 +49597,12 @@ function retryAsyncDecorator(fn, retryOptions) {
         return (0, retry_1.retryAsync)(wrappedFn, retryOptions);
     };
 }
-exports.retryAsyncDecorator = retryAsyncDecorator;
 function retryDecorator(fn, retryOptions) {
     return (...args) => {
         const wrappedFn = () => fn(...args);
         return (0, retry_1.retry)(wrappedFn, retryOptions);
     };
 }
-exports.retryDecorator = retryDecorator;
 
 
 /***/ }),
@@ -49646,12 +49625,13 @@ Object.defineProperty(exports, "retryAsyncDecorator", ({ enumerable: true, get: 
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createRandomDelay = exports.createMutiplicableDelay = exports.createExponetialDelay = void 0;
+exports.createExponetialDelay = createExponetialDelay;
+exports.createMutiplicableDelay = createMutiplicableDelay;
+exports.createRandomDelay = createRandomDelay;
 function createExponetialDelay(initialDelay) {
     const delay = ({ lastDelay }) => lastDelay !== undefined ? lastDelay * initialDelay : initialDelay;
     return delay;
 }
-exports.createExponetialDelay = createExponetialDelay;
 function createMutiplicableDelay(initialDelay, multiplicator) {
     const delay = ({ currentTry }) => {
         if (currentTry === 1) {
@@ -49662,12 +49642,64 @@ function createMutiplicableDelay(initialDelay, multiplicator) {
     };
     return delay;
 }
-exports.createMutiplicableDelay = createMutiplicableDelay;
 function createRandomDelay(min, max) {
     const multiplicator = max - min + 1;
     return () => Math.floor(Math.random() * multiplicator + min);
 }
-exports.createRandomDelay = createRandomDelay;
+
+
+/***/ }),
+
+/***/ 61680:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AbortError = void 0;
+exports.isAbortError = isAbortError;
+class AbortError extends Error {
+    constructor(error, currentTry) {
+        super("function call aborted due to an error");
+        this.error = error;
+        this.currentTry = currentTry;
+        this.abortError = true;
+    }
+    getError() {
+        return this.error;
+    }
+    getCurrentTry() {
+        return this.currentTry;
+    }
+}
+exports.AbortError = AbortError;
+function isAbortError(error) {
+    return error.abortError === true;
+}
+
+
+/***/ }),
+
+/***/ 26790:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TooManyTries = void 0;
+exports.isTooManyTries = isTooManyTries;
+class TooManyTries extends Error {
+    constructor(lastResult = undefined) {
+        super("function did not complete within allowed number of attempts");
+        this.lastResult = lastResult;
+        this.tooManyTries = true;
+    }
+    getLastResult() {
+        return this.lastResult;
+    }
+}
+exports.TooManyTries = TooManyTries;
+function isTooManyTries(error) {
+    return error.tooManyTries === true;
+}
 
 
 /***/ }),
@@ -49728,7 +49760,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilDefinedDecorator = exports.retryUntilDefinedDecorator = void 0;
+exports.retryUntilDefinedDecorator = retryUntilDefinedDecorator;
+exports.retryAsyncUntilDefinedDecorator = retryAsyncUntilDefinedDecorator;
 const retry_1 = __nccwpck_require__(72238);
 function retryUntilDefinedDecorator(fn, retryOptions) {
     return (...args) => __awaiter(this, void 0, void 0, function* () {
@@ -49736,14 +49769,12 @@ function retryUntilDefinedDecorator(fn, retryOptions) {
         return yield (0, retry_1.retryUntilDefined)(wrappedFn, retryOptions);
     });
 }
-exports.retryUntilDefinedDecorator = retryUntilDefinedDecorator;
 function retryAsyncUntilDefinedDecorator(fn, retryOptions) {
     return (...args) => __awaiter(this, void 0, void 0, function* () {
         const wrappedFn = () => __awaiter(this, void 0, void 0, function* () { return yield fn(...args); });
         return yield (0, retry_1.retryAsyncUntilDefined)(wrappedFn, retryOptions);
     });
 }
-exports.retryAsyncUntilDefinedDecorator = retryAsyncUntilDefinedDecorator;
 
 
 /***/ }),
@@ -49778,7 +49809,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilDefined = exports.retryUntilDefined = void 0;
+exports.retryUntilDefined = retryUntilDefined;
+exports.retryAsyncUntilDefined = retryAsyncUntilDefined;
 const retry_1 = __nccwpck_require__(3336);
 const options_1 = __nccwpck_require__(34626);
 const until = (lastResult) => lastResult !== undefined && lastResult !== null;
@@ -49789,14 +49821,12 @@ function retryUntilDefined(fn, retryOptions) {
         return (yield (0, retry_1.retry)(fn, options));
     });
 }
-exports.retryUntilDefined = retryUntilDefined;
 function retryAsyncUntilDefined(fn, retryOptions) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = getOptions(retryOptions);
         return (yield (0, retry_1.retryAsync)(fn, options));
     });
 }
-exports.retryAsyncUntilDefined = retryAsyncUntilDefined;
 
 
 /***/ }),
@@ -49815,7 +49845,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilResponseDecorator = void 0;
+exports.retryAsyncUntilResponseDecorator = retryAsyncUntilResponseDecorator;
 const retry_1 = __nccwpck_require__(39058);
 function retryAsyncUntilResponseDecorator(fn, retryOptions) {
     return (...args) => __awaiter(this, void 0, void 0, function* () {
@@ -49823,7 +49853,6 @@ function retryAsyncUntilResponseDecorator(fn, retryOptions) {
         return yield (0, retry_1.retryAsyncUntilResponse)(wrappedFn, retryOptions);
     });
 }
-exports.retryAsyncUntilResponseDecorator = retryAsyncUntilResponseDecorator;
 
 
 /***/ }),
@@ -49856,7 +49885,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilResponse = void 0;
+exports.retryAsyncUntilResponse = retryAsyncUntilResponse;
 const retry_1 = __nccwpck_require__(3336);
 const options_1 = __nccwpck_require__(34626);
 const until = (lastResult) => lastResult.ok;
@@ -49867,7 +49896,6 @@ function retryAsyncUntilResponse(fn, retryOptions) {
         return yield (0, retry_1.retryAsync)(fn, options);
     });
 }
-exports.retryAsyncUntilResponse = retryAsyncUntilResponse;
 
 
 /***/ }),
@@ -49886,7 +49914,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilTruthyDecorator = exports.retryUntilTruthyDecorator = void 0;
+exports.retryUntilTruthyDecorator = retryUntilTruthyDecorator;
+exports.retryAsyncUntilTruthyDecorator = retryAsyncUntilTruthyDecorator;
 const retry_1 = __nccwpck_require__(72933);
 function retryUntilTruthyDecorator(fn, retryOptions) {
     return (...args) => __awaiter(this, void 0, void 0, function* () {
@@ -49894,14 +49923,12 @@ function retryUntilTruthyDecorator(fn, retryOptions) {
         return yield (0, retry_1.retryUntilTruthy)(wrappedFn, retryOptions);
     });
 }
-exports.retryUntilTruthyDecorator = retryUntilTruthyDecorator;
 function retryAsyncUntilTruthyDecorator(fn, retryOptions) {
     return (...args) => __awaiter(this, void 0, void 0, function* () {
         const wrappedFn = () => __awaiter(this, void 0, void 0, function* () { return yield fn(...args); });
         return yield (0, retry_1.retryAsyncUntilTruthy)(wrappedFn, retryOptions);
     });
 }
-exports.retryAsyncUntilTruthyDecorator = retryAsyncUntilTruthyDecorator;
 
 
 /***/ }),
@@ -49936,7 +49963,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.retryAsyncUntilTruthy = exports.retryUntilTruthy = void 0;
+exports.retryUntilTruthy = retryUntilTruthy;
+exports.retryAsyncUntilTruthy = retryAsyncUntilTruthy;
 const __1 = __nccwpck_require__(27154);
 const options_1 = __nccwpck_require__(34626);
 const until = (lastResult) => 
@@ -49949,14 +49977,12 @@ function retryUntilTruthy(fn, retryOptions) {
         return yield (0, __1.retry)(fn, options);
     });
 }
-exports.retryUntilTruthy = retryUntilTruthy;
 function retryAsyncUntilTruthy(fn, retryOptions) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = getOptions(retryOptions);
         return yield (0, __1.retryAsync)(fn, options);
     });
 }
-exports.retryAsyncUntilTruthy = retryAsyncUntilTruthy;
 
 
 /***/ }),
@@ -49985,16 +50011,16 @@ Object.defineProperty(exports, "setDefaultDuration", ({ enumerable: true, get: f
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDefaultDuration = exports.setDefaultDuration = exports.defaultDuration = void 0;
+exports.defaultDuration = void 0;
+exports.setDefaultDuration = setDefaultDuration;
+exports.getDefaultDuration = getDefaultDuration;
 exports.defaultDuration = 60 * 1000;
 function setDefaultDuration(duration) {
     exports.defaultDuration = duration;
 }
-exports.setDefaultDuration = setDefaultDuration;
 function getDefaultDuration() {
     return exports.defaultDuration;
 }
-exports.getDefaultDuration = getDefaultDuration;
 
 
 /***/ }),
@@ -50013,22 +50039,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isTimeoutError = exports.TimeoutError = exports.waitUntilAsync = exports.waitUntil = exports.wait = void 0;
+exports.TimeoutError = void 0;
+exports.wait = wait;
+exports.waitUntil = waitUntil;
+exports.waitUntilAsync = waitUntilAsync;
+exports.isTimeoutError = isTimeoutError;
 const misc_1 = __nccwpck_require__(699);
 const options_1 = __nccwpck_require__(22847);
 function wait(duration = options_1.defaultDuration) {
     return new Promise((resolve) => setTimeout(resolve, duration));
 }
-exports.wait = wait;
 function waitUntil(fn, duration, error) {
     return __awaiter(this, void 0, void 0, function* () {
         const fnAsync = (0, misc_1.asyncDecorator)(fn);
         return yield waitUntilAsync(fnAsync, duration, error);
     });
 }
-exports.waitUntil = waitUntil;
-function waitUntilAsync(fn, duration = options_1.defaultDuration, error = new TimeoutError("function did not complete within allowed time")) {
-    return __awaiter(this, void 0, void 0, function* () {
+function waitUntilAsync(fn_1) {
+    return __awaiter(this, arguments, void 0, function* (fn, duration = options_1.defaultDuration, error = new TimeoutError("function did not complete within allowed time")) {
         const canary = Symbol("DELAY_EXPIRED");
         const result = yield Promise.race([
             fn(),
@@ -50040,7 +50068,6 @@ function waitUntilAsync(fn, duration = options_1.defaultDuration, error = new Ti
         return result;
     });
 }
-exports.waitUntilAsync = waitUntilAsync;
 const timeout = (duration, result) => __awaiter(void 0, void 0, void 0, function* () {
     yield wait(duration);
     return result;
@@ -50055,7 +50082,6 @@ exports.TimeoutError = TimeoutError;
 function isTimeoutError(error) {
     return error.isTimeout === true;
 }
-exports.isTimeoutError = isTimeoutError;
 
 
 /***/ }),
@@ -85260,7 +85286,11 @@ const fetchWorkflowResults = async (octokit, workflowContext, delayMs = 1000, ma
         }, {
             delay: delayMs,
             maxTry,
-            onError: (err, currentTry) => console.error(`current try: ${currentTry}`, err)
+            onError: (err, currentTry) => {
+                console.error(`current try: ${currentTry}`, err);
+                // Returning undefined keeps the pre-v6 behavior: continue retrying.
+                return undefined;
+            }
         });
         return results;
     }
