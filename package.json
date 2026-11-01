@@ -38,7 +38,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
     "@octokit/rest": "^22.0.1",
     "@octokit/webhooks-types": "^7.6.1",
