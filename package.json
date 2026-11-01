@@ -56,7 +56,7 @@
     "@octokit/types": "^17.0.0",
     "@opentelemetry/sdk-node": "0.222.0",
     "@opentelemetry/semantic-conventions": "^1.43.0",
-    "@types/node": "^24.10.0",
+    "@types/node": "^26.6.6",
     "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.71.0",
     "@vercel/ncc": "^0.45.0",
